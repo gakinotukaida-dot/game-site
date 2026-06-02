@@ -1,4 +1,4 @@
-name: Steam player count test
+name: Steam collector (watchlist hourly)
 
 on:
   workflow_dispatch:
@@ -6,18 +6,30 @@ on:
     - cron: "0 * * * *"
 
 jobs:
-  fetch:
+  collect:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch and save current players (Counter-Strike 2)
+      - name: Fetch current players for watchlist games
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
         run: |
-          COUNT=$(curl -s "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=730" | jq -r '.response.player_count')
-          echo "取得した同時接続数: $COUNT 人"
-          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "CREATE TABLE IF NOT EXISTS player_counts (id BIGSERIAL PRIMARY KEY, appid INTEGER NOT NULL, player_count INTEGER NOT NULL, recorded_at TIMESTAMPTZ NOT NULL DEFAULT now());"
-          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "INSERT INTO player_counts (appid, player_count) VALUES (730, $COUNT);"
-          echo "保存しました。これまでの記録件数:"
-          psql "$DATABASE_URL" -t -c "SELECT count(*) FROM player_counts;"
-          echo "直近の記録（時刻は日本時間):"
-          psql "$DATABASE_URL" -c "SELECT appid, player_count, recorded_at AT TIME ZONE 'Asia/Tokyo' AS jst FROM player_counts ORDER BY recorded_at DESC LIMIT 5;"
+          set -uo pipefail
+          APPIDS=$(psql "$DATABASE_URL" -t -A -c "SELECT appid FROM games WHERE status='watchlist' ORDER BY appid;")
+          echo "監視リスト: $(echo "$APPIDS" | tr '\n' ' ')"
+          OK=0
+          for APPID in $APPIDS; do
+            RESP=$(curl -s --max-time 15 "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=${APPID}&key=${STEAM_API_KEY}")
+            PC=$(echo "$RESP" | jq -r '.response.player_count // empty')
+            if [[ "$PC" =~ ^[0-9]+$ ]]; then
+              psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "INSERT INTO player_counts (appid, player_count) VALUES (${APPID}, ${PC});"
+              psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "UPDATE games SET last_checked_at = now(), last_active_at = CASE WHEN ${PC} > 0 THEN now() ELSE last_active_at END WHERE appid = ${APPID};"
+              echo "  appid ${APPID}: ${PC} 人"
+              OK=$((OK+1))
+            else
+              echo "  appid ${APPID}: 取得失敗（スキップ）"
+            fi
+          done
+          echo "保存できた件数: ${OK}"
+          echo "直近の記録（日本時間）:"
+          psql "$DATABASE_URL" -c "SELECT pc.appid, g.name, pc.player_count, pc.recorded_at AT TIME ZONE 'Asia/Tokyo' AS jst FROM player_counts pc JOIN games g ON g.appid = pc.appid ORDER BY pc.recorded_at DESC LIMIT 10;"
