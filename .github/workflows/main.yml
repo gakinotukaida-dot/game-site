@@ -1,0 +1,13 @@
+name: Steam player count test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get current players (Counter-Strike 2)
+        run: |
+          COUNT=$(curl -s "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=730" | jq -r '.response.player_count')
+          echo "Counter-Strike 2 (appid 730) の現在の同時接続数: $COUNT 人"
