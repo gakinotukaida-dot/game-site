@@ -1,0 +1,26 @@
+name: Daily sweep (rolling)
+
+on:
+  workflow_dispatch:
+    inputs:
+      cap:
+        description: "1回の観測上限（動作確認は 500 など）"
+        default: "80000"
+        required: false
+  schedule:
+    - cron: "0 18 * * *"
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - name: Daily rolling sweep
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
+          SWEEP_CAP: ${{ github.event.inputs.cap || '80000' }}
+        run: |
+          pip install psycopg2-binary --quiet
+          python3 scripts/daily_sweep.py
