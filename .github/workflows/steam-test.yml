@@ -1,9 +1,12 @@
-name: Steam collector (watchlist hourly)
+name: Steam collector (watchlist)
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 * * * *"
+    # 監視リスト(5本)の同接を高頻度で観測。GitHubの無料スケジュールは
+    # :00 ちょうどが最も混雑して取りこぼされやすいため、混雑を避けた
+    # :07/:22/:37/:52（15分毎）に分散させて取りこぼしに強くする。
+    - cron: "7,22,37,52 * * * *"
 
 jobs:
   collect:
