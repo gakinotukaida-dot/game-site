@@ -20,6 +20,14 @@ WORKERS = 12
 DORMANT_DAYS = 180   # 長期に床未満かつ無反応なら dormant へ
 CCU_URL = "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/"
 
+# ── 取りこぼし対策ガード（job_state）の設定 ──────────────────────────
+# GitHubの無料スケジュールは遅延・取りこぼしが多い。対策としてこのジョブは
+# 1日に複数回起動を試み、「直近 MIN_INTERVAL_HOURS 時間以内に成功していれば
+# 即終了」することで、重い巡回を1日1回だけに保つ（job_state テーブルが必要）。
+JOB_NAME = "daily_sweep"
+MIN_INTERVAL_HOURS = int(os.environ.get("MIN_INTERVAL_HOURS") or "20")  # 暫定値（環境変数で調整可）
+FORCE = (os.environ.get("FORCE") or "").strip().lower() in ("1", "true", "yes")  # 手動で強制実行
+
 _lock = threading.Lock()
 _next = [0.0]
 _interval = 1.0 / RATE_PER_SEC
@@ -103,7 +111,55 @@ def write_results(checked, above):
         conn.close()
 
 
+def should_run():
+    """直近 MIN_INTERVAL_HOURS 時間以内に成功していれば False（=今日はもう回した）。
+    FORCE 指定時は常に True。状態を確認できないときは安全側で True（収集を取りこぼさない＝fail-open）。"""
+    if FORCE:
+        print("[guard] FORCE 指定のためクールダウンを無視して実行します。")
+        return True
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        try:
+            with conn, conn.cursor() as cur:
+                cur.execute(
+                    "SELECT last_success_at, "
+                    "       (last_success_at > now() - (%s * interval '1 hour')) AS too_soon "
+                    "FROM job_state WHERE job = %s",
+                    (MIN_INTERVAL_HOURS, JOB_NAME),
+                )
+                row = cur.fetchone()
+        finally:
+            conn.close()
+    except Exception as e:
+        print(f"[guard] 状態の確認に失敗（{e}）。安全側で実行します（fail-open）。")
+        return True
+    if row and row[0] is not None and row[1]:
+        print(f"[guard] 直近 {MIN_INTERVAL_HOURS}h 以内に成功済み（last_success_at={row[0]}）。今回はスキップします。")
+        return False
+    return True
+
+
+def mark_success():
+    """正常完了を job_state に記録する（重複しても非破壊なので失敗しても安全）。"""
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        try:
+            with conn, conn.cursor() as cur:
+                cur.execute(
+                    "INSERT INTO job_state (job, last_success_at) VALUES (%s, now()) "
+                    "ON CONFLICT (job) DO UPDATE SET last_success_at = EXCLUDED.last_success_at",
+                    (JOB_NAME,),
+                )
+        finally:
+            conn.close()
+        print(f"[guard] 成功を記録しました（job={JOB_NAME}）。")
+    except Exception as e:
+        print(f"[guard] 成功の記録に失敗（{e}）。次回は再実行されます。")
+
+
 def main():
+    if not should_run():
+        return
     targets = get_targets()
     print(f"今回観測する対象: {len(targets)} 件")
     results = []
@@ -115,6 +171,7 @@ def main():
     print(f"取得成功: {len(checked)} 件 / 保存(同接{FLOOR}以上): {len(above)} 件")
     demoted = write_results(checked, above)
     print(f"dormant へ格下げ: {demoted} 件")
+    mark_success()
 
 
 if __name__ == "__main__":

@@ -9,7 +9,7 @@ review_snapshots に保存する（レビュー本文は取得しない）。
 - 取得口は store.steampowered.com（ストアフロント）。CCU巡回が使う Web API
   キー(STEAM_API_KEY)は不要・送らない＝CCUの10万/日コール枠とは別系統。
 - レート上限は Valve 非公表・IP単位。GitHub Actions は共有IPなので控えめに。
-  安全策: スロットル + 429バックオフ + cap で一回の件数を上限化（daily_sweep と同じ作り）。
+  安全策: スロットル + 429バックオフ + cap で1回の件数を上限化（daily_sweep と同じ作り）。
 - 失敗したゲームは last_review_check_at を進めない＝次回再試行（daily_sweep と同様）。
   焦点スコープは cap 内に収まるので、この滞留が巡回を遅らせる影響は当面ほぼ無い。
 """
@@ -33,6 +33,14 @@ ACTIVE_DAYS   = int(os.environ.get("ACTIVE_DAYS")       or "30")     # 「活動
 RATE_PER_SEC  = int(os.environ.get("REVIEW_RATE")       or "8")      # store は控えめに（IP単位・非公表）
 WORKERS       = int(os.environ.get("REVIEW_WORKERS")    or "8")
 SAMPLE_LOG    = int(os.environ.get("REVIEW_SAMPLE_LOG") or "3")      # 先頭N件の生サマリをログ（検証用）
+
+# ── 取りこぼし対策ガード（job_state）の設定 ──────────────────────────
+# GitHubの無料スケジュールは遅延・取りこぼしが多い。対策としてこのジョブは
+# 1日に複数回起動を試み、「直近 MIN_INTERVAL_HOURS 時間以内に成功していれば
+# 即終了」することで、重い巡回を1日1回だけに保つ（job_state テーブルが必要）。
+JOB_NAME = "review_sweep"
+MIN_INTERVAL_HOURS = int(os.environ.get("MIN_INTERVAL_HOURS") or "20")  # 暫定値（環境変数で調整可）
+FORCE = (os.environ.get("FORCE") or "").strip().lower() in ("1", "true", "yes")  # 手動で強制実行
 
 REVIEWS_URL = "https://store.steampowered.com/appreviews/"
 # 「全体・全言語・全購入種別」の総数を取るためのパラメータ。
@@ -142,7 +150,55 @@ def write_results(rows):
         conn.close()
 
 
+def should_run():
+    """直近 MIN_INTERVAL_HOURS 時間以内に成功していれば False（=今日はもう回した）。
+    FORCE 指定時は常に True。状態を確認できないときは安全側で True（収集を取りこぼさない＝fail-open）。"""
+    if FORCE:
+        print("[guard] FORCE 指定のためクールダウンを無視して実行します。")
+        return True
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        try:
+            with conn, conn.cursor() as cur:
+                cur.execute(
+                    "SELECT last_success_at, "
+                    "       (last_success_at > now() - (%s * interval '1 hour')) AS too_soon "
+                    "FROM job_state WHERE job = %s",
+                    (MIN_INTERVAL_HOURS, JOB_NAME),
+                )
+                row = cur.fetchone()
+        finally:
+            conn.close()
+    except Exception as e:
+        print(f"[guard] 状態の確認に失敗（{e}）。安全側で実行します（fail-open）。")
+        return True
+    if row and row[0] is not None and row[1]:
+        print(f"[guard] 直近 {MIN_INTERVAL_HOURS}h 以内に成功済み（last_success_at={row[0]}）。今回はスキップします。")
+        return False
+    return True
+
+
+def mark_success():
+    """正常完了を job_state に記録する（重複しても非破壊なので失敗しても安全）。"""
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        try:
+            with conn, conn.cursor() as cur:
+                cur.execute(
+                    "INSERT INTO job_state (job, last_success_at) VALUES (%s, now()) "
+                    "ON CONFLICT (job) DO UPDATE SET last_success_at = EXCLUDED.last_success_at",
+                    (JOB_NAME,),
+                )
+        finally:
+            conn.close()
+        print(f"[guard] 成功を記録しました（job={JOB_NAME}）。")
+    except Exception as e:
+        print(f"[guard] 成功の記録に失敗（{e}）。次回は再実行されます。")
+
+
 def main():
+    if not should_run():
+        return
     targets = get_targets()
     print(f"今回レビューを観測する対象: {len(targets)} 件 "
           f"(cap={REVIEW_CAP}, active_days={ACTIVE_DAYS}, rate={RATE_PER_SEC}/s, workers={WORKERS})")
@@ -178,6 +234,7 @@ def main():
 
     write_results(rows)
     print("保存完了。")
+    mark_success()
 
 
 if __name__ == "__main__":
