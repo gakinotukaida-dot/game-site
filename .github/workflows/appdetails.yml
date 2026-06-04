@@ -1,0 +1,40 @@
+name: App details sweep (rolling)
+
+on:
+  workflow_dispatch:
+    inputs:
+      cap:
+        description: "1回の観測上限（テストは 30 など。本番 6000前後）"
+        default: "6000"
+        required: false
+      rate:
+        description: "毎秒リクエスト数（appdetailsは厳しめ。0.5=150/5分・上限200/5分の安全側。上げない）"
+        default: "0.5"
+        required: false
+      force:
+        description: "true でクールダウン無視・必ず実行（手動テストは false でガード確認）"
+        default: "true"
+        required: false
+  # 取りこぼし対策＝1日に複数回起動を試み、Python側ガード（直近20h以内に成功なら
+  # スキップ）で1日1回に保つ＝並行実行で率制限を二重に踏まない。CCU/レビューと時刻をずらす。
+  schedule:
+    - cron: "23 3,9,15,21 * * *"
+
+jobs:
+  appdetails:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - name: App details rolling sweep
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # STEAM_API_KEY は不要（store の appdetails はキーなし・別系統）。
+          APPDETAILS_CAP: ${{ github.event.inputs.cap || '6000' }}
+          APPDETAILS_RATE: ${{ github.event.inputs.rate || '0.5' }}
+          APPDETAILS_CC: "jp"
+          FORCE: ${{ github.event.inputs.force || '' }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          pip install psycopg2-binary --quiet
+          python3 scripts/appdetails_sweep.py
