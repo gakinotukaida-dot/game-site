@@ -11,10 +11,15 @@ on:
         description: "毎秒リクエスト数（ストアフロントは控えめに。詰まるなら下げる）"
         default: "8"
         required: false
-  # ↓ テストで「挙動」と「パラメータ（全期間の総数か）」を確認してから、
-  #    この schedule のコメントを外して毎日自動を有効化する。
+      force:
+        description: "true でクールダウン無視・必ず実行（手動テストは false にするとガードを確認できる）"
+        default: "true"
+        required: false
+  # GitHubの無料スケジュールは遅延・取りこぼしが多い。1日に複数回（6時間ごと・
+  # 混雑する :00 を外す）起動を試み、Python側のガード（直近20h以内に成功して
+  # いればスキップ）で重い処理は1日1回だけに保つ。CCU巡回とは時刻をずらす。
   schedule:
-    - cron: "0 21 * * *"   # 毎日 21:00 UTC（CCU巡回 18:00 とずらす）
+    - cron: "41 2,8,14,20 * * *"
 
 jobs:
   review-sweep:
@@ -28,6 +33,7 @@ jobs:
           # STEAM_API_KEY は不要（store の appreviews はキーなし・別系統）。
           REVIEW_CAP: ${{ github.event.inputs.cap || '30000' }}
           REVIEW_RATE: ${{ github.event.inputs.rate || '8' }}
+          FORCE: ${{ github.event.inputs.force || '' }}
           PYTHONUNBUFFERED: "1"
         run: |
           pip install psycopg2-binary --quiet

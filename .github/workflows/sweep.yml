@@ -7,8 +7,15 @@ on:
         description: "1回の観測上限（動作確認は 500 など）"
         default: "80000"
         required: false
+      force:
+        description: "true でクールダウン無視・必ず実行（手動テストは false にするとガードを確認できる）"
+        default: "true"
+        required: false
+  # GitHubの無料スケジュールは遅延・取りこぼしが多い。1日に複数回（6時間ごと・
+  # 混雑する :00 を外す）起動を試み、Python側のガード（直近20h以内に成功して
+  # いればスキップ）で重い巡回は1日1回だけに保つ。
   schedule:
-    - cron: "0 18 * * *"
+    - cron: "11 1,7,13,19 * * *"
 
 jobs:
   sweep:
@@ -21,6 +28,8 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
           SWEEP_CAP: ${{ github.event.inputs.cap || '80000' }}
+          FORCE: ${{ github.event.inputs.force || '' }}
+          PYTHONUNBUFFERED: "1"
         run: |
           pip install psycopg2-binary --quiet
           python3 scripts/daily_sweep.py
