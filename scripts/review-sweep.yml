@@ -1,0 +1,40 @@
+name: Review sweep (focused)
+
+on:
+  workflow_dispatch:
+    inputs:
+      cap:
+        description: "1回の観測上限（まず 300 でテスト → OKなら 50000。全名簿ローリング）"
+        default: "50000"
+        required: false
+      rate:
+        description: "毎秒リクエスト数（ストアフロントは控えめに。詰まるなら下げる）"
+        default: "8"
+        required: false
+      force:
+        description: "true でクールダウン無視・必ず実行（手動テストは false にするとガードを確認できる）"
+        default: "true"
+        required: false
+  # GitHubの無料スケジュールは遅延・取りこぼしが多い。1日に複数回（6時間ごと・
+  # 混雑する :00 を外す）起動を試み、Python側のガード（直近20h以内に成功して
+  # いればスキップ）で重い処理は1日1回だけに保つ。CCU巡回とは時刻をずらす。
+  schedule:
+    - cron: "41 2,8,14,20 * * *"
+
+jobs:
+  review-sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - name: Focused review snapshot sweep
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # STEAM_API_KEY は不要（store の appreviews はキーなし・別系統）。
+          REVIEW_CAP: ${{ github.event.inputs.cap || '50000' }}
+          REVIEW_RATE: ${{ github.event.inputs.rate || '8' }}
+          FORCE: ${{ github.event.inputs.force || '' }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          pip install psycopg2-binary --quiet
+          python3 scripts/review_sweep.py

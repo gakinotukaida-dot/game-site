@@ -1,7 +1,8 @@
 """
-フェーズ2: レビューの定点観測（焦点スコープ）
+フェーズ2: レビューの定点観測（全名簿ハイブリッド・ローリング）
 
-対象 = 監視リスト ∪「直近 ACTIVE_DAYS 日に同接>=1 を観測したゲーム」。
+対象 = 監視リスト ∪「活動中(直近 ACTIVE_DAYS 日に同接>=1)」を先に → 残り枠で
+全名簿へ last_review_check_at 古い順に広げる（案D本丸＝低CCU高販売を取りこぼさない）。
 1ゲーム=1コールで store の appreviews を叩き、query_summary の総数だけを
 review_snapshots に保存する（レビュー本文は取得しない）。
 
@@ -11,7 +12,7 @@ review_snapshots に保存する（レビュー本文は取得しない）。
 - レート上限は Valve 非公表・IP単位。GitHub Actions は共有IPなので控えめに。
   安全策: スロットル + 429バックオフ + cap で1回の件数を上限化（daily_sweep と同じ作り）。
 - 失敗したゲームは last_review_check_at を進めない＝次回再試行（daily_sweep と同様）。
-  焦点スコープは cap 内に収まるので、この滞留が巡回を遅らせる影響は当面ほぼ無い。
+  全名簿ローリングなので、失敗分は次回また「古い順」で拾い直される（取りこぼさない）。
 """
 import os
 import json
@@ -110,15 +111,20 @@ def fetch_summary(appid):
 
 
 def get_targets():
+    """対象 = 全名簿のハイブリッド・ローリング。
+    監視リスト ∪「直近 ACTIVE_DAYS 日に同接>=1 を観測した活動中ゲーム」を先に観て
+    （＝頻度を確保）、残り枠を last_review_check_at 古い順に全名簿へ広げる
+    （＝案D本丸＝低CCUでもよく売れた作品を取りこぼさない）。cap 件まで。"""
     conn = psycopg2.connect(DATABASE_URL)
     try:
         with conn, conn.cursor() as cur:
             cur.execute(
                 "SELECT appid FROM games "
-                "WHERE status = 'watchlist' "
-                "   OR (last_active_at IS NOT NULL "
-                "       AND last_active_at >= now() - (%s * interval '1 day')) "
-                "ORDER BY last_review_check_at ASC NULLS FIRST "
+                "ORDER BY (CASE WHEN status = 'watchlist' "
+                "               OR (last_active_at IS NOT NULL "
+                "                   AND last_active_at >= now() - (%s * interval '1 day')) "
+                "          THEN 0 ELSE 1 END) ASC, "
+                "         last_review_check_at ASC NULLS FIRST "
                 "LIMIT %s",
                 (ACTIVE_DAYS, REVIEW_CAP),
             )
