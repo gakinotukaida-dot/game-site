@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       cap:
-        description: "1回の観測上限（まず 200 でテスト → OKなら 30000）"
-        default: "30000"
+        description: "1回の観測上限（まず 300 でテスト → OKなら 50000。全名簿ローリング）"
+        default: "50000"
         required: false
       rate:
         description: "毎秒リクエスト数（ストアフロントは控えめに。詰まるなら下げる）"
@@ -24,14 +24,14 @@ on:
 jobs:
   review-sweep:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
       - name: Focused review snapshot sweep
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           # STEAM_API_KEY は不要（store の appreviews はキーなし・別系統）。
-          REVIEW_CAP: ${{ github.event.inputs.cap || '30000' }}
+          REVIEW_CAP: ${{ github.event.inputs.cap || '50000' }}
           REVIEW_RATE: ${{ github.event.inputs.rate || '8' }}
           FORCE: ${{ github.event.inputs.force || '' }}
           PYTHONUNBUFFERED: "1"
