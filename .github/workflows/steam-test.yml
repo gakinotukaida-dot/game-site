@@ -1,38 +1,31 @@
-name: Steam collector (watchlist)
+name: Steam collector (dense tier)
 
 on:
   workflow_dispatch:
+    inputs:
+      n:
+        description: "密ティアの上位件数（動作確認は 20 など。本番は既定の 300）"
+        default: "300"
+        required: false
+  # 密ティア（監視リスト ∪ 直近CCU上位N）の同接を高頻度で観測する。
+  # GitHubの無料スケジュールは :00 が最も混雑して取りこぼされやすいため、
+  # :07/:22/:37/:52（15分毎）に分散する。※それでも best-effort で発火漏れは残る
+  # （高頻度の確実化は別途の設計判断＝引継ぎ参照。当面は“広さ”を優先）。
   schedule:
-    # 監視リスト(5本)の同接を高頻度で観測。GitHubの無料スケジュールは
-    # :00 ちょうどが最も混雑して取りこぼされやすいため、混雑を避けた
-    # :07/:22/:37/:52（15分毎）に分散させて取りこぼしに強くする。
     - cron: "7,22,37,52 * * * *"
 
 jobs:
   collect:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - name: Fetch current players for watchlist games
+      - uses: actions/checkout@v4
+      - name: Dense-tier current players sweep
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
+          DENSE_N: ${{ github.event.inputs.n || '300' }}
+          PYTHONUNBUFFERED: "1"
         run: |
-          set -uo pipefail
-          APPIDS=$(psql "$DATABASE_URL" -t -A -c "SELECT appid FROM games WHERE status='watchlist' ORDER BY appid;")
-          echo "監視リスト: $(echo "$APPIDS" | tr '\n' ' ')"
-          OK=0
-          for APPID in $APPIDS; do
-            RESP=$(curl -s --max-time 15 "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=${APPID}&key=${STEAM_API_KEY}")
-            PC=$(echo "$RESP" | jq -r '.response.player_count // empty')
-            if [[ "$PC" =~ ^[0-9]+$ ]]; then
-              psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "INSERT INTO player_counts (appid, player_count) VALUES (${APPID}, ${PC});"
-              psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "UPDATE games SET last_checked_at = now(), last_active_at = CASE WHEN ${PC} > 0 THEN now() ELSE last_active_at END WHERE appid = ${APPID};"
-              echo "  appid ${APPID}: ${PC} 人"
-              OK=$((OK+1))
-            else
-              echo "  appid ${APPID}: 取得失敗（スキップ）"
-            fi
-          done
-          echo "保存できた件数: ${OK}"
-          echo "直近の記録（日本時間）:"
-          psql "$DATABASE_URL" -c "SELECT pc.appid, g.name, pc.player_count, pc.recorded_at AT TIME ZONE 'Asia/Tokyo' AS jst FROM player_counts pc JOIN games g ON g.appid = pc.appid ORDER BY pc.recorded_at DESC LIMIT 10;"
+          pip install psycopg2-binary --quiet
+          python3 scripts/dense_sweep.py
