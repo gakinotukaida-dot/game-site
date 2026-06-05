@@ -1,16 +1,19 @@
 """
-②-appdetails: 発売日 / is_free / 価格・割引 / ジャンル を全名簿ローリングで取得する。
-
+②-appdetails: 発売日 / is_free / 価格・割引 / ジャンル / type を全名簿ローリングで取得する。
+③拡張(v2): 体験版(demo)を発見して名簿に登録し、親ゲームへ紐づける（発売前の早期人気シグナルの土台）。
+  - 親ゲームの appdetails の `demos`[{appid,...}] から体験版appidを発見 → games に INSERT（status=active・親appidを fullgame_appid に）。
+  - 体験版自身の appdetails の `fullgame.appid`（文字列）から親appidを取得 → 自分の行の fullgame_appid を設定。
+  - fullgame_appid は COALESCE で更新＝一度ついた親リンクを後続のNULLで壊さない（非破壊）。
 取得口 = store.steampowered.com/api/appdetails（ストアフロント・APIキー不要）。
   率制限 ≈ 200req/5分/IP・1コール1appid（一括不可）。安全側で控えめに叩く（既定 0.5/s）。
 保存の分離:
-  - 静的（発売日/is_free/ジャンル/type/name）→ games 表の列（一度取れば再取得は稀）。
+  - 静的（発売日/is_free/ジャンル/type/fullgame_appid）→ games 表の列（一度取れば再取得は稀）。
   - 価格・割引（"腐る"）→ price_snapshots（時系列・review_snapshots と同型）。
 対象 = ハイブリッド: 活動中＋監視を先に観て、残り枠で last_appdetails_check_at 古い順に広げる。
 失敗時の扱い:
   - ネットワーク/429 → last_appdetails_check_at を進めない＝次回再試行（daily/review と同設計）。
   - success=false（販売終了・地域外） → 「確認済み」として時刻を進める（無限再試行を避ける）。
-取りこぼし対策ガード（job_state）: 直近 MIN_INTERVAL_HOURS 以内に成功してたらスキップ＝1日1回。
+取りこぼし対策ガード(job_state): 直近 MIN_INTERVAL_HOURS 以内に成功してたらスキップ＝1日1回。
 長時間対策: FLUSH_EVERY 件ごとに逐次保存（途中終了でも進捗が残る）。
 """
 import os
@@ -86,6 +89,14 @@ def parse_release_date(text, coming_soon):
     return None
 
 
+def _to_int(v):
+    """Steam は appid を int でも str でも返す（fullgame.appid は文字列）。失敗時は None。"""
+    try:
+        return int(v)
+    except (TypeError, ValueError):
+        return None
+
+
 def fetch_appdetails(appid):
     _throttle()
     url = API + "?" + urllib.parse.urlencode({"appids": appid, "cc": CC, "l": LANG})
@@ -107,7 +118,17 @@ def fetch_appdetails(appid):
             if isinstance(po, dict):
                 price = (po.get("currency"), po.get("initial"),
                          po.get("final"), po.get("discount_percent"))
+            # ③ 体験版リンク: 自分が体験版なら親appid（fullgame.appid＝文字列）、親なら demos の体験版appid群。
+            fg = d.get("fullgame")
+            fullgame_appid = _to_int(fg.get("appid")) if isinstance(fg, dict) else None
+            demo_appids = []
+            for x in (d.get("demos") or []):
+                if isinstance(x, dict):
+                    da = _to_int(x.get("appid"))
+                    if da is not None:
+                        demo_appids.append(da)
             fields = {
+                "name": d.get("name"),
                 "release_date_text": rd_text,
                 "release_date": parse_release_date(rd_text, coming),
                 "coming_soon": coming,
@@ -115,6 +136,8 @@ def fetch_appdetails(appid):
                 "app_type": d.get("type"),
                 "genres": d.get("genres") or [],
                 "price": price,
+                "fullgame_appid": fullgame_appid,
+                "demos": demo_appids,
             }
             _note("ok")
             return appid, "ok", fields
@@ -198,22 +221,30 @@ def get_targets():
 
 
 def flush(buffer):
-    """buffer = [(appid, status, fields), ...] を1回ぶんDBへ書き、書いた件数を返す。"""
-    static_rows = []   # (rdt, rd, cs, isf, atp, genres_json, appid)  ※UPDATEのプレースホルダ順
+    """buffer = [(appid, status, fields), ...] を1回ぶんDBへ書き、(静的更新件数, 体験版登録件数) を返す。"""
+    static_rows = []   # (rdt, rd, cs, isf, atp, genres_json, fullgame_appid, appid) ※UPDATEのプレースホルダ順
     price_rows = []    # (appid, currency, initial, final, discount)
+    demo_rows = []     # (demo_appid, name, parent_appid) ※体験版を名簿に登録＋親リンク
+    seen_demo = set()
     for appid, status, f in buffer:
         if status == "ok":
             static_rows.append((f["release_date_text"], f["release_date"], f["coming_soon"],
-                                f["is_free"], f["app_type"], Json(f["genres"]), appid))
+                                f["is_free"], f["app_type"], Json(f["genres"]),
+                                f.get("fullgame_appid"), appid))
             if f["price"]:
                 cur_, ini, fin, disc = f["price"]
                 if all(x is not None for x in (cur_, ini, fin)):
                     price_rows.append((appid, cur_, ini, fin, disc))
+            for da in (f.get("demos") or []):
+                if da not in seen_demo:
+                    seen_demo.add(da)
+                    base = (f.get("name") or ("appid " + str(appid)))[:120]
+                    demo_rows.append((da, base + " (Demo)", appid))
         elif status == "nodata":
-            static_rows.append((None, None, None, None, None, None, appid))
+            static_rows.append((None, None, None, None, None, None, None, appid))
         # "fail" は何も書かない（last_appdetails_check_at を進めない＝次回再試行）
-    if not static_rows and not price_rows:
-        return 0
+    if not static_rows and not price_rows and not demo_rows:
+        return 0, 0
     conn = psycopg2.connect(DATABASE_URL)
     try:
         with conn, conn.cursor() as cur:
@@ -222,7 +253,9 @@ def flush(buffer):
                     cur,
                     "UPDATE games SET "
                     "  release_date_text = %s, release_date = %s, coming_soon = %s, "
-                    "  is_free = %s, app_type = %s, genres = %s, last_appdetails_check_at = now() "
+                    "  is_free = %s, app_type = %s, genres = %s, "
+                    "  fullgame_appid = COALESCE(%s, fullgame_appid), "
+                    "  last_appdetails_check_at = now() "
                     "WHERE appid = %s",
                     static_rows, page_size=500,
                 )
@@ -233,9 +266,19 @@ def flush(buffer):
                     "VALUES (%s, %s, %s, %s, %s)",
                     price_rows, page_size=500,
                 )
+            if demo_rows:
+                # 体験版を名簿に登録（active＝以後 daily/dense がCCUを採取）。既存行は親リンクのみ補完（非破壊）。
+                execute_batch(
+                    cur,
+                    "INSERT INTO games (appid, name, status, fullgame_appid) "
+                    "VALUES (%s, %s, 'active', %s) "
+                    "ON CONFLICT (appid) DO UPDATE SET "
+                    "  fullgame_appid = COALESCE(games.fullgame_appid, EXCLUDED.fullgame_appid)",
+                    demo_rows, page_size=500,
+                )
     finally:
         conn.close()
-    return len(static_rows)
+    return len(static_rows), len(demo_rows)
 
 
 def main():
@@ -247,6 +290,7 @@ def main():
 
     buffer = []
     written = 0
+    demos_total = 0
     shown = 0
     counts = Counter()
     with ThreadPoolExecutor(max_workers=WORKERS) as ex:
@@ -256,18 +300,24 @@ def main():
             if status == "ok" and shown < SAMPLE_LOG:
                 print(f"  sample appid={appid}: type={f['app_type']} is_free={f['is_free']} "
                       f"release='{f['release_date_text']}'(parsed={f['release_date']}) "
-                      f"price={f['price']} genres={[g.get('description') for g in f['genres']]}")
+                      f"price={f['price']} demos={f.get('demos')} fullgame={f.get('fullgame_appid')} "
+                      f"genres={[g.get('description') for g in f['genres']]}")
                 shown += 1
             if len(buffer) >= FLUSH_EVERY:
-                written += flush(buffer)
+                w, dms = flush(buffer)
+                written += w
+                demos_total += dms
                 buffer = []
-                print(f"  …逐次保存: 累計 {written} 件（ok={counts['ok']} nodata={counts['nodata']} fail={counts['fail']}）")
+                print(f"  …逐次保存: 累計 {written} 件 / 体験版登録 {demos_total} 件"
+                      f"（ok={counts['ok']} nodata={counts['nodata']} fail={counts['fail']}）")
     if buffer:
-        written += flush(buffer)
+        w, dms = flush(buffer)
+        written += w
+        demos_total += dms
 
     print(f"取得: ok(データ有)={counts['ok']} / nodata(販売終了等)={counts['nodata']} / fail(再試行)={counts['fail']}")
     print("ステータス内訳:", dict(_status))
-    print(f"保存（last_appdetails_check_at 更新）: {written} 件。")
+    print(f"保存（last_appdetails_check_at 更新）: {written} 件。体験版を発見・登録: {demos_total} 件。")
     mark_success()
 
 
