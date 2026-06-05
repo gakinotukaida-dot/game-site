@@ -9,7 +9,7 @@
 保存の分離:
   - 静的（発売日/is_free/ジャンル/type/fullgame_appid）→ games 表の列（一度取れば再取得は稀）。
   - 価格・割引（"腐る"）→ price_snapshots（時系列・review_snapshots と同型）。
-対象 = ハイブリッド: 活動中＋監視を先に観て、残り枠で last_appdetails_check_at 古い順に広げる。
+対象 = ハイブリッド: 発売前(coming_soon)＋活動中＋監視を先に観て、残り枠で last_appdetails_check_at 古い順に広げる。
 失敗時の扱い:
   - ネットワーク/429 → last_appdetails_check_at を進めない＝次回再試行（daily/review と同設計）。
   - success=false（販売終了・地域外） → 「確認済み」として時刻を進める（無限再試行を避ける）。
@@ -208,6 +208,7 @@ def get_targets():
             cur.execute(
                 "SELECT appid FROM games "
                 "ORDER BY (CASE WHEN status = 'watchlist' "
+                "               OR coming_soon IS TRUE "
                 "               OR (last_active_at IS NOT NULL "
                 "                   AND last_active_at >= now() - (%s * interval '1 day')) "
                 "          THEN 0 ELSE 1 END) ASC, "
