@@ -31,6 +31,12 @@ RISER_MULT = float(os.environ.get("RISER_MULT") or "3")
 RISER_ABS_ADD = int(os.environ.get("RISER_ABS_ADD") or "200")
 RISER_ABS_FLOOR = int(os.environ.get("RISER_ABS_FLOOR") or "200")
 
+# --- 発売直後ウィンドウ（coming_soon→released を高解像度で拾う）。すべて暫定・env可変。---
+# release_date がこの日数以内で coming_soon=false（=最近発売）なら密ティアへ一時編入。
+# 履歴ゼロでも launch を高解像度で捕まえる狙い。ウィンドウを過ぎれば自然に外れる（自己消滅）。
+LAUNCH_DAYS = int(os.environ.get("LAUNCH_DAYS") or "14")   # 発売後この日数まで
+LAUNCH_MAX  = int(os.environ.get("LAUNCH_MAX")  or "200")  # 上限件数（CCUキー10万/日の枠を守る）
+
 _lock = threading.Lock()
 _next = [0.0]
 _interval = 1.0 / RATE_PER_SEC
@@ -74,6 +80,8 @@ def get_targets():
         "mult": RISER_MULT,
         "abs_add": RISER_ABS_ADD,
         "abs_floor": RISER_ABS_FLOOR,
+        "launch_days": LAUNCH_DAYS,
+        "launch_max": LAUNCH_MAX,
     }
     sql = (
         "WITH latest AS ("
@@ -95,11 +103,18 @@ def get_targets():
         "    AND w.base_n >= %(min_base)s"
         "    AND w.recent_max >= GREATEST(w.base_avg * %(mult)s, w.base_avg + %(abs_add)s)"
         "    AND w.recent_max >= %(abs_floor)s"
+        "), launched AS ("
+        "  SELECT g.appid FROM games g"
+        "  WHERE g.status <> 'dormant' AND g.coming_soon IS FALSE"
+        "    AND g.release_date IS NOT NULL"
+        "    AND g.release_date >= (now()::date - %(launch_days)s)"
+        "  ORDER BY g.release_date DESC LIMIT %(launch_max)s"
         ") "
-        "SELECT appid, bool_or(is_riser) AS is_riser FROM ("
-        "  SELECT appid, false AS is_riser FROM games WHERE status = 'watchlist'"
-        "  UNION ALL SELECT appid, false FROM top_active"
-        "  UNION ALL SELECT appid, true  FROM risers"
+        "SELECT appid, bool_or(is_riser) AS is_riser, bool_or(is_launch) AS is_launch FROM ("
+        "  SELECT appid, false AS is_riser, false AS is_launch FROM games WHERE status = 'watchlist'"
+        "  UNION ALL SELECT appid, false, false FROM top_active"
+        "  UNION ALL SELECT appid, true,  false FROM risers"
+        "  UNION ALL SELECT appid, false, true  FROM launched"
         ") u GROUP BY appid"
     )
     conn = psycopg2.connect(DATABASE_URL)
@@ -109,7 +124,8 @@ def get_targets():
             rows = cur.fetchall()
             targets = [r[0] for r in rows]
             n_risers = sum(1 for r in rows if r[1])
-            return targets, n_risers
+            n_launched = sum(1 for r in rows if r[2])
+            return targets, n_risers, n_launched
     finally:
         conn.close()
 
@@ -146,10 +162,11 @@ def write_results(checked, above):
 
 
 def main():
-    targets, n_risers = get_targets()
-    print(f"密ティア対象: {len(targets)} 件 (内 昇格条件該当 {n_risers} 件) "
+    targets, n_risers, n_launched = get_targets()
+    print(f"密ティア対象: {len(targets)} 件 (内 昇格 {n_risers} 件 / 発売直後 {n_launched} 件) "
           f"[DENSE_N={DENSE_N}, floor={FLOOR}, rate={RATE_PER_SEC}/s, workers={WORKERS}; "
-          f"riser x{RISER_MULT}/+{RISER_ABS_ADD}/>={RISER_ABS_FLOOR}, 直近{RISER_RECENT_HOURS}h vs {RISER_BASE_DAYS}d, 基準>={RISER_MIN_BASE_OBS}点]")
+          f"riser x{RISER_MULT}/+{RISER_ABS_ADD}/>={RISER_ABS_FLOOR}, 直近{RISER_RECENT_HOURS}h vs {RISER_BASE_DAYS}d, 基準>={RISER_MIN_BASE_OBS}点; "
+          f"launch<= {LAUNCH_DAYS}日/上限{LAUNCH_MAX}]")
     results = []
     with ThreadPoolExecutor(max_workers=WORKERS) as ex:
         for appid, pc in ex.map(fetch_ccu, targets):
