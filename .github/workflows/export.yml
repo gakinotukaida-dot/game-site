@@ -1,0 +1,51 @@
+name: Export now-CCU JSON (display)
+
+# 表示の箱(view01「今のプレイヤー数」)用に、Neon を読むだけで data/now_ccu.json を更新する。
+# - DBは読み取り専用（SELECTのみ）＝(B)・非破壊。STEAM_API_KEY は使わない（DATABASE_URL のみ）。
+# - 中身が変わった時だけコミットする（変更なしの回は no-op）。
+# - 既存ワークフローは on:push を使っていない＝このコミットでループは起きない
+#   （加えて GITHUB_TOKEN のコミットは他Actionsを発火させない仕様も歯止め）。
+# - スケジュールは best-effort（GitHub無料枠は遅延・取りこぼしあり）。CCUはスナップショット的なので許容。
+#   発火頻度の確実化が要るとデータが示したら別途検討（引継ぎ §6③）。
+
+on:
+  workflow_dispatch:        # 手動実行（動作確認用）
+  schedule:
+    # 6時間毎・:00混雑回避で :17 に。暫定（あとで頻度は調整可）。
+    - cron: "17 1,7,13,19 * * *"
+
+permissions:
+  contents: write           # data/now_ccu.json をコミットして戻すため（このリポジトリのみ）
+
+# 同時実行を1本に直列化（押し合いでコミットが衝突しないように）
+concurrency:
+  group: export-now-ccu
+  cancel-in-progress: false
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Export now-CCU snapshot to data/now_ccu.json
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          pip install psycopg2-binary --quiet
+          python3 scripts/export_now_ccu.py
+
+      - name: Commit JSON if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/now_ccu.json
+          if git diff --staged --quiet; then
+            echo "変更なし＝コミットしません（データに更新なし）。"
+          else
+            git commit -m "data: now_ccu snapshot $(date -u +%FT%TZ)"
+            git push
+            echo "data/now_ccu.json を更新コミットしました。"
+          fi
