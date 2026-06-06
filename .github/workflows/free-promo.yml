@@ -1,0 +1,31 @@
+name: Free promo sweep (0-yen)
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "true でクールダウン無視・必ず実行（手動テストは true 推奨）"
+        default: "true"
+        required: false
+  # 0円配布（Free to Keep）は1週間未満で終わることが多い＝高頻度で取りに行く。
+  # featuredcategories は1コールと軽いので 4時間ごと（:23＝混雑する :00 を避ける）。
+  # 取りこぼし対策＝Python側ガード（直近 MIN_INTERVAL_HOURS=2h 以内に成功ならスキップ）で過剰実行も抑える。
+  # 他ジョブと時刻をずらす（news 37/1,13・4gamer 53/2,8,14,20・export 17/1,7,13,19）。
+  schedule:
+    - cron: "23 */4 * * *"
+
+jobs:
+  free-promo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - name: Free-to-keep (0-yen) sweep
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # STEAM_API_KEY は不要（featuredcategories は公式・キーなしで取得可＝CCUのキー枠を消費しない）。
+          FORCE: ${{ github.event.inputs.force || '' }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          pip install psycopg2-binary --quiet
+          python3 scripts/free_promo_sweep.py
