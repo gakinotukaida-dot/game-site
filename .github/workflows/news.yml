@@ -1,0 +1,39 @@
+name: News sweep (announcements)
+
+on:
+  workflow_dispatch:
+    inputs:
+      cap:
+        description: "1回の観測上限（テストは 50 など。本番 2000前後）"
+        default: "2000"
+        required: false
+      rate:
+        description: "毎秒リクエスト数（api.steampowered.com・キー不要系統。安全側で 5）"
+        default: "5"
+        required: false
+      force:
+        description: "true でクールダウン無視・必ず実行（手動テストは false でガード確認）"
+        default: "true"
+        required: false
+  # 取りこぼし対策＝1日に複数回起動を試み、Python側ガード（直近20h以内に成功なら
+  # スキップ）で1日1回に保つ。CCU/レビュー/appdetails と時刻をずらす。告知は腐りにくいので低頻度。
+  schedule:
+    - cron: "37 1,13 * * *"
+
+jobs:
+  news:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v5
+      - name: News rolling sweep
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # STEAM_API_KEY は不要（GetNewsForApp は公式・キーなしで取得可＝CCUのキー枠を消費しない）。
+          NEWS_CAP: ${{ github.event.inputs.cap || '2000' }}
+          NEWS_RATE: ${{ github.event.inputs.rate || '5' }}
+          FORCE: ${{ github.event.inputs.force || '' }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          pip install psycopg2-binary --quiet
+          python3 scripts/news_sweep.py
