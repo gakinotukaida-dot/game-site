@@ -1,0 +1,28 @@
+name: JP news sweep (4Gamer RSS)
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "true でクールダウン無視・必ず実行（手動テストは true 推奨）"
+        default: "true"
+        required: false
+  # 低頻度で十分（告知より腐りにくい）。CCU/レビュー/appdetails/告知と時刻をずらす。
+  schedule:
+    - cron: "53 2,8,14,20 * * *"
+
+jobs:
+  jp_news:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - name: 4Gamer RSS sweep
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # STEAM_API_KEY 不要（4Gamer RSS＝Steam APIと無関係・キー枠を消費しない）。
+          FORCE: ${{ github.event.inputs.force || '' }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          pip install psycopg2-binary --quiet
+          python3 scripts/jp_news_sweep.py
