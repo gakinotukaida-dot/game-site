@@ -1,5 +1,5 @@
 """
-②-appdetails: 発売日 / is_free / 価格・割引 / ジャンル / type を全名簿ローリングで取得する。
+②-appdetails: 発売日 / is_free / 価格・割引 / ジャンル / type / 開発元 / 販売元 / カテゴリ / DLC を全名簿ローリングで取得する。
 ③拡張(v2): 体験版(demo)を発見して名簿に登録し、親ゲームへ紐づける（発売前の早期人気シグナルの土台）。
   - 親ゲームの appdetails の `demos`[{appid,...}] から体験版appidを発見 → games に INSERT（status=active・親appidを fullgame_appid に）。
   - 体験版自身の appdetails の `fullgame.appid`（文字列）から親appidを取得 → 自分の行の fullgame_appid を設定。
@@ -135,6 +135,10 @@ def fetch_appdetails(appid):
                 "is_free": bool(d.get("is_free")),
                 "app_type": d.get("type"),
                 "genres": d.get("genres") or [],
+                "developers": d.get("developers") or [],
+                "publishers": d.get("publishers") or [],
+                "categories": d.get("categories") or [],
+                "dlc": d.get("dlc") or [],
                 "price": price,
                 "fullgame_appid": fullgame_appid,
                 "demos": demo_appids,
@@ -231,6 +235,8 @@ def flush(buffer):
         if status == "ok":
             static_rows.append((f["release_date_text"], f["release_date"], f["coming_soon"],
                                 f["is_free"], f["app_type"], Json(f["genres"]),
+                                Json(f["developers"]), Json(f["publishers"]),
+                                Json(f["categories"]), Json(f["dlc"]),
                                 f.get("fullgame_appid"), appid))
             if f["price"]:
                 cur_, ini, fin, disc = f["price"]
@@ -242,7 +248,7 @@ def flush(buffer):
                     base = (f.get("name") or ("appid " + str(appid)))[:120]
                     demo_rows.append((da, base + " (Demo)", appid))
         elif status == "nodata":
-            static_rows.append((None, None, None, None, None, None, None, appid))
+            static_rows.append((None, None, None, None, None, None, None, None, None, None, None, appid))
         # "fail" は何も書かない（last_appdetails_check_at を進めない＝次回再試行）
     if not static_rows and not price_rows and not demo_rows:
         return 0, 0
@@ -255,6 +261,7 @@ def flush(buffer):
                     "UPDATE games SET "
                     "  release_date_text = %s, release_date = %s, coming_soon = %s, "
                     "  is_free = %s, app_type = %s, genres = %s, "
+                    "  developers = %s, publishers = %s, categories = %s, dlc = %s, "
                     "  fullgame_appid = COALESCE(%s, fullgame_appid), "
                     "  last_appdetails_check_at = now() "
                     "WHERE appid = %s",
