@@ -37,15 +37,22 @@ jobs:
           pip install psycopg2-binary --quiet
           python3 scripts/export_now_ccu.py
 
+      - name: Export free-promos lens to data/free_promos.json
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python3 scripts/export_free_promos.py
+
       - name: Commit JSON if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/now_ccu.json
+          git add data/now_ccu.json data/free_promos.json
           if git diff --staged --quiet; then
             echo "変更なし＝コミットしません（データに更新なし）。"
           else
-            git commit -m "data: now_ccu snapshot $(date -u +%FT%TZ)"
+            git commit -m "data: display snapshot $(date -u +%FT%TZ)"
             git push
-            echo "data/now_ccu.json を更新コミットしました。"
+            echo "data/*.json を更新コミットしました。"
           fi
