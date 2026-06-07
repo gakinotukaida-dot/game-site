@@ -1,0 +1,31 @@
+name: Epic free promo sweep (0-yen)
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "true でクールダウン無視・必ず実行（手動テストは true 推奨）"
+        default: "true"
+        required: false
+  # Epic の無料配布は週替わり（多くは木曜 15:00-16:00 UTC 前後に切替）＝低頻度で十分。
+  # 1日2回（切替直後を拾う 15:43 UTC ＋ 予備 03:43 UTC）。取りこぼし対策＝Python側ガード
+  # （直近 MIN_INTERVAL_HOURS=6h 以内に成功ならスキップ）で過剰実行も抑える。
+  # 他ジョブと分を散らす（news 37・4gamer 53・export 17・free-promo 23 → ここは 43）。
+  schedule:
+    - cron: "43 3,15 * * *"
+
+jobs:
+  epic-free:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - name: Epic free-to-keep (0-yen) sweep
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # STEAM_API_KEY は不要（Epic公式の公開JSON＝キーなしで取得）。CCUのキー枠は消費しない。
+          FORCE: ${{ github.event.inputs.force || '' }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          pip install psycopg2-binary --quiet
+          python3 scripts/epic_free_sweep.py
