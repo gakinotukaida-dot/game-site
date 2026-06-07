@@ -139,6 +139,7 @@ def fetch_appdetails(appid):
                 "publishers": d.get("publishers") or [],
                 "categories": d.get("categories") or [],
                 "dlc": d.get("dlc") or [],
+                "website": d.get("website"),   # L3: 公式website（appdetails basic に含まれる・null可）
                 "price": price,
                 "fullgame_appid": fullgame_appid,
                 "demos": demo_appids,
@@ -237,6 +238,7 @@ def flush(buffer):
                                 f["is_free"], f["app_type"], Json(f["genres"]),
                                 Json(f["developers"]), Json(f["publishers"]),
                                 Json(f["categories"]), Json(f["dlc"]),
+                                f.get("website"),
                                 f.get("fullgame_appid"), appid))
             if f["price"]:
                 cur_, ini, fin, disc = f["price"]
@@ -248,7 +250,7 @@ def flush(buffer):
                     base = (f.get("name") or ("appid " + str(appid)))[:120]
                     demo_rows.append((da, base + " (Demo)", appid))
         elif status == "nodata":
-            static_rows.append((None, None, None, None, None, None, None, None, None, None, None, appid))
+            static_rows.append((None, None, None, None, None, None, None, None, None, None, None, None, appid))
         # "fail" は何も書かない（last_appdetails_check_at を進めない＝次回再試行）
     if not static_rows and not price_rows and not demo_rows:
         return 0, 0
@@ -262,6 +264,7 @@ def flush(buffer):
                     "  release_date_text = %s, release_date = %s, coming_soon = %s, "
                     "  is_free = %s, app_type = %s, genres = %s, "
                     "  developers = %s, publishers = %s, categories = %s, dlc = %s, "
+                    "  website = %s, "
                     "  fullgame_appid = COALESCE(%s, fullgame_appid), "
                     "  last_appdetails_check_at = now() "
                     "WHERE appid = %s",
@@ -309,7 +312,7 @@ def main():
                 print(f"  sample appid={appid}: type={f['app_type']} is_free={f['is_free']} "
                       f"release='{f['release_date_text']}'(parsed={f['release_date']}) "
                       f"price={f['price']} demos={f.get('demos')} fullgame={f.get('fullgame_appid')} "
-                      f"genres={[g.get('description') for g in f['genres']]}")
+                      f"genres={[g.get('description') for g in f['genres']]} website={f.get('website')}")
                 shown += 1
             if len(buffer) >= FLUSH_EVERY:
                 w, dms = flush(buffer)

@@ -1,32 +1,39 @@
 """
-表示用エクスポート（候補1「今のプレイヤー数」）── 2026-06-06
+表示用エクスポート（候補1「今のプレイヤー数」＋ L1詳細 ＋ L2同じ開発元の他作品 ＋ L3公式website）── 2026-06-06 / v4
 ================================================================
-役割：Neon を「読むだけ」で、各appidの最新CCU上位20件を取り、
-      表示の箱(radar_shell) view01 が読める JSON を data/now_ccu.json に書き出す。
+役割：Neon を「読むだけ」で各appidの最新CCU上位N件を取り、表示の箱(radar_shell)が読む
+      JSON を data/now_ccu.json に書き出す。
+  v2: 各行に L1 詳細(detail)＝開発元/販売元/ジャンル/カテゴリ/DLC有無/発売日。
+  v3: detail に L2 siblings＝同じ開発元の他作品（自分除く・最新CCU降順・最大8）。
+  v4: detail に L3 website＝公式website（games.website・null可。深掘りの「公式へ降りる」）。
 
-設計の線（土台・確定事項と整合）：
+設計の線（土台・確定事項・drilldown設計v1 と整合）：
 - DBは読み取り専用（SELECT のみ）。書き込み・スキーマ変更は一切しない＝(B)・非破壊。
-- STEAM_API_KEY は不要（DBを読むだけ）。env は DATABASE_URL のみ。
-- 出力は「データだけで決まる」内容（observed_at と rows）にする＝中身が変わらなければ
-  ファイルはバイト同一→ワークフロー側で「変更時のみコミット」が効く（best-effort二重発火の無駄コミット回避）。
-  ※ 生成時刻(wall clock)はファイルに入れない（毎回変わってしまい差分が常に出るため）。
-- クエリは sql/candidate1_now_ccu.sql と同一（各appid最新→CCU降順→上位20→games で命名）。
+- L1/L2 とも **新規収集ゼロ**＝既に games に入っている列だけで作る。
+- siblings は `developers ?| ARRAY[...]`（JSONB配列の要素一致）で導出。
+  名寄せは **完全一致のbest-effort**＝表記ゆれは取りこぼし／別社の同名混在があり得る（箱で注記）。
+  速度のため GIN 索引 `idx_games_developers_gin`（sql/l2_developers_index.sql）を推奨（無くても動くが遅い）。
+- detail/siblings は箱の「詳しく」開示でのみ使う＝既定は出さない（段階的開示・根幹9）。
+- 後方互換：行の {appid,name,ccu} は不変＝旧箱は detail/siblings を無視して動く。
 
-戻し方：このファイルと .github/workflows/export.yml と data/now_ccu.json を削除すれば元に戻る（可逆）。
+戻し方：このファイルを v2/v1 に戻せば siblings/detail が消えるだけ（DB無変更・可逆）。
 """
 
 import json
 import os
-from datetime import datetime, timezone
+from datetime import datetime
 
 import psycopg2
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 OUT_PATH = os.environ.get("OUT_PATH") or "data/now_ccu.json"
-TOP_N = int(os.environ.get("TOP_N") or "20")  # 上位件数（箱の view01 は20件想定）。暫定・env可変。
+TOP_N = int(os.environ.get("TOP_N") or "100")
 
-# 候補1クエリ（sql/candidate1_now_ccu.sql と同一の考え方）。
-# 各appidの最新記録(DISTINCT ON)→ CCU降順 上位N → games で名前付与。返りは JSON 配列1セル。
+DEV_MAX = int(os.environ.get("DEV_MAX") or "5")
+GENRE_MAX = int(os.environ.get("GENRE_MAX") or "7")
+CATEGORY_MAX = int(os.environ.get("CATEGORY_MAX") or "7")
+SIBLINGS_MAX = int(os.environ.get("SIBLINGS_MAX") or "8")   # §7既定：6〜8件。暫定・env可変。
+
 QUERY = """
 WITH latest AS (
   SELECT DISTINCT ON (appid) appid, player_count, recorded_at
@@ -34,17 +41,33 @@ WITH latest AS (
   ORDER BY appid, recorded_at DESC
 )
 SELECT json_agg(
-         json_build_object('appid', l.appid, 'name', g.name,
-                           'ccu', l.player_count, 'observed_at', l.recorded_at)
-         ORDER BY l.player_count DESC
+         json_build_object(
+           'appid', l.appid, 'name', g.name,
+           'ccu', l.player_count, 'observed_at', l.recorded_at,
+           'developers', g.developers, 'publishers', g.publishers,
+           'genres', g.genres, 'categories', g.categories,
+           'dlc', g.dlc,
+           'release_date', g.release_date, 'release_date_text', g.release_date_text,
+           'website', g.website
+         ) ORDER BY l.player_count DESC
        ) AS now_list
 FROM (SELECT * FROM latest ORDER BY player_count DESC LIMIT %s) l
 JOIN games g ON g.appid = l.appid;
 """
 
+# L2：同じ開発元の他作品（自分除く・最新CCU降順・最大N）。developers は JSONB 文字列配列。
+SIBLING_QUERY = """
+SELECT g2.appid, g2.name,
+       (SELECT pc.player_count FROM player_counts pc
+        WHERE pc.appid = g2.appid ORDER BY pc.recorded_at DESC LIMIT 1) AS ccu
+FROM games g2
+WHERE g2.developers ?| %s AND g2.appid <> %s
+ORDER BY ccu DESC NULLS LAST
+LIMIT %s
+"""
+
 
 def _as_list(cell):
-    """psycopg2 は json を Python オブジェクトで返すことも文字列で返すこともある。両対応。"""
     if cell is None:
         return []
     if isinstance(cell, (list, tuple)):
@@ -54,8 +77,52 @@ def _as_list(cell):
     return list(cell)
 
 
+def _names(arr, cap):
+    if not isinstance(arr, list):
+        return []
+    out = [str(x).strip() for x in arr if x and str(x).strip()]
+    return out[:cap]
+
+
+def _descs(arr, cap):
+    if not isinstance(arr, list):
+        return []
+    out = []
+    for x in arr:
+        if isinstance(x, dict):
+            d = x.get("description")
+            if d and str(d).strip():
+                out.append(str(d).strip())
+        if len(out) >= cap:
+            break
+    return out
+
+
+def _fetch_siblings(cur, developers, self_appid):
+    """同じ開発元の他作品を返す。開発元名が無ければ []（突合しない）。"""
+    names = _names(developers, 50)  # 突合に使う開発元名（複数社対応・上限ゆるめ）
+    if not names:
+        return []
+    cur.execute(SIBLING_QUERY, (names, self_appid, SIBLINGS_MAX))
+    return [{"appid": r[0], "name": r[1], "ccu": r[2]} for r in cur.fetchall()]
+
+
+def _build_detail(it):
+    dlc = it.get("dlc")
+    dlc_count = len(dlc) if isinstance(dlc, list) else 0
+    return {
+        "developers": _names(it.get("developers"), DEV_MAX),
+        "publishers": _names(it.get("publishers"), DEV_MAX),
+        "genres": _descs(it.get("genres"), GENRE_MAX),
+        "categories": _descs(it.get("categories"), CATEGORY_MAX),
+        "dlc_count": dlc_count,
+        "release": it.get("release_date") or it.get("release_date_text"),
+        "website": it.get("website"),            # L3: 公式website（無ければ None＝箱はストアリンクのみ）
+        "siblings": it.get("_siblings") or [],   # L2（_fetch_siblings で付与済み）
+    }
+
+
 def _max_observed_at(items):
-    """rows の observed_at(ISO文字列)の最大を返す。観測時刻の代表値（最新）。"""
     best = None
     for it in items:
         raw = it.get("observed_at")
@@ -63,7 +130,7 @@ def _max_observed_at(items):
             continue
         try:
             dt = datetime.fromisoformat(raw)
-        except ValueError:
+        except (ValueError, TypeError):
             continue
         if best is None or dt > best:
             best = dt
@@ -75,23 +142,24 @@ def main():
     try:
         with conn.cursor() as cur:  # 読み取りのみ（commit しない）
             cur.execute(QUERY, (TOP_N,))
-            cell = cur.fetchone()[0]
+            items = _as_list(cur.fetchone()[0])
+            # L2：各行の siblings を同じ読み取り接続で取得（開発元がある行のみ）。
+            for it in items:
+                it["_siblings"] = _fetch_siblings(cur, it.get("developers"), it.get("appid"))
     finally:
         conn.close()
 
-    items = _as_list(cell)
     observed_at = _max_observed_at(items)
-
-    # 箱(view01)が必要とする最小の形 {appid, name, ccu} に絞る（観測時刻は top-level の observed_at に集約）。
     rows = [
-        {"appid": it["appid"], "name": it.get("name"), "ccu": it["ccu"]}
+        {"appid": it["appid"], "name": it.get("name"), "ccu": it["ccu"], "detail": _build_detail(it)}
         for it in items
     ]
 
     payload = {
-        "view": "now_ccu",        # どのビュー用か（将来 view02/03 を足す時の識別）
-        "source": "steam_official_ccu",  # 出所（公式API観測）。誇張理由は付けない＝観測実数のみ。
-        "observed_at": observed_at,       # 代表観測時刻（rows中の最新）。箱の「観測時刻」表示に使う。
+        "view": "now_ccu",
+        "source": "steam_official_ccu",
+        "schema": "v4-l3",   # v1=detailなし / v2-l1 / v3-l2(+siblings) / v4-l3(+website)
+        "observed_at": observed_at,
         "count": len(rows),
         "rows": rows,
     }
@@ -101,14 +169,21 @@ def main():
         os.makedirs(out_dir, exist_ok=True)
     with open(OUT_PATH, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2, sort_keys=False)
-        f.write("\n")  # 末尾改行＝差分を安定させる
+        f.write("\n")
 
-    print(f"書き出し: {OUT_PATH}（{len(rows)} 件・観測時刻 {observed_at}）")
+    print(f"書き出し: {OUT_PATH}（{len(rows)} 件・観測時刻 {observed_at}・schema v3-l2）")
     for r in rows[:5]:
-        print(f"  sample appid={r['appid']} {(r['name'] or '')[:30]}: {r['ccu']} 人")
+        d = r["detail"]
+        print(f"  sample appid={r['appid']} {(r['name'] or '')[:22]}: {r['ccu']}人 "
+              f"dev={d['developers']} genres={d['genres'][:2]} dlc={d['dlc_count']} "
+              f"siblings={[s['name'] for s in d['siblings'][:3]]}")
     if not rows:
-        # 空でもクラッシュさせない（DBが空/接続直後等）。ワークフローは緑のまま＝無コミット。
         print("注意: 行が0件でした（player_counts がまだ空か、観測直後の可能性）。")
+    else:
+        miss = sum(1 for r in rows if not r["detail"]["developers"] and not r["detail"]["genres"])
+        sib = sum(1 for r in rows if r["detail"]["siblings"])
+        print(f"L1メタ未充足の行: {miss}/{len(rows)}（appdetails未到達＝ローリングで充足）／"
+              f"L2 他作品が1件以上ついた行: {sib}/{len(rows)}")
 
 
 if __name__ == "__main__":
