@@ -1,13 +1,18 @@
 # B2: 配信者活動の広域・短期記録（書き込み収集）。置き場所: .github/workflows/streamer_activity_sweep.yml
 # 注意: PII（公開配信者の活動）を最小限・14日短期で保存する“書き込み収集”。独立に有効/無効を制御できるよう別ワークフロー。
-# 既存は触らない・可逆（DROP TABLE streamer_activity;）。まず手動実行で確認 → 必要なら schedule を有効化（twitch_sweepより低頻度推奨）。
+# 既存は触らない・可逆（DROP TABLE streamer_activity;）。
+#
+# 【2026-06-08 schedule有効化】手動確認(7476行記録)済→定期実行をON。
+#   - cron は UTC・30分ごと（twitch=9,24,39,54 とずらして 14,44）。PII短期のため twitch より低頻度に保つ。
+#   - 戻し方（可逆）: 下の schedule: 2行を「#」でコメントアウトして commit するだけ（手動実行は残る）。
+#   - 頻度変更: cron 文字列を書き換えるだけ（例: 1時間ごと="14 * * * *"）。
+#   - 容量メモ: 1実行≈7476行・30分ごと・14日ローリング → 定常で約500万行（Neon Launchは従量で上限なし）。
 name: Streamer activity sweep (write - streamer_activity / B2)
 
 on:
   workflow_dispatch: {}
-  # 動作確認後に有効化（例: 30分ごと。PII短期のため過度に高頻度にしない）:
-  # schedule:
-  #   - cron: "14,44 * * * *"
+  schedule:
+    - cron: "14,44 * * * *"
 
 jobs:
   b2:

@@ -1,13 +1,16 @@
 # Twitch視聴の時系列保存（書き込み収集）。置き場所: .github/workflows/twitch_sweep.yml
 # 注意: これは“書き込み収集”。新テーブル twitch_snapshots に追記する（既存は触らない・可逆: DROP可）。
-# 最初は手動実行で動作確認 → 問題なければ schedule を有効化。
+#
+# 【2026-06-08 schedule有効化】手動確認(538件保存)済→定期実行をON。
+#   - cron は UTC・15分ごと（dense=7,22,37,52 とずらして 9,24,39,54）。Twitch率制限800/分に対し安全。
+#   - 戻し方（可逆）: 下の schedule: 2行を「#」でコメントアウトして commit するだけ（workflow_dispatch の手動実行は残る）。
+#   - 頻度変更: cron 文字列を書き換えるだけ（例: 30分ごと="9,39 * * * *"）。
 name: Twitch sweep (write - twitch_snapshots)
 
 on:
   workflow_dispatch: {}
-  # 動作確認後に有効化（dense と同じ15分間隔の例。Twitch率制限に注意して調整）:
-  # schedule:
-  #   - cron: "9,24,39,54 * * * *"
+  schedule:
+    - cron: "9,24,39,54 * * * *"
 
 jobs:
   twitch:
