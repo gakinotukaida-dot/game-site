@@ -1,0 +1,27 @@
+# view02 Twitch lite プローブ（読み取り専用・保存なし・ログのみ）
+# 置き場所: .github/workflows/view02_twitch_probe.yml
+# 事前準備（オーナー作業）:
+#   1) https://dev.twitch.tv/console でアプリ登録 → Client ID と New Secret を取得
+#   2) リポジトリ Settings → Secrets and variables → Actions に
+#        TWITCH_CLIENT_ID / TWITCH_CLIENT_SECRET を追加（鍵の入力はオーナーが行う）
+# 実行: Actions →「view02 twitch probe (read-only)」→ Run workflow → ログに結果
+name: view02 twitch probe (read-only)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "psycopg2-binary>=2.9"
+      - name: Run twitch probe (read-only; no storage; prints to log)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
+          TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
+        run: python scripts/view02_twitch_probe.py
