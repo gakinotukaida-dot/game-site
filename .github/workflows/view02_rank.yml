@@ -1,0 +1,25 @@
+# view02 ランキング（A1＋推定きっかけ）を手動実行（読み取り専用・ログのみ・コミットなし）
+# 置き場所: .github/workflows/view02_rank.yml
+# 実行: Actions タブ →「view02 rank (read-only)」→ Run workflow → 実行ログに結果が出る
+name: view02 rank (read-only)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  rank:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "psycopg2-binary>=2.9"
+      - name: Run view02 rank (read-only; prints to log)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # 必要なら暫定パラメータを上書き（例）:
+          # MIN_POINTS: "5"
+          # MIN_CURRENT: "100"
+          # TOP_N: "30"
+        run: python scripts/view02_rank.py
