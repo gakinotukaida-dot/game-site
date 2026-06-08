@@ -1,0 +1,32 @@
+# view02 A1 診断を手動実行（読み取り専用・ログ出力のみ・コミットなし）
+# 置き場所: .github/workflows/diagnose_view02_a1.yml
+# 実行: GitHub の Actions タブ →「Diagnose view02 A1 (read-only)」→ Run workflow
+# 出力: 実行ログに [1]〜[4] が表示される。リポジトリやDBは一切変更しない。
+name: Diagnose view02 A1 (read-only)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: pip install "psycopg2-binary>=2.9"
+      - name: Run A1 diagnostic (read-only; prints to log)
+        env:
+          # export 用ワークフローと同じ Neon 接続のシークレットを指定すること。
+          # 名前が DATABASE_URL でない場合は右辺 secrets.XXX を合わせる。
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # 必要なら暫定パラメータをここで上書き可（例）:
+          # WINDOW_DAYS_REF: "28"
+          # GAP_DAYS: "1"
+          # MIN_POINTS: "7"
+          # MIN_CURRENT: "100"
+        run: python scripts/diagnose_view02_a1.py
