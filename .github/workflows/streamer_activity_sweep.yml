@@ -1,0 +1,26 @@
+# B2: 配信者活動の広域・短期記録（書き込み収集）。置き場所: .github/workflows/streamer_activity_sweep.yml
+# 注意: PII（公開配信者の活動）を最小限・14日短期で保存する“書き込み収集”。独立に有効/無効を制御できるよう別ワークフロー。
+# 既存は触らない・可逆（DROP TABLE streamer_activity;）。まず手動実行で確認 → 必要なら schedule を有効化（twitch_sweepより低頻度推奨）。
+name: Streamer activity sweep (write - streamer_activity / B2)
+
+on:
+  workflow_dispatch: {}
+  # 動作確認後に有効化（例: 30分ごと。PII短期のため過度に高頻度にしない）:
+  # schedule:
+  #   - cron: "14,44 * * * *"
+
+jobs:
+  b2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "psycopg2-binary>=2.9"
+      - name: Streamer activity sweep (writes streamer_activity; 14d rolling)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
+          TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
+        run: python scripts/streamer_activity_sweep.py
