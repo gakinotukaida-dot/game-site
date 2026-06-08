@@ -1,0 +1,26 @@
+# Twitch視聴の時系列保存（書き込み収集）。置き場所: .github/workflows/twitch_sweep.yml
+# 注意: これは“書き込み収集”。新テーブル twitch_snapshots に追記する（既存は触らない・可逆: DROP可）。
+# 最初は手動実行で動作確認 → 問題なければ schedule を有効化。
+name: Twitch sweep (write - twitch_snapshots)
+
+on:
+  workflow_dispatch: {}
+  # 動作確認後に有効化（dense と同じ15分間隔の例。Twitch率制限に注意して調整）:
+  # schedule:
+  #   - cron: "9,24,39,54 * * * *"
+
+jobs:
+  twitch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "psycopg2-binary>=2.9"
+      - name: Twitch snapshot sweep (writes twitch_snapshots)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
+          TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
+        run: python scripts/twitch_sweep.py
