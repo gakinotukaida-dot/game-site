@@ -1,0 +1,42 @@
+# view02 ランキング v2（A＋B1）を手動実行し、出力JSONをリポジトリに保存する
+# 置き場所: .github/workflows/view02_rank_v2.yml
+# 実行: Actions タブ →「view02 rank v2 (read-only + JSON)」→ Run workflow
+#   - 自前DBは読み取り専用（SELECTのみ）。
+#   - 実行ログに順位表を印字し、data/view02_rising.json を生成 → 変更があればコミット（サイトが読む用）。
+#   - JSONを残したくない（見るだけ）の場合は、末尾の「Commit JSON」ステップを削除すればログ出力のみになる。
+#   - 戻し方（可逆）: このファイルを消すかコメントアウト。生成JSONは git 履歴から戻せる。
+name: view02 rank v2 (read-only + JSON)
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write        # 生成した data/view02_rising.json をコミットするため
+
+jobs:
+  rank:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "psycopg2-binary>=2.9"
+      - name: Run view02 rank v2 (prints log + writes data/view02_rising.json)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}            # 必須（読み取り専用）
+          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}    # 任意（無ければB1を自動スキップ）
+          TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
+          # 必要なら暫定パラメータを上書き（例）:
+          # TOP_N: "30"
+          # OUT_PATH: "data/view02_rising.json"
+          # RECENT_HOURS: "6"
+          # MIN_CURRENT: "100"
+        run: python scripts/view02_rank_v2.py
+      - name: Commit JSON if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/view02_rising.json
+          git diff --staged --quiet || git commit -m "Update view02_rising.json [skip ci]"
+          git push
