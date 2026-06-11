@@ -37,6 +37,13 @@ RISER_ABS_FLOOR = int(os.environ.get("RISER_ABS_FLOOR") or "200")
 LAUNCH_DAYS = int(os.environ.get("LAUNCH_DAYS") or "14")   # 発売後この日数まで
 LAUNCH_MAX  = int(os.environ.get("LAUNCH_MAX")  or "200")  # 上限件数（CCUキー10万/日の枠を守る）
 
+# --- 1発火あたりの観測パス（A案：GitHubのschedule発火が間引かれる対策）。すべて暫定・env可変。---
+# 1回の起動で PASSES 回観測し、6時間窓に複数点を確保する。発火が無い窓は依然薄い＝部分改善（引継ぎ §5）。
+# 既定 PASSES=1 ＝ 改修前と完全に同一挙動（後方互換）。点数を増やすのは yml 側で明示する（戻すのも yml だけ）。
+PASSES = int(os.environ.get("PASSES") or "1")                       # 1発火あたりの観測回数
+INTERVAL_SEC = int(os.environ.get("INTERVAL_SEC") or "300")         # パス開始時刻の間隔（秒）
+MAX_RUNTIME_SEC = int(os.environ.get("MAX_RUNTIME_SEC") or "1080")  # ハード上限。timeout(20分=1200秒)に余裕を残す安全弁
+
 _lock = threading.Lock()
 _next = [0.0]
 _interval = 1.0 / RATE_PER_SEC
@@ -161,12 +168,9 @@ def write_results(checked, above):
         conn.close()
 
 
-def main():
-    targets, n_risers, n_launched = get_targets()
-    print(f"密ティア対象: {len(targets)} 件 (内 昇格 {n_risers} 件 / 発売直後 {n_launched} 件) "
-          f"[DENSE_N={DENSE_N}, floor={FLOOR}, rate={RATE_PER_SEC}/s, workers={WORKERS}; "
-          f"riser x{RISER_MULT}/+{RISER_ABS_ADD}/>={RISER_ABS_FLOOR}, 直近{RISER_RECENT_HOURS}h vs {RISER_BASE_DAYS}d, 基準>={RISER_MIN_BASE_OBS}点; "
-          f"launch<= {LAUNCH_DAYS}日/上限{LAUNCH_MAX}]")
+def run_one_pass(targets, pass_no):
+    """1回分の観測（fetch → write_results）。非破壊（追記＋時刻UPDATEのみ）。
+    1パスの失敗はそのパスを捨てるだけ＝player_counts は追記のみで壊れない。"""
     results = []
     with ThreadPoolExecutor(max_workers=WORKERS) as ex:
         for appid, pc in ex.map(fetch_ccu, targets):
@@ -174,8 +178,43 @@ def main():
     checked = [a for (a, pc) in results if pc is not None]
     above = [(a, pc) for (a, pc) in results if pc is not None and pc >= FLOOR]
     fails = len(targets) - len(checked)
-    print(f"取得成功: {len(checked)} 件 / 保存(同接{FLOOR}以上): {len(above)} 件 / 取得失敗: {fails} 件")
+    print(f"[pass {pass_no}/{PASSES}] 取得成功: {len(checked)} 件 / 保存(同接{FLOOR}以上): {len(above)} 件 / 取得失敗: {fails} 件")
     write_results(checked, above)
+
+
+def main():
+    # ターゲットはループ開始時に1回だけ算出し、全パスで同一対象を等間隔観測する（p90に素直・DB負荷も低い）。
+    # ループ中（最大十数分）に出た新顔は次の発火で拾うため影響は軽微。
+    targets, n_risers, n_launched = get_targets()
+    print(f"密ティア対象: {len(targets)} 件 (内 昇格 {n_risers} 件 / 発売直後 {n_launched} 件) "
+          f"[DENSE_N={DENSE_N}, floor={FLOOR}, rate={RATE_PER_SEC}/s, workers={WORKERS}; "
+          f"riser x{RISER_MULT}/+{RISER_ABS_ADD}/>={RISER_ABS_FLOOR}, 直近{RISER_RECENT_HOURS}h vs {RISER_BASE_DAYS}d, 基準>={RISER_MIN_BASE_OBS}点; "
+          f"launch<= {LAUNCH_DAYS}日/上限{LAUNCH_MAX}]")
+    print(f"観測パス: PASSES={PASSES}, INTERVAL_SEC={INTERVAL_SEC}, MAX_RUNTIME_SEC={MAX_RUNTIME_SEC}（timeout内に収める安全弁）")
+
+    t0 = time.monotonic()
+    done = 0
+    for i in range(PASSES):
+        # 予定開始時刻（パス開始時刻基準の等間隔）まで待つ。
+        if i > 0:
+            target_at = t0 + i * INTERVAL_SEC
+            wait = target_at - time.monotonic()
+            if wait > 0:
+                # この待機後に1パス（≈60秒）を走らせるとハード上限を超える見込みなら、ここで打ち切る。
+                if (target_at - t0) + 90 > MAX_RUNTIME_SEC:
+                    print(f"[pass {i+1}/{PASSES}] 残り時間不足のためスキップ（ハード上限 {MAX_RUNTIME_SEC}s を守る）")
+                    break
+                print(f"次パスまで {wait:.0f}s 待機…")
+                time.sleep(wait)
+        # 1パス失敗はループを止めず次へ（Neonの一過性タイムアウト等に耐える。非破壊なので捨てて安全）。
+        try:
+            run_one_pass(targets, i + 1)
+            done += 1
+        except Exception as e:
+            print(f"[pass {i+1}/{PASSES}] 失敗（このパスは捨てる・非破壊）: {e}")
+
+    print(f"観測パス完了: {done}/{PASSES} 成功。経過 {time.monotonic() - t0:.0f}s")
+
     conn = psycopg2.connect(DATABASE_URL)
     try:
         with conn, conn.cursor() as cur:
