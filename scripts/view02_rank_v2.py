@@ -19,6 +19,7 @@ import os
 import re
 import json
 import time
+import datetime
 import urllib.parse
 import urllib.request
 
@@ -37,6 +38,7 @@ N0          = float(os.environ.get("N0")        or "10")
 MIN_CURRENT = int(os.environ.get("MIN_CURRENT") or "100")
 MIN_POINTS  = int(os.environ.get("MIN_POINTS")  or "5")
 TOP_N       = int(os.environ.get("TOP_N")       or "30")
+OUT_PATH    = os.environ.get("OUT_PATH") or "data/view02_rising.json"  # 出力JSON（独立・上書き・可逆）
 CAND_N      = int(os.environ.get("CAND_N")      or "45")    # Twitch照会する候補数（base順上位）
 # 有意性ソフト化
 Z_REF       = float(os.environ.get("Z_REF")     or "3")
@@ -232,21 +234,22 @@ def twitch_fetch(names):
 
 
 def b1_signal(current, tw):
-    """戻り：(label or None, boost)。少数配信×高視聴=発掘 / 高視聴=注目。すべて上限付き・暫定。"""
+    """戻り：(type_code or None, label or None, boost)。少数配信×高視聴=発掘 / 高視聴=注目。上限付き・暫定。
+    type_code は公開JSON用（数値なし・②）。label は診断印字用（数値あり・公開しない）。"""
     if not tw:
-        return None, 0.0
+        return None, None, 0.0
     v, c = tw
     if not v or v <= 0:
-        return None, 0.0
+        return None, None, 0.0
     conc = v / max(c, 1)               # 視聴/配信（集中度）
     vpc = v / current if current else 0  # 視聴/CCU（注目度）
     if c <= B1_FEW_CH and conc >= B1_CONC_REF:
-        return f"配信発掘(配信{c}・視聴{v})", B1_DISCOVERY
+        return "b1_discovery", f"配信発掘(配信{c}・視聴{v})", B1_DISCOVERY
     if vpc >= B1_VPC_REF:
-        return f"配信注目(視聴/CCU {vpc:.2f})", B1_ATTENTION
+        return "b1_attention", f"配信注目(視聴/CCU {vpc:.2f})", B1_ATTENTION
     if v > 0:
-        return f"配信あり(弱・視聴{v})", 0.0
-    return None, 0.0
+        return None, f"配信あり(弱・視聴{v})", 0.0
+    return None, None, 0.0
 
 
 def main():
@@ -276,34 +279,47 @@ def main():
     for r in cand:
         sr = shrunk(r["raw_ratio"], r["n_points"])
         bs = base_score(sr, r["robust_z"])
-        causes, boost = [], 0.0
-        if sale.get(r["appid"], 0) and sale[r["appid"]] > 0:
-            causes.append(f"セール{sale[r['appid']]}%"); boost += BOOST_SALE
+        signals, label_parts, boost = [], [], 0.0
+        sp = sale.get(r["appid"], 0)
+        if sp and sp > 0:
+            signals.append({"type": "sale", "layer": "trigger", "value": {"discount_percent": int(sp)}})
+            label_parts.append(f"セール{sp}%"); boost += BOOST_SALE
         if r["appid"] in news:
-            causes.append("更新/告知"); boost += BOOST_NEWS
+            signals.append({"type": "news", "layer": "trigger", "value": None})
+            label_parts.append("更新/告知"); boost += BOOST_NEWS
         if r["is_launch"]:
-            causes.append("新作"); boost += BOOST_LAUNCH
+            signals.append({"type": "launch", "layer": "trigger", "value": None})
+            label_parts.append("新作"); boost += BOOST_LAUNCH
         if r["appid"] in free:
-            causes.append("無料配布"); boost += BOOST_FREE
-        if revd.get(r["appid"], 0) >= REV_SURGE:
-            causes.append(f"レビュー急増(+{revd[r['appid']]})"); boost += BOOST_REVIEW
-        b1label, b1boost = b1_signal(r["current_ccu"], tw.get(r["name"]))
+            signals.append({"type": "free_promo", "layer": "trigger", "value": None})
+            label_parts.append("無料配布"); boost += BOOST_FREE
+        dl = revd.get(r["appid"], 0)
+        if dl >= REV_SURGE:
+            signals.append({"type": "review_surge", "layer": "trigger", "value": {"delta": int(dl)}})
+            label_parts.append(f"レビュー急増(+{dl})"); boost += BOOST_REVIEW
+        b1type, b1label, b1boost = b1_signal(r["current_ccu"], tw.get(r["name"]))
+        if b1type:  # 公開JSONは種別のみ・数値なし（②）。弱い「配信あり」はシグナルにしない。
+            signals.append({"type": b1type, "layer": "trigger", "value": None}); boost += b1boost
         if b1label:
-            causes.append(b1label); boost += b1boost
+            label_parts.append(b1label)  # 印字（診断用）にはラベルを残す＝公開はしない
+        boost_capped = boost >= BOOST_CAP
         boost = clamp(boost, 0, BOOST_CAP)
         eff = bs * (1 + boost)
-        # 確信度
+        # 確信度（高/中/低 印字用 と high/mid/low JSON用）
         z = r["robust_z"] or 0; n = r["n_points"] or 0
-        if not causes:
+        if not signals:
             conf = "低" if (z < 2 or n < 7) else "中"
+            conf_code = "low" if (z < 2 or n < 7) else "mid"
             label = "原因不明"
         else:
             conf = "高" if (z >= 2 and n >= 7) else "中"
+            conf_code = "high" if (z >= 2 and n >= 7) else "mid"
             if n < 5:
-                conf = "低"
-            label = " + ".join(causes)
-        r.update({"shrunk": sr, "eff": eff, "label": label, "conf": conf,
-                  "tw": tw.get(r["name"])})
+                conf = "低"; conf_code = "low"
+            label = " + ".join(label_parts) if label_parts else "（シグナルあり）"
+        r.update({"shrunk": sr, "base": bs, "eff": eff, "label": label, "conf": conf,
+                  "conf_code": conf_code, "signals": signals, "boost": boost,
+                  "boost_capped": boost_capped, "tw": tw.get(r["name"])})
         rows.append(r)
 
     rows.sort(key=lambda x: x["eff"], reverse=True)
@@ -325,7 +341,54 @@ def main():
               f"{'Y' if r['is_launch'] else '-'}    {tws.rjust(10)}  {r['label']} / {r['conf']}")
     print(f"\n原因不明: {n_unknown}/{len(rows)}。重みは上限付き暫定（案2で学習予定）。Twitchは集計のみ・保存なし。")
     print("=" * 88)
-    print("この出力を共有 → B1の効き/きっかけ精度/暫定パラメータを調整 → 出力JSON設計へ。")
+
+    # ---------- 出力JSON（data/view02_rising.json・独立・上書き・可逆） ----------
+    out = {
+        "meta": {
+            "schema_version": 1,
+            "generated_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "method": "v1_transparent_provisional",
+            "experimental": True,
+            "disclaimer_code": "provisional_weights_experimental",
+            "window": {"base_days": BASE_DAYS, "gap_days": GAP_DAYS,
+                       "recent_hours": RECENT_HOURS, "recent_quantile": RECENT_Q},
+            "item_count": len(rows),
+        },
+        "items": [],
+    }
+    for i, r in enumerate(rows, 1):
+        out["items"].append({
+            "rank": i,
+            "appid": int(r["appid"]),
+            "name": r["name"],
+            "detection": {
+                "current_ccu": int(r["current_ccu"]),
+                "recent_value": None if r["recent_value"] is None else int(round(r["recent_value"])),
+                "baseline": None if r["baseline"] is None else int(round(r["baseline"])),
+                "ratio": None if r["raw_ratio"] is None else round(r["raw_ratio"], 1),
+                "robust_z": None if r["robust_z"] is None else round(r["robust_z"], 1),
+                "n_points": int(r["n_points"]),
+                "is_riser": bool(r["is_riser"]),
+                "is_launch": bool(r["is_launch"]),
+            },
+            "signals": r["signals"],  # 種別＋層タグ＋数値（B1は数値なし＝②）。個人は含まない。
+            "prediction": {"known": bool(r["signals"]),
+                           "cause_types": [s["type"] for s in r["signals"]]},
+            "confidence": r["conf_code"],
+            "score": {"eff": round(r["eff"], 2), "base": round(r["base"], 2),
+                      "boost": round(r["boost"], 2), "boost_capped": bool(r["boost_capped"])},
+        })
+    try:
+        out_dir = os.path.dirname(OUT_PATH)
+        if out_dir:
+            os.makedirs(out_dir, exist_ok=True)
+        with open(OUT_PATH, "w", encoding="utf-8") as f:
+            json.dump(out, f, ensure_ascii=False, indent=2)
+        print(f"出力JSON: {OUT_PATH}（{len(rows)}件・schema v1・experimental）")
+    except Exception as e:
+        print(f"  ⚠ JSON書き出し失敗: {type(e).__name__}: {e}")
+
+    print("この出力を共有 → B1の効き/きっかけ精度/暫定パラメータを調整。公開JSONは data/view02_rising.json。")
 
 
 if __name__ == "__main__":
