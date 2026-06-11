@@ -1,42 +1,65 @@
-# view02 ランキング v2（A＋B1）を手動実行し、出力JSONをリポジトリに保存する
+# view02 v2 ランキング（A＋B1）を実行し、data/view02_rising.json を生成してコミットする
 # 置き場所: .github/workflows/view02_rank_v2.yml
-# 実行: Actions タブ →「view02 rank v2 (read-only + JSON)」→ Run workflow
-#   - 自前DBは読み取り専用（SELECTのみ）。
-#   - 実行ログに順位表を印字し、data/view02_rising.json を生成 → 変更があればコミット（サイトが読む用）。
-#   - JSONを残したくない（見るだけ）の場合は、末尾の「Commit JSON」ステップを削除すればログ出力のみになる。
-#   - 戻し方（可逆）: このファイルを消すかコメントアウト。生成JSONは git 履歴から戻せる。
-name: view02 rank v2 (read-only + JSON)
+# 実行: Actions タブ →「view02 rank v2 (JSON出力)」→ Run workflow
+#
+# 守る線: DBは読み取り専用（SELECTのみ）。書き込みは「リポジトリ内の data/view02_rising.json 1ファイル」だけ。
+#         独立ファイル・毎回上書き＝可逆（消しても他に影響しない）。
+# 戻し方: このファイルを削除（または旧 view02_rank.yml に戻す）だけ。
+#
+# 修正点（2026-06-11）:
+#   1. permissions: contents: write を明示（無いと push が 403 → exit 128）
+#   2. git の user.name / user.email を設定（無いと commit が exit 128）
+#   3. push衝突時は取り込み直して最大3回再試行（他ワークフローの同時pushに備える保険）
+#   4. checkout@v6 / setup-python@v6 に版上げ（2026-06-16のNode24強制化対応・最新版はGitHub APIで確認済み）
+
+name: view02 rank v2 (JSON出力)
 
 on:
   workflow_dispatch: {}
+  # 定期実行したくなったら下を有効化（頻度はオーナー確定。例は6時間ごと）
+  # schedule:
+  #   - cron: "5 */6 * * *"
 
 permissions:
-  contents: write        # 生成した data/view02_rising.json をコミットするため
+  contents: write   # data/view02_rising.json をコミットするために必要（これが無いと exit 128）
 
 jobs:
   rank:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - run: pip install "psycopg2-binary>=2.9"
-      - name: Run view02 rank v2 (prints log + writes data/view02_rising.json)
+
+      - name: Run view02 v2 (DB read-only / JSON書き出し)
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}            # 必須（読み取り専用）
-          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}    # 任意（無ければB1を自動スキップ）
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # Twitch鍵が無ければ B1 は自動スキップ・A単独で動く（コード側の設計どおり）
+          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
           TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
-          # 必要なら暫定パラメータを上書き（例）:
-          # TOP_N: "30"
-          # OUT_PATH: "data/view02_rising.json"
-          # RECENT_HOURS: "6"
-          # MIN_CURRENT: "100"
+          # OUT_PATH: "data/view02_rising.json"   # 既定のまま。変える場合のみ有効化
         run: python scripts/view02_rank_v2.py
-      - name: Commit JSON if changed
+        # ↑ スクリプトの置き場所が scripts/ でない場合はパスを直す（v1のymlに合わせた想定）
+
+      - name: Commit JSON（変更があるときだけ）
         run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/view02_rising.json
-          git diff --staged --quiet || git commit -m "Update view02_rising.json [skip ci]"
-          git push
+          if git diff --cached --quiet; then
+            echo "変更なし＝コミットしない"
+            exit 0
+          fi
+          git commit -m "view02: update data/view02_rising.json"
+          for i in 1 2 3; do
+            if git push; then
+              echo "push成功"
+              exit 0
+            fi
+            echo "push失敗 → リモートを取り込み直して再試行 ($i/3)"
+            git pull --rebase
+          done
+          echo "3回失敗。他ワークフローと衝突が続いている可能性 → ログを共有してください"
+          exit 1
