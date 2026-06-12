@@ -1,5 +1,12 @@
 name: Steam collector (dense tier)
 
+# A'案：1回の発火で長時間ループし、6時間窓に複数の観測点を確保する（p90 を設計どおり効かせる）。
+# GitHub-hosted ランナーのジョブ実行上限は 6時間（360分・ハードリミット）。その内側で約5.7時間ループする。
+# 外部トリガー（B案）と違い PAT を外部に預けないため、鍵を増やさず・隔離を崩さずに高頻度化できる。
+# 発火漏れ対策：schedule を 2時間ごとにして発火機会を増やし、concurrency で多重起動を防ぐ
+#   （実行中なら新しい発火は待機。長時間ジョブが1本でも走れば6時間ぶん埋まる＝漏れに強い）。
+# すべて暫定。戻すとき＝yml のこのブロックの値を元（PASSES=1 等）に戻すだけ。コードは触らない。
+
 on:
   workflow_dispatch:
     inputs:
@@ -8,35 +15,33 @@ on:
         default: "300"
         required: false
       passes:
-        description: "1発火あたりの観測回数（動作確認は 1 で素早く。本番は既定の 3）"
-        default: "3"
+        description: "観測回数（動作確認は 1〜2 で素早く。本番は既定の 18＝20分×約5.7h）"
+        default: "18"
         required: false
-  # 密ティア（監視リスト ∪ 直近CCU上位N）の同接を高頻度で観測する。
-  # GitHubの無料スケジュールは :00 が最も混雑して取りこぼされやすいため、
-  # :07/:22/:37/:52（15分毎）に分散する。※それでも best-effort で発火漏れは残る。
-  # 対策（A案）：発火漏れを完全には防げないので、1回の発火で PASSES 回観測して
-  # 6時間窓に複数点を確保する。発火が全く無い窓は依然薄いまま＝部分改善（引継ぎ §4/§5）。
-  # 真の等間隔保証は外部トリガー（B案・PAT外部預け）でのみ可能で、本番採否は別判断。
   schedule:
-    - cron: "7,22,37,52 * * * *"
+    - cron: "13 */2 * * *"   # 2時間ごと。:00 は混雑するため :13 に分散（best-effort なので分は目安）
+
+# 同じグループのジョブは同時に1本だけ。実行中に来た発火は待機させ、二重観測と無駄な課金を防ぐ。
+concurrency:
+  group: dense-collector
+  cancel-in-progress: false
 
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 350        # GitHub上限360分の手前。コード側 MAX_RUNTIME_SEC が先に自発停止する。
     steps:
       - uses: actions/checkout@v6
-      - name: Dense-tier current players sweep
+      - name: Dense-tier current players sweep (long-running)
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
           DENSE_N: ${{ github.event.inputs.n || '300' }}
-          # A案の観測パス。schedule発火時は inputs が空になるため || で既定値にフォールバックする。
-          # 既定 PASSES=3／INTERVAL_SEC=300（開始 0/5/10分）／MAX_RUNTIME_SEC=1080（timeout 20分に2分の安全マージン）。
-          # 戻すとき＝ここの PASSES を 1 にするだけで改修前と完全に同一挙動（コードは触らない）。
-          PASSES: ${{ github.event.inputs.passes || '3' }}
-          INTERVAL_SEC: "300"
-          MAX_RUNTIME_SEC: "1080"
+          # A'案の本番値。schedule発火時は inputs が空になるため || で既定値にフォールバックする。
+          PASSES: ${{ github.event.inputs.passes || '18' }}   # 6時間窓に約18点（案イ）
+          INTERVAL_SEC: "1200"                                 # 20分間隔（パス開始時刻基準の等間隔）
+          MAX_RUNTIME_SEC: "20640"                             # 344分で自発停止（timeout350分・上限360分に余裕）
+          REFRESH_TARGETS_EVERY: "6"                           # 6パス=2時間ごとにターゲット再算出（新顔取り込み）
           PYTHONUNBUFFERED: "1"
         run: |
           pip install psycopg2-binary --quiet
