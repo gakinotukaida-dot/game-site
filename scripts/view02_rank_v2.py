@@ -54,6 +54,17 @@ LAUNCH_DAYS = int(os.environ.get("LAUNCH_DAYS") or "14")
 NEWS_DAYS   = int(os.environ.get("CAUSE_NEWS_DAYS") or "7")
 REV_DAYS    = int(os.environ.get("CAUSE_REV_DAYS")  or "7")
 REV_SURGE   = int(os.environ.get("CAUSE_REV_SURGE") or "50")
+# レビュー急増の判定方式（休眠導入・既定 abs ＝現行と完全同一挙動）
+#   abs      : 直近 REV_DAYS 日の総レビュー増が REV_SURGE 件以上で点灯（現行）。
+#   relative : 「自分比」。今週増 ÷ そのゲームの平常週ペース ≥ REV_REL_MULT かつ 今週増 ≥ REV_ABS_FLOOR。
+#              平常週ペース＝基準窓(REV_BASELINE_DAYS 日・今週より前)の増加 ÷ 週数。
+#              平常を測る履歴が無いゲームは点灯しない（誤ラベルより無ラベルを優先）。
+#   ★有効化条件：注目ゲームに (REV_BASELINE_DAYS + REV_DAYS) 日ぶんの履歴が貯まってから。
+#     先に diagnose_review_history.py を短い基準窓で回して分布を確認→しきい値確定→ここを relative に。
+REV_SURGE_MODE    = (os.environ.get("REV_SURGE_MODE") or "abs").strip().lower()
+REV_BASELINE_DAYS = int(os.environ.get("REV_BASELINE_DAYS") or "14")  # relative時の平常窓（14=2週=曜日効果を相殺）
+REV_REL_MULT      = float(os.environ.get("REV_REL_MULT")    or "3")   # 平常週ペースの何倍で急増とみなすか
+REV_ABS_FLOOR     = int(os.environ.get("REV_ABS_FLOOR")     or "15")  # 極小ゲームのノイズ除け（最低増加数）
 # 上限付きブースト（暫定の足場・案2で学習予定）
 BOOST_SALE   = float(os.environ.get("BOOST_SALE")   or "0.05")
 BOOST_NEWS   = float(os.environ.get("BOOST_NEWS")   or "0.05")
@@ -180,7 +191,36 @@ def cause_sets(cur, ids):
             revd[a] = dl or 0
     except Exception as e:
         print(f"  ⚠ cause[review] skip: {type(e).__name__}: {e}")
-    return sale, news, free, revd
+    # ---- レビュー急増の点灯集合（方式で分岐。既定 abs は上の revd を使った現行と同一） ----
+    if REV_SURGE_MODE == "relative":
+        rev_surge_ids = set()
+        try:
+            # ro=今週開始時点の総数 / rb=さらに REV_BASELINE_DAYS 日前の総数（平常窓の起点）
+            cur.execute("WITH ro AS (SELECT DISTINCT ON (appid) appid, total_reviews FROM review_snapshots "
+                        "  WHERE appid = ANY(%s) AND recorded_at <= now() - make_interval(days => %s) "
+                        "  ORDER BY appid, recorded_at DESC), "
+                        "rb AS (SELECT DISTINCT ON (appid) appid, total_reviews FROM review_snapshots "
+                        "  WHERE appid = ANY(%s) AND recorded_at <= now() - make_interval(days => %s) "
+                        "  ORDER BY appid, recorded_at DESC) "
+                        "SELECT ro.appid, ro.total_reviews, rb.total_reviews "
+                        "FROM ro LEFT JOIN rb USING (appid)",
+                        (ids, REV_DAYS, ids, REV_DAYS + REV_BASELINE_DAYS))
+            weeks = REV_BASELINE_DAYS / 7.0
+            for a, ro_t, rb_t in cur.fetchall():
+                if rb_t is None:
+                    continue  # 平常を測る履歴が無い→点灯しない（誤ラベル回避）
+                d = revd.get(a, 0)
+                bw = ((ro_t or 0) - rb_t) / weeks if weeks > 0 else 0.0  # 平常週ペース
+                # ratio>=REL_MULT を割り算なしで判定。bw<=0（休眠→増加）は自動的に点灯。
+                if d >= REV_ABS_FLOOR and d >= REV_REL_MULT * bw:
+                    rev_surge_ids.add(a)
+        except Exception as e:
+            # 失敗時は安全側で現行(abs)へフォールバック（点灯が黙って消えるより既知挙動を保つ）
+            print(f"  ⚠ cause[review:relative] skip→absフォールバック: {type(e).__name__}: {e}")
+            rev_surge_ids = {a for a, dl in revd.items() if dl >= REV_SURGE}
+    else:
+        rev_surge_ids = {a for a, dl in revd.items() if dl >= REV_SURGE}
+    return sale, news, free, revd, rev_surge_ids
 
 
 # ---------- Twitch（集計のみ・保存なし） ----------
@@ -269,7 +309,7 @@ def main():
                 print("0件。MIN_*を緩めるか窓を短くして再診断。")
                 return
             ids = [r["appid"] for r in cand]
-            sale, news, free, revd = cause_sets(cur, ids)
+            sale, news, free, revd, rev_surge_ids = cause_sets(cur, ids)
     finally:
         conn.close()
 
@@ -294,7 +334,7 @@ def main():
             signals.append({"type": "free_promo", "layer": "trigger", "value": None})
             label_parts.append("無料配布"); boost += BOOST_FREE
         dl = revd.get(r["appid"], 0)
-        if dl >= REV_SURGE:
+        if r["appid"] in rev_surge_ids:
             signals.append({"type": "review_surge", "layer": "trigger", "value": {"delta": int(dl)}})
             label_parts.append(f"レビュー急増(+{dl})"); boost += BOOST_REVIEW
         b1type, b1label, b1boost = b1_signal(r["current_ccu"], tw.get(r["name"]))
