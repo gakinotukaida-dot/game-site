@@ -1,12 +1,36 @@
 # バックテスト採点器を手動実行（読み取り専用・ログ出力のみ・コミットなし）
 # 置き場所: .github/workflows/backtest_hit.yml
-# 実行: GitHub の Actions タブ →「Backtest hit-rate (read-only)」→ Run workflow
-# 出力: 実行ログに [1]〜[4]（グリッド範囲 / サージ①②当たり率 / B0とlift / 推移・例示）。DB・リポジトリは不変。
-# ※ 先に diagnose_ccu_history.py を回して [1]〜[4]（データ厚み・しきい値感）を確認してから使うこと。
+# 実行: Actions タブ →「Backtest hit-rate (read-only)」→ Run workflow（入力でチューニング可）
+# 出力: sweep=1 → (H×Top-N) の lift 比較表。sweep=0 → 単発の [1]〜[4] 詳細。DB・リポジトリは不変。
 name: Backtest hit-rate (read-only)
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      sweep:
+        description: "1=スイープ(H×Top-N比較) / 0=単発詳細"
+        default: "1"
+      sweep_h:
+        description: "スイープするH(日)・カンマ区切り"
+        default: "7,14"
+      sweep_topn:
+        description: "スイープするTop-N・カンマ区切り"
+        default: "10,20,30"
+      persist_frac:
+        description: "①持続しきい値（中央値≥これ×R）"
+        default: "0.6"
+      rise_mult:
+        description: "②追随しきい値（ピーク≥これ×R）"
+        default: "1.3"
+      grid_max:
+        description: "as-of日数の上限"
+        default: "45"
+      h_days:
+        description: "単発モードのH(日)"
+        default: "7"
+      top_n:
+        description: "単発モードのTop-N"
+        default: "30"
 
 jobs:
   backtest:
@@ -22,13 +46,13 @@ jobs:
         run: pip install "psycopg2-binary>=2.9"
       - name: Run backtest scorer (read-only; prints to log)
         env:
-          # 他の read-only ワークフローと同じ Neon 接続のシークレットを指定すること。
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          # 暫定しきい値（diagnose_ccu_history[4] で確定した値をここで上書き）:
-          # H_DAYS: "7"
-          # PERSIST_FRAC: "0.6"
-          # RISE_MULT: "1.3"
-          # FORWARD_MIN_DAYS: "3"
-          # TOP_N: "30"
-          # GRID_MAX: "45"
+          SWEEP: ${{ github.event.inputs.sweep }}
+          SWEEP_H: ${{ github.event.inputs.sweep_h }}
+          SWEEP_TOPN: ${{ github.event.inputs.sweep_topn }}
+          PERSIST_FRAC: ${{ github.event.inputs.persist_frac }}
+          RISE_MULT: ${{ github.event.inputs.rise_mult }}
+          GRID_MAX: ${{ github.event.inputs.grid_max }}
+          H_DAYS: ${{ github.event.inputs.h_days }}
+          TOP_N: ${{ github.event.inputs.top_n }}
         run: python scripts/backtest_hit.py
