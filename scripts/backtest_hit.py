@@ -53,6 +53,11 @@ GRID_STRIDE_DAYS = int(os.environ.get("GRID_STRIDE_DAYS") or "1")
 GRID_MAX         = int(os.environ.get("GRID_MAX")         or "45")  # 採点する as-of 日数の上限（コスト）
 EXAMPLES         = int(os.environ.get("EXAMPLES")         or "12")
 
+# --- スイープ（H × Top-N を一度に比較して lift の効きを見る・チューニング用） ---
+SWEEP      = (os.environ.get("SWEEP") or "0").strip() in ("1", "true", "yes")
+SWEEP_H    = [int(x) for x in (os.environ.get("SWEEP_H")    or "7,14").split(",") if x.strip()]
+SWEEP_TOPN = [int(x) for x in (os.environ.get("SWEEP_TOPN") or "10,20,30").split(",") if x.strip()]
+
 
 def _fmt(x, nd=2):
     return "—" if x is None else f"{x:.{nd}f}"
@@ -189,6 +194,49 @@ def score_one(m, R, daymaxes):
     return (True, hit1, hit2)
 
 
+def run_config(cur, mn, mx, H, topn, grid_max):
+    """1つの (H, Top-N) 設定で as-of グリッドを回し、surge/B0 の①②hit集計を返す（スイープ用・lean）。
+    しきい値 PERSIST_FRAC/RISE_MULT/FORWARD_MIN_DAYS は score_one のグローバル（固定）を使う。"""
+    t_last = mx - datetime.timedelta(days=H)
+    t_first = mn + datetime.timedelta(days=BASE_DAYS + GAP_DAYS)
+    grid, t = [], t_last
+    while t >= t_first:
+        grid.append(t)
+        t = t - datetime.timedelta(days=GRID_STRIDE_DAYS)
+    grid.reverse()
+    if len(grid) > grid_max:
+        grid = grid[-grid_max:]
+    s_n = s1 = s2 = b_n = b1 = b2 = 0
+    for tt in grid:
+        t1 = tt + datetime.timedelta(days=H)
+        try:
+            P = surge_topn_asof(cur, tt, topn)
+            B0 = ccu_topn_asof(cur, tt, topn)
+        except Exception:
+            continue
+        ids = sorted({a for a, _, _ in P} | {a for a, _ in B0})
+        m = metrics_asof(cur, ids, tt, t1)
+        dm = forward_daymax(cur, ids, tt, t1)
+        ccu0 = {a: c for a, c in B0}
+        for appid, R, bmed in P:
+            mm = m.get(appid)
+            RR = R if R is not None else ccu0.get(appid)
+            if mm is not None and (RR is None or RR <= 0):
+                RR = mm.get("rp90")
+            sc, h1, h2 = score_one(mm, RR, dm.get(appid, []))
+            if not sc:
+                continue
+            s_n += 1; s1 += h1; s2 += h2
+        for appid, ccu in B0:
+            mm = m.get(appid)
+            RR = mm.get("rp90") if (mm and mm.get("rp90") is not None) else ccu
+            sc, h1, h2 = score_one(mm, RR, dm.get(appid, []))
+            if not sc:
+                continue
+            b_n += 1; b1 += h1; b2 += h2
+    return dict(ndays=len(grid), s_n=s_n, s1=s1, s2=s2, b_n=b_n, b1=b1, b2=b2)
+
+
 def main():
     need_days = BASE_DAYS + GAP_DAYS + H_DAYS
     print("=" * 78)
@@ -207,6 +255,32 @@ def main():
             mn, mx = cur.fetchone()
             if not (mn and mx):
                 print("player_counts が空。中止。")
+                return
+
+            # ---------- スイープ: (H × Top-N) の lift 比較（チューニング用・1回で全体像） ----------
+            if SWEEP:
+                print(f"SWEEP: (H × Top-N) の lift 比較 ／ ①持続=中央値≥{PERSIST_FRAC}×R かつ 高止まり≥{FORWARD_MIN_DAYS}日, "
+                      f"②追随=ピーク≥{RISE_MULT}×R（しきい値は固定）  GRID_MAX={GRID_MAX}")
+                print(f"  データ期間: {mn} 〜 {mx}")
+                print("  {:>3} {:>5} {:>5} {:>8} {:>7} {:>7} {:>7} {:>7}".format(
+                    "H", "TopN", "asof", "surge①", "B0①", "lift①", "surge②", "lift②"))
+                for H in SWEEP_H:
+                    for tn in SWEEP_TOPN:
+                        try:
+                            r = run_config(cur, mn, mx, H, tn, GRID_MAX)
+                        except Exception as e:
+                            print(f"  ⚠ H={H} TopN={tn} 失敗: {type(e).__name__}: {e}")
+                            continue
+                        s1r = r["s1"] / r["s_n"] if r["s_n"] else 0
+                        b1r = r["b1"] / r["b_n"] if r["b_n"] else 0
+                        s2r = r["s2"] / r["s_n"] if r["s_n"] else 0
+                        b2r = r["b2"] / r["b_n"] if r["b_n"] else 0
+                        l1 = (s1r / b1r) if b1r else 0
+                        l2 = (s2r / b2r) if b2r else 0
+                        print("  {:>3} {:>5} {:>5} {:>7.0%} {:>6.0%} {:>7.2f} {:>7.0%} {:>7.2f}".format(
+                            H, tn, r["ndays"], s1r, b1r, l1, s2r, l2))
+                print("\n  読み方: lift①>1＝サージ順位が素CCU順位に勝つ（芸あり）。TopNを絞るほど精度が上がるか、Hを延ばして持続が保つかを見る。")
+                print("  最良の (H, TopN) を単発モード（SWEEP=0）で詳細確認 → 本番しきい値に採用。read-only固定。")
                 return
 
             # as-of 日グリッド: [mn+need_before, mx-H] を stride 刻み、直近 GRID_MAX 個
