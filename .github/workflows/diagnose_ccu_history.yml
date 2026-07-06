@@ -1,0 +1,34 @@
+# CCU履歴の厚み点検 ＋ ①持続/②追随 as-of ドライランを手動実行（読み取り専用・ログ出力のみ・コミットなし）
+# 置き場所: .github/workflows/diagnose_ccu_history.yml
+# 実行: GitHub の Actions タブ →「Diagnose CCU history (read-only)」→ Run workflow
+# 出力: 実行ログに [1]〜[4] が表示される。リポジトリやDBは一切変更しない。
+name: Diagnose CCU history (read-only)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: pip install "psycopg2-binary>=2.9"
+      - name: Run ccu-history diagnostic (read-only; prints to log)
+        env:
+          # 他の read-only ワークフローと同じ Neon 接続のシークレットを指定すること。
+          # 名前が DATABASE_URL でない場合は右辺 secrets.XXX を合わせる。
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # 必要なら暫定パラメータをここで上書き可（例）:
+          # MIN_CURRENT: "100"
+          # REL_N: "50"
+          # H_DAYS: "7"
+          # FORWARD_MIN_DAYS: "3"
+          # PERSIST_FRAC: "0.6"
+          # RISE_MULT: "1.3"
+        run: python scripts/diagnose_ccu_history.py
