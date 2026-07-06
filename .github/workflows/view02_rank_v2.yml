@@ -39,6 +39,15 @@ jobs:
           # Twitch鍵が無ければ B1 は自動スキップ・A単独で動く（コード側の設計どおり）
           TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
           TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
+          # === レビュー急増を「自分比(relative)」で有効化（D2・2026-07-06） ===
+          # レビュー履歴は 2026-06-03 開始＝21日超に達したため解禁（休眠実装を relative へ切替）。
+          # 目的：現行の +50 絶対値は過剰ラベル（注目上位の95%点灯）と実測確定 → 平常週ペース比で妥当割合に。
+          # 値は「暫定の出発点」。diagnose_review_history.yml を BASELINE_DAYS_LIST:"14" で回して分布を見てから
+          #   REV_REL_MULT / REV_ABS_FLOOR を微調整できる。戻すなら REV_SURGE_MODE を "abs" に（env だけ・可逆）。
+          REV_SURGE_MODE: "relative"     # 自分比。今週増 ÷ 平常週ペース ≥ REV_REL_MULT かつ 今週増 ≥ REV_ABS_FLOOR
+          REV_BASELINE_DAYS: "14"        # 平常窓（14=2週＝曜日効果を相殺／各ゲームに 14+7=21日 の履歴が要る）
+          REV_REL_MULT: "3"              # 平常週ペースの何倍で「急増」とみなすか（暫定）
+          REV_ABS_FLOOR: "15"            # 極小ゲームのノイズ除け・最低増加数（暫定）
           # OUT_PATH: "data/view02_rising.json"   # 既定のまま。変える場合のみ有効化
         run: python scripts/view02_rank_v2.py
         # ↑ スクリプトの置き場所が scripts/ でない場合はパスを直す（v1のymlに合わせた想定）

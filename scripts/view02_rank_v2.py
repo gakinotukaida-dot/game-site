@@ -176,7 +176,7 @@ def shrunk(raw, n):
 
 # ---------- cause（既存テーブル・防御クエリ） ----------
 def cause_sets(cur, ids):
-    sale, news, free, revd = {}, set(), set(), {}
+    sale, news, free, revd = {}, {}, set(), {}
     try:
         cur.execute("SELECT DISTINCT ON (appid) appid, discount_percent FROM price_snapshots "
                     "WHERE appid = ANY(%s) ORDER BY appid, recorded_at DESC", (ids,))
@@ -185,9 +185,11 @@ def cause_sets(cur, ids):
     except Exception as e:
         print(f"  ⚠ cause[sale] skip: {type(e).__name__}: {e}")
     try:
-        cur.execute("SELECT DISTINCT appid FROM announcements WHERE appid = ANY(%s) "
-                    "AND published_at >= now() - make_interval(days => %s)", (ids, NEWS_DAYS))
-        news = {r[0] for r in cur.fetchall()}
+        # C2: 最新告知からの経過日数も取得（news きっかけに「N日前に更新」を添える）。種別のみ・本文は載せない。
+        cur.execute("SELECT appid, GREATEST(0, EXTRACT(DAY FROM (now() - max(published_at)))::int) AS days_ago "
+                    "FROM announcements WHERE appid = ANY(%s) "
+                    "AND published_at >= now() - make_interval(days => %s) GROUP BY appid", (ids, NEWS_DAYS))
+        news = {a: (int(d) if d is not None else None) for a, d in cur.fetchall()}
     except Exception as e:
         print(f"  ⚠ cause[news] skip: {type(e).__name__}: {e}")
     try:
@@ -342,8 +344,10 @@ def main():
             signals.append({"type": "sale", "layer": "trigger", "value": {"discount_percent": int(sp)}})
             label_parts.append(f"セール{sp}%"); boost += BOOST_SALE
         if r["appid"] in news:
-            signals.append({"type": "news", "layer": "trigger", "value": None})
-            label_parts.append("更新/告知"); boost += BOOST_NEWS
+            da = news.get(r["appid"])
+            signals.append({"type": "news", "layer": "trigger",
+                            "value": (None if da is None else {"days_ago": int(da)})})
+            label_parts.append(f"更新/告知({da}日前)" if da is not None else "更新/告知"); boost += BOOST_NEWS
         if r["is_launch"]:
             signals.append({"type": "launch", "layer": "trigger", "value": None})
             label_parts.append("新作"); boost += BOOST_LAUNCH
