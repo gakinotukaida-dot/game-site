@@ -1,0 +1,45 @@
+# 「新着で伸び」JSON を生成して data/new_rising.json にコミットする（読み取り専用・全ゲーム対象）
+# 置き場所: .github/workflows/export_new_rising.yml
+# 実行: Actions タブ →「export new-rising JSON」→ Run workflow
+# 守る線: DBは読み取り専用（SELECTのみ）。書き込みは data/new_rising.json 1ファイルだけ・毎回上書き＝可逆。
+name: export new-rising JSON
+
+on:
+  workflow_dispatch: {}
+  # 定期実行したくなったら有効化（頻度はオーナー確定・例は6時間ごと）:
+  # schedule:
+  #   - cron: "17 */6 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install "psycopg2-binary>=2.9"
+      - name: Run export_new_rising (DB read-only / JSON書き出し)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # 暫定パラメータ（必要なら上書き）:
+          # LAUNCH_DAYS: "14"
+          # MIN_CURRENT: "50"
+          # RISE_MIN: "1.0"
+          # TOP_N: "60"
+        run: python scripts/export_new_rising.py
+      - name: Commit JSON（変更があるときだけ）
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/new_rising.json
+          if git diff --cached --quiet; then echo "変更なし＝コミットしない"; exit 0; fi
+          git commit -m "data: update new_rising.json"
+          for i in 1 2 3; do
+            if git push; then echo "push成功"; exit 0; fi
+            echo "push失敗 → 取り込み直して再試行 ($i/3)"; git pull --rebase
+          done
+          echo "3回失敗。同時pushの衝突が続いている可能性 → ログ共有を"; exit 1

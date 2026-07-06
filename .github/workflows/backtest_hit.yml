@@ -1,0 +1,34 @@
+# バックテスト採点器を手動実行（読み取り専用・ログ出力のみ・コミットなし）
+# 置き場所: .github/workflows/backtest_hit.yml
+# 実行: GitHub の Actions タブ →「Backtest hit-rate (read-only)」→ Run workflow
+# 出力: 実行ログに [1]〜[4]（グリッド範囲 / サージ①②当たり率 / B0とlift / 推移・例示）。DB・リポジトリは不変。
+# ※ 先に diagnose_ccu_history.py を回して [1]〜[4]（データ厚み・しきい値感）を確認してから使うこと。
+name: Backtest hit-rate (read-only)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: pip install "psycopg2-binary>=2.9"
+      - name: Run backtest scorer (read-only; prints to log)
+        env:
+          # 他の read-only ワークフローと同じ Neon 接続のシークレットを指定すること。
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # 暫定しきい値（diagnose_ccu_history[4] で確定した値をここで上書き）:
+          # H_DAYS: "7"
+          # PERSIST_FRAC: "0.6"
+          # RISE_MULT: "1.3"
+          # FORWARD_MIN_DAYS: "3"
+          # TOP_N: "30"
+          # GRID_MAX: "45"
+        run: python scripts/backtest_hit.py
