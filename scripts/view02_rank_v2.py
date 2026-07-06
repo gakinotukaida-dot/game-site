@@ -178,10 +178,14 @@ def shrunk(raw, n):
 def cause_sets(cur, ids):
     sale, news, free, revd = {}, {}, set(), {}
     try:
-        cur.execute("SELECT DISTINCT ON (appid) appid, discount_percent FROM price_snapshots "
-                    "WHERE appid = ANY(%s) ORDER BY appid, recorded_at DESC", (ids,))
-        for a, d in cur.fetchall():
-            sale[a] = d or 0
+        # C1: 現在の割引＋観測内の最大割引。is_best＝いまが観測範囲で最も安い（＝良いセール）か。
+        cur.execute("SELECT appid, "
+                    "(array_agg(discount_percent ORDER BY recorded_at DESC))[1] AS cur_disc, "
+                    "max(discount_percent) AS max_disc "
+                    "FROM price_snapshots WHERE appid = ANY(%s) GROUP BY appid", (ids,))
+        for a, cur_d, max_d in cur.fetchall():
+            cd = cur_d or 0
+            sale[a] = {"pct": cd, "best": bool(cd > 0 and max_d is not None and cd >= max_d)}
     except Exception as e:
         print(f"  ⚠ cause[sale] skip: {type(e).__name__}: {e}")
     try:
@@ -339,10 +343,11 @@ def main():
         sr = shrunk(r["raw_ratio"], r["n_points"])
         bs = base_score(sr, r["robust_z"])
         signals, label_parts, boost = [], [], 0.0
-        sp = sale.get(r["appid"], 0)
-        if sp and sp > 0:
-            signals.append({"type": "sale", "layer": "trigger", "value": {"discount_percent": int(sp)}})
-            label_parts.append(f"セール{sp}%"); boost += BOOST_SALE
+        sp = sale.get(r["appid"])
+        if sp and sp["pct"] > 0:
+            signals.append({"type": "sale", "layer": "trigger",
+                            "value": {"discount_percent": int(sp["pct"]), "is_best": bool(sp["best"])}})
+            label_parts.append(f"セール{sp['pct']}%" + ("(観測内最大)" if sp["best"] else "")); boost += BOOST_SALE
         if r["appid"] in news:
             da = news.get(r["appid"])
             signals.append({"type": "news", "layer": "trigger",

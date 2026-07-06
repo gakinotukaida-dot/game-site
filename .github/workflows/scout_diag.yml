@@ -1,0 +1,27 @@
+# B2 目利きスコア データ準備度 診断を手動実行（読み取り専用・ログ出力のみ・コミットなし）
+# 置き場所: .github/workflows/scout_diag.yml
+# 実行: Actions タブ →「Scout score readiness (read-only)」→ Run workflow
+# 出力: 実行ログに [1]〜[3]（pickup量 / 解決・eligible / p0・scout lift）。DB・リポジトリは不変。
+name: Scout score readiness (read-only)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install "psycopg2-binary>=2.9"
+      - name: Run scout readiness diagnostic (read-only; prints to log)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # 暫定パラメータ（必要なら上書き）:
+          # H_DAYS: "14"
+          # SMALL_CAP: "5000"
+          # RISE_MULT: "2.0"
+          # N_MIN: "5"
+        run: python scripts/scout_diag.py
