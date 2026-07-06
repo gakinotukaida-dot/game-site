@@ -38,6 +38,8 @@ N0          = float(os.environ.get("N0")        or "10")
 MIN_CURRENT = int(os.environ.get("MIN_CURRENT") or "100")
 MIN_POINTS  = int(os.environ.get("MIN_POINTS")  or "5")
 TOP_N       = int(os.environ.get("TOP_N")       or "30")
+GENRE_MAX   = int(os.environ.get("GENRE_MAX")   or "6")   # 「どんなゲームか」タグ（games.genres 由来）
+CATEGORY_MAX = int(os.environ.get("CATEGORY_MAX") or "6") # 補助タグ（games.categories 由来）
 OUT_PATH    = os.environ.get("OUT_PATH") or "data/view02_rising.json"  # 出力JSON（独立・上書き・可逆）
 CAND_N      = int(os.environ.get("CAND_N")      or "45")    # Twitch照会する候補数（base順上位）
 # 有意性ソフト化
@@ -115,7 +117,7 @@ win AS (
   FROM player_counts WHERE recorded_at >= now() - make_interval(days => %(riser_base_days)s)
   GROUP BY appid
 )
-SELECT l.appid, g.name, g.release_date, g.coming_soon,
+SELECT l.appid, g.name, g.release_date, g.coming_soon, g.genres, g.categories,
   l.current_ccu,
   COALESCE(r.recent_q, l.current_ccu)                               AS recent_value,
   b.baseline, b.n_points,
@@ -140,6 +142,21 @@ LIMIT %(cand_n)s;
 
 def clamp(x, lo, hi):
     return max(lo, min(hi, x))
+
+
+def _descs(v, cap):
+    """games.genres / games.categories（[{id,description},...] または [str]）→ 説明文の配列（先頭 cap 件）。
+    「どんなゲームか」タグ用。著作物でない短い分類語のみ（export_now_ccu と同方針）。"""
+    if not v:
+        return []
+    out = []
+    for x in v:
+        d = x.get("description") if isinstance(x, dict) else (x if isinstance(x, str) else None)
+        if d:
+            out.append(d)
+        if len(out) >= cap:
+            break
+    return out
 
 
 def base_score(shrunk_ratio, z):
@@ -411,6 +428,8 @@ def main():
                 "is_riser": bool(r["is_riser"]),
                 "is_launch": bool(r["is_launch"]),
             },
+            "genres": _descs(r.get("genres"), GENRE_MAX),        # 「どんなゲームか」タグ（games.genres・appdetails由来）
+            "categories": _descs(r.get("categories"), CATEGORY_MAX),  # 補助タグ（Single-player/Co-op 等）
             "signals": r["signals"],  # 種別＋層タグ＋数値（B1は数値なし＝②）。個人は含まない。
             "prediction": {"known": bool(r["signals"]),
                            "cause_types": [s["type"] for s in r["signals"]]},
