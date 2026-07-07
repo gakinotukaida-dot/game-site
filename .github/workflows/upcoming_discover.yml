@@ -1,0 +1,28 @@
+# 「これから来そう」用：発売前ゲームを games に発見・登録する（DB書き込み）
+# 置き場所: .github/workflows/upcoming_discover.yml
+# 当面は手動のみ（workflow_dispatch）。動作確認できたら schedule を追加する想定。
+# 流れ: これを実行 → games に coming_soon 追加 → 既存 appdetails_sweep が発売日/ジャンル付与
+#       → 既存 export_upcoming が data/upcoming.json を生成 → サイトの「これから来そう」が埋まる。
+name: Upcoming discover (write games)
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install "psycopg2-binary>=2.9"
+      - name: Discover coming-soon games into games table
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          CC: "JP"
+          LANG_STORE: "japanese"
+        run: python scripts/upcoming_discover.py
