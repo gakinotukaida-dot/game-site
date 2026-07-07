@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- 多層防御：XSS成立時の外部送信/改ざんを制限（本体のXSS対策は esc()/safeUrl()）。GA有効化時は script-src/connect-src に測定ドメインを追加すること。 -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; frame-ancestors 'none'; img-src 'self' data: https://cdn.cloudflare.steamstatic.com https://shared.cloudflare.steamstatic.com https://*.steamstatic.com https://*.akamaihd.net; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'">
+<!-- frame-ancestors はメタでは無視されるため除外（Pagesはヘッダ不可＝クリックジャッキング対策は前段CDNで別途）。 -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; img-src 'self' data: https://cdn.cloudflare.steamstatic.com https://shared.cloudflare.steamstatic.com https://*.steamstatic.com https://*.akamaihd.net; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'">
 <meta name="referrer" content="no-referrer">
 <title>トレパ / Trend Pulse — Steam発見レーダー</title>
 <link rel="alternate" type="application/rss+xml" title="トレパ — いつもより伸びているPCゲーム" href="./data/rising_feed.xml">
