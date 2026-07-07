@@ -98,13 +98,30 @@ def src_note(name):
 SOURCE_FUNCS = {"youtube": src_youtube, "note": src_note}
 
 
+def _write(sql_fn):
+    """書き込みを実行。Neon サーバーレスの復帰時に一時的な read-only 窓（SQLSTATE 25006）や
+    接続断が起きうるので、指数バックオフで数回だけ再接続・再試行する（appdetails と同じ方針）。"""
+    attempts = int(os.environ.get("WRITE_RETRIES") or "4")
+    for i in range(attempts):
+        conn = None
+        try:
+            conn = psycopg2.connect(DATABASE_URL)
+            with conn, conn.cursor() as cur:
+                sql_fn(cur)
+            return
+        except psycopg2.Error as e:
+            transient = (getattr(e, "pgcode", None) == "25006") or isinstance(e, psycopg2.OperationalError)
+            if not transient or i == attempts - 1:
+                raise
+            print(f"[retry] 一時的な read-only/接続断（{getattr(e, 'pgcode', '')}）→ {3*(2**i)}s 後に再試行 ({i+1}/{attempts})")
+            time.sleep(3 * (2 ** i))
+        finally:
+            if conn is not None:
+                conn.close()
+
+
 def ensure_table():
-    conn = psycopg2.connect(DATABASE_URL)
-    try:
-        with conn, conn.cursor() as cur:
-            cur.execute(DDL)
-    finally:
-        conn.close()
+    _write(lambda cur: cur.execute(DDL))
 
 
 def get_targets():
@@ -151,14 +168,9 @@ def main():
         print("記録行 0（全ソースが0/失敗）。")
         return
 
-    conn = psycopg2.connect(DATABASE_URL)
-    try:
-        with conn, conn.cursor() as cur:
-            execute_batch(cur,
-                          "INSERT INTO web_mentions (appid, source, mentions) VALUES (%s, %s, %s)",
-                          rows, page_size=500)
-    finally:
-        conn.close()
+    _write(lambda cur: execute_batch(
+        cur, "INSERT INTO web_mentions (appid, source, mentions) VALUES (%s, %s, %s)",
+        rows, page_size=500))
 
     per = {}
     for _, s, n in rows:
