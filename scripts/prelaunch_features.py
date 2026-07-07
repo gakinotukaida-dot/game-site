@@ -30,17 +30,31 @@ TW_WIN = 30
 NEWS_WIN = 90
 
 
-def _dev_array(alias="g"):
-    # jsonb 配列（開発元名の配列）→ text[]。?| で「同じ開発元の作品」を重なりで拾う。
-    # developers が配列でない/NULL のときは要素抽出でエラーになるため jsonb_typeof でガード（→NULL＝該当なし）。
-    return (f"(CASE WHEN jsonb_typeof({alias}.developers)='array' "
-            f"THEN (SELECT array_agg(v) FROM jsonb_array_elements_text({alias}.developers) v) END)")
+def cte_prelude():
+    """重い開発元横断を速くするための前計算 CTE（両クエリの WITH 先頭に置く）。
+    - peak_by_app / reviews_by_app：appidごとの最高CCU・最大レビューを1回で集計（相関サブクエリの再スキャンを排除）。
+    - game_dev：jsonb配列の開発元名を1行1件に展開＝開発元名(text)の等値結合にできる（?| の総当たりを回避＝高速）。
+    ※ dev_best_* は前計算 peak/reviews の“全期間の最大”を使う軽い近似（as-of は first_rec<asof で近似）。
+       厳密 as-of の検証は prelaunch_backtest.py（開発元特徴なし）を正直の基準として別に持つ。"""
+    return """
+peak_by_app AS (
+  SELECT appid, max(player_count) AS peak, min(recorded_at) AS first_rec
+  FROM player_counts GROUP BY appid
+),
+reviews_by_app AS (
+  SELECT appid, max(total_reviews) AS max_reviews, min(recorded_at) AS first_rec
+  FROM review_snapshots GROUP BY appid
+),
+game_dev AS (
+  SELECT g0.appid, d.dev
+  FROM games g0, LATERAL jsonb_array_elements_text(g0.developers) AS d(dev)
+  WHERE jsonb_typeof(g0.developers) = 'array'
+)"""
 
 
 def feature_sql(asof, demo_win=DEMO_WIN, tw_win=TW_WIN, news_win=NEWS_WIN):
     """asof（SQLの時刻式：学習では g.release_date、推論では now()）より前だけを見る特徴量列を返す。
-    返り値は SELECT のカラム列（SQL_FEATURES の順）。外側は必ず `g` エイリアスを提供すること。"""
-    da = _dev_array("g")
+    返り値は SELECT のカラム列（SQL_FEATURES の順）。外側は必ず `g` エイリアスを、クエリ先頭に cte_prelude() を置くこと。"""
     return f"""
       (SELECT max(pc.player_count) FROM player_counts pc
          JOIN games dg ON dg.appid = pc.appid AND dg.fullgame_appid = g.appid
@@ -51,12 +65,16 @@ def feature_sql(asof, demo_win=DEMO_WIN, tw_win=TW_WIN, news_win=NEWS_WIN):
         WHERE sa.appid = g.appid AND sa.recorded_at < {asof} AND sa.recorded_at >= {asof} - make_interval(days => {tw_win})) AS streamers,
       (SELECT count(*) FROM announcements a
         WHERE a.appid = g.appid AND a.published_at < {asof} AND a.published_at >= {asof} - make_interval(days => {news_win})) AS news_count,
-      (SELECT max(pc.player_count) FROM player_counts pc
-         JOIN games a2 ON a2.appid = pc.appid
-        WHERE a2.appid <> g.appid AND a2.developers ?| {da} AND pc.recorded_at < {asof}) AS dev_best_peak,
-      (SELECT max(rs.total_reviews) FROM review_snapshots rs
-         JOIN games a3 ON a3.appid = rs.appid
-        WHERE a3.appid <> g.appid AND a3.developers ?| {da} AND rs.recorded_at < {asof}) AS dev_best_reviews,
+      (SELECT max(pb.peak)
+         FROM game_dev sd
+         JOIN game_dev od ON od.dev = sd.dev AND od.appid <> g.appid
+         JOIN peak_by_app pb ON pb.appid = od.appid
+        WHERE sd.appid = g.appid AND pb.first_rec < {asof}) AS dev_best_peak,
+      (SELECT max(rb.max_reviews)
+         FROM game_dev sd
+         JOIN game_dev od ON od.dev = sd.dev AND od.appid <> g.appid
+         JOIN reviews_by_app rb ON rb.appid = od.appid
+        WHERE sd.appid = g.appid AND rb.first_rec < {asof}) AS dev_best_reviews,
       g.is_free AS is_free
     """
 
