@@ -30,6 +30,8 @@ from concurrent.futures import ThreadPoolExecutor
 import psycopg2
 from psycopg2.extras import execute_batch, Json
 
+from _filters import is_adult_from_details
+
 DATABASE_URL = os.environ["DATABASE_URL"]
 
 APPDETAILS_CAP = int(os.environ.get("APPDETAILS_CAP")     or "6000")   # 1回の観測上限（暫定・率制限とtimeout内に収める）
@@ -140,6 +142,7 @@ def fetch_appdetails(appid):
                 "categories": d.get("categories") or [],
                 "dlc": d.get("dlc") or [],
                 "website": d.get("website"),   # L3: 公式website（appdetails basic に含まれる・null可）
+                "is_adult": is_adult_from_details(d),   # 成人向け判定（content_descriptors {3,4}/ジャンル）＝サイトから除外用
                 "price": price,
                 "fullgame_appid": fullgame_appid,
                 "demos": demo_appids,
@@ -238,7 +241,7 @@ def flush(buffer):
                                 f["is_free"], f["app_type"], Json(f["genres"]),
                                 Json(f["developers"]), Json(f["publishers"]),
                                 Json(f["categories"]), Json(f["dlc"]),
-                                f.get("website"),
+                                f.get("website"), f.get("is_adult"),
                                 f.get("fullgame_appid"), appid))
             if f["price"]:
                 cur_, ini, fin, disc = f["price"]
@@ -250,7 +253,7 @@ def flush(buffer):
                     base = (f.get("name") or ("appid " + str(appid)))[:120]
                     demo_rows.append((da, base + " (Demo)", appid))
         elif status == "nodata":
-            static_rows.append((None, None, None, None, None, None, None, None, None, None, None, None, appid))
+            static_rows.append((None, None, None, None, None, None, None, None, None, None, None, None, None, appid))
         # "fail" は何も書かない（last_appdetails_check_at を進めない＝次回再試行）
     if not static_rows and not price_rows and not demo_rows:
         return 0, 0
@@ -271,7 +274,7 @@ def flush(buffer):
                         "  release_date_text = %s, release_date = %s, coming_soon = %s, "
                         "  is_free = %s, app_type = %s, genres = %s, "
                         "  developers = %s, publishers = %s, categories = %s, dlc = %s, "
-                        "  website = %s, "
+                        "  website = %s, is_adult = COALESCE(%s, is_adult), "
                         "  fullgame_appid = COALESCE(%s, fullgame_appid), "
                         "  last_appdetails_check_at = now() "
                         "WHERE appid = %s",
@@ -308,9 +311,20 @@ def flush(buffer):
                 conn.close()
 
 
+def ensure_schema():
+    """新設列を冪等に用意（既存なら何もしない）。is_adult＝成人向け判定（サイトから除外用）。"""
+    conn = psycopg2.connect(DATABASE_URL)
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute("ALTER TABLE games ADD COLUMN IF NOT EXISTS is_adult boolean")
+    finally:
+        conn.close()
+
+
 def main():
     if not should_run():
         return
+    ensure_schema()
     targets = get_targets()
     print(f"今回appdetailsを観測する対象: {len(targets)} 件 "
           f"(cap={APPDETAILS_CAP}, rate={RATE_PER_SEC}/s, workers={WORKERS}, cc={CC}, flush={FLUSH_EVERY})")

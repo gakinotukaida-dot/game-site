@@ -22,6 +22,7 @@ from datetime import datetime
 import psycopg2
 
 import prelaunch_features as F
+from _filters import not_adult
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 OUT_PATH = os.environ.get("OUT_PATH") or "data/prelaunch_model.json"
@@ -41,6 +42,7 @@ released AS (
     AND g.release_date <= now()::date
     AND g.release_date >= (now() - make_interval(days => %(lookback)s))::date
     AND g.coming_soon IS NOT TRUE
+    AND {not_adult('g')}
 ),
 {F.dev_best_cte('released', 's.release_date')}
 SELECT g.appid, g.genres,

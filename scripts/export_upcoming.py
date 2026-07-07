@@ -21,6 +21,7 @@ from datetime import datetime
 import psycopg2
 
 import prelaunch_features as F
+from _filters import not_adult
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 OUT_PATH = os.environ.get("OUT_PATH") or "data/upcoming.json"
@@ -29,7 +30,8 @@ MODEL_PATH = os.environ.get("MODEL_PATH") or "data/prelaunch_model.json"
 GENRE_MAX = int(os.environ.get("GENRE_MAX") or "7")
 LIMIT = int(os.environ.get("LIMIT") or "200")
 
-UPCOMING_WHERE = "g.coming_soon IS TRUE OR (g.release_date IS NOT NULL AND g.release_date > now()::date)"
+UPCOMING_WHERE = ("(g.coming_soon IS TRUE OR (g.release_date IS NOT NULL AND g.release_date > now()::date))"
+                  " AND " + not_adult("g"))   # ★成人向けは除外
 
 QUERY = f"""
 WITH {F.cte_prelude()},

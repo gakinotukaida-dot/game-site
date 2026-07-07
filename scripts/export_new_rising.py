@@ -23,6 +23,8 @@ from datetime import datetime
 
 import psycopg2
 
+from _filters import not_adult
+
 DATABASE_URL = os.environ["DATABASE_URL"]
 OUT_PATH = os.environ.get("OUT_PATH") or "data/new_rising.json"
 
@@ -52,6 +54,7 @@ SELECT l.appid, g.name, l.player_count AS ccu, l.recorded_at,
        g.release_date, g.release_date_text, g.website
 FROM latest l JOIN games g ON g.appid = l.appid
 WHERE g.coming_soon IS NOT TRUE
+  AND """ + not_adult("g") + """
   AND g.release_date IS NOT NULL
   AND g.release_date >= (now()::date - %(launch_days)s)
   AND l.player_count >= %(min_current)s
