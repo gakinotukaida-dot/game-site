@@ -102,7 +102,7 @@ def _write(sql_fn):
     """書き込みを実行。Neon はアイドルで compute が scale-to-zero するため、最初の書き込みが
     復帰中の一時 read-only 窓（SQLSTATE 25006）に当たりやすい。指数バックオフで多め（既定6回・
     合計~75s）に再接続・再試行して cold start を吸収する。トランザクション失敗はロールバック＝二重書き込みなし。"""
-    attempts = int(os.environ.get("WRITE_RETRIES") or "6")
+    attempts = int(os.environ.get("WRITE_RETRIES") or "9")   # scale-to-zero の書き込み復帰が遅い時があるため多め（合計~2.7分）
     for i in range(attempts):
         conn = None
         try:
