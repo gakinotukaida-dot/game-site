@@ -30,6 +30,7 @@ GENRE_MAX = int(os.environ.get("GENRE_MAX") or "7")
 LIMIT = int(os.environ.get("LIMIT") or "200")
 
 QUERY = f"""
+WITH {F.cte_prelude()}
 SELECT g.appid, g.name, g.release_date, g.release_date_text, g.genres, g.coming_soon,
   {F.feature_sql(asof='now()')}
 FROM games g
