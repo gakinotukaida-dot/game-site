@@ -254,42 +254,58 @@ def flush(buffer):
         # "fail" は何も書かない（last_appdetails_check_at を進めない＝次回再試行）
     if not static_rows and not price_rows and not demo_rows:
         return 0, 0
-    conn = psycopg2.connect(DATABASE_URL)
-    try:
-        with conn, conn.cursor() as cur:
-            if static_rows:
-                execute_batch(
-                    cur,
-                    "UPDATE games SET "
-                    "  release_date_text = %s, release_date = %s, coming_soon = %s, "
-                    "  is_free = %s, app_type = %s, genres = %s, "
-                    "  developers = %s, publishers = %s, categories = %s, dlc = %s, "
-                    "  website = %s, "
-                    "  fullgame_appid = COALESCE(%s, fullgame_appid), "
-                    "  last_appdetails_check_at = now() "
-                    "WHERE appid = %s",
-                    static_rows, page_size=500,
-                )
-            if price_rows:
-                execute_batch(
-                    cur,
-                    "INSERT INTO price_snapshots (appid, currency, initial, final, discount_percent) "
-                    "VALUES (%s, %s, %s, %s, %s)",
-                    price_rows, page_size=500,
-                )
-            if demo_rows:
-                # 体験版を名簿に登録（active＝以後 daily/dense がCCUを採取）。既存行は親リンクのみ補完（非破壊）。
-                execute_batch(
-                    cur,
-                    "INSERT INTO games (appid, name, status, fullgame_appid) "
-                    "VALUES (%s, %s, 'active', %s) "
-                    "ON CONFLICT (appid) DO UPDATE SET "
-                    "  fullgame_appid = COALESCE(games.fullgame_appid, EXCLUDED.fullgame_appid)",
-                    demo_rows, page_size=500,
-                )
-    finally:
-        conn.close()
-    return len(static_rows), len(demo_rows)
+    # Neon のサーバーレス compute 復帰／オートスケール遷移時、接続が一時的に read-only 窓へ当たり
+    # "cannot execute UPDATE in a read-only transaction"（SQLSTATE 25006）や接続断が起きうる（数秒で解消する一過性）。
+    # 指数バックオフで数回だけ再接続・再試行する。成功時は素通り。恒久的な権限/構文エラー等は即送出。
+    # トランザクション（with conn）は失敗時ロールバックされるため、再試行しても二重書き込みにならない。
+    attempts = int(os.environ.get("WRITE_RETRIES") or "4")
+    for i in range(attempts):
+        conn = None
+        try:
+            conn = psycopg2.connect(DATABASE_URL)
+            with conn, conn.cursor() as cur:
+                if static_rows:
+                    execute_batch(
+                        cur,
+                        "UPDATE games SET "
+                        "  release_date_text = %s, release_date = %s, coming_soon = %s, "
+                        "  is_free = %s, app_type = %s, genres = %s, "
+                        "  developers = %s, publishers = %s, categories = %s, dlc = %s, "
+                        "  website = %s, "
+                        "  fullgame_appid = COALESCE(%s, fullgame_appid), "
+                        "  last_appdetails_check_at = now() "
+                        "WHERE appid = %s",
+                        static_rows, page_size=500,
+                    )
+                if price_rows:
+                    execute_batch(
+                        cur,
+                        "INSERT INTO price_snapshots (appid, currency, initial, final, discount_percent) "
+                        "VALUES (%s, %s, %s, %s, %s)",
+                        price_rows, page_size=500,
+                    )
+                if demo_rows:
+                    # 体験版を名簿に登録（active＝以後 daily/dense がCCUを採取）。既存行は親リンクのみ補完（非破壊）。
+                    execute_batch(
+                        cur,
+                        "INSERT INTO games (appid, name, status, fullgame_appid) "
+                        "VALUES (%s, %s, 'active', %s) "
+                        "ON CONFLICT (appid) DO UPDATE SET "
+                        "  fullgame_appid = COALESCE(games.fullgame_appid, EXCLUDED.fullgame_appid)",
+                        demo_rows, page_size=500,
+                    )
+            return len(static_rows), len(demo_rows)
+        except psycopg2.Error as e:
+            code = getattr(e, "pgcode", None)
+            transient = isinstance(e, psycopg2.OperationalError) or code == "25006"  # 25006 = read_only_sql_transaction
+            if not transient or i == attempts - 1:
+                raise
+            wait = 3 * (2 ** i)  # 3, 6, 12 秒
+            print(f"  [retry] 一時的に書き込み不可（{type(e).__name__} pgcode={code}）→ {wait}s 後に再接続・再試行 ({i + 1}/{attempts})")
+            time.sleep(wait)
+        finally:
+            if conn is not None:
+                conn.close()
 
 
 def main():
