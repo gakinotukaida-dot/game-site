@@ -1,0 +1,45 @@
+# 発売前シグナル→発売後の跳ね の as-of 検証（読み取り専用・診断）を data/prelaunch_backtest.json に出す
+# 置き場所: .github/workflows/prelaunch_backtest.yml
+# 役割: 「期待度（参考）」を将来「検証済み予測」に格上げできるか、成績とデータの足り具合を貯めて測る。
+# 守る線: DBは読み取り専用（SELECTのみ）。書き込みは data/prelaunch_backtest.json 1ファイルだけ・毎回上書き＝可逆。
+#         リーク無し（as-of）＝シグナルは発売前だけ・結果は発売後だけ。
+name: prelaunch backtest (read-only diagnostic)
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    # 週1回（日曜 5:35 UTC）。ゆっくり動く検証指標なので頻度は低くてよい。
+    - cron: "35 5 * * 0"
+
+permissions:
+  contents: write
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install "psycopg2-binary>=2.9"
+      - name: Run prelaunch_backtest (DB read-only / JSON書き出し)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # LOOKBACK_DAYS: "180"
+          # OUTCOME_DAYS: "14"
+          # HIT_THRESHOLD: "1000"
+          # MIN_PAIRS: "30"
+        run: python scripts/prelaunch_backtest.py
+      - name: Commit JSON（変更があるときだけ）
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/prelaunch_backtest.json
+          if git diff --cached --quiet; then echo "変更なし＝コミットしない"; exit 0; fi
+          git commit -m "data: update prelaunch_backtest.json"
+          for i in 1 2 3; do
+            if git push; then echo "push成功"; exit 0; fi
+            echo "push失敗 → 取り込み直して再試行 ($i/3)"; git pull --rebase
+          done
+          echo "3回失敗。同時pushの衝突が続いている可能性 → ログ共有を"; exit 1
