@@ -99,9 +99,10 @@ SOURCE_FUNCS = {"youtube": src_youtube, "note": src_note}
 
 
 def _write(sql_fn):
-    """書き込みを実行。Neon サーバーレスの復帰時に一時的な read-only 窓（SQLSTATE 25006）や
-    接続断が起きうるので、指数バックオフで数回だけ再接続・再試行する（appdetails と同じ方針）。"""
-    attempts = int(os.environ.get("WRITE_RETRIES") or "4")
+    """書き込みを実行。Neon はアイドルで compute が scale-to-zero するため、最初の書き込みが
+    復帰中の一時 read-only 窓（SQLSTATE 25006）に当たりやすい。指数バックオフで多め（既定6回・
+    合計~75s）に再接続・再試行して cold start を吸収する。トランザクション失敗はロールバック＝二重書き込みなし。"""
+    attempts = int(os.environ.get("WRITE_RETRIES") or "6")
     for i in range(attempts):
         conn = None
         try:
@@ -113,8 +114,9 @@ def _write(sql_fn):
             transient = (getattr(e, "pgcode", None) == "25006") or isinstance(e, psycopg2.OperationalError)
             if not transient or i == attempts - 1:
                 raise
-            print(f"[retry] 一時的な read-only/接続断（{getattr(e, 'pgcode', '')}）→ {3*(2**i)}s 後に再試行 ({i+1}/{attempts})")
-            time.sleep(3 * (2 ** i))
+            wait = min(30, 3 * (2 ** i))
+            print(f"[retry] 一時的な read-only/接続断（{getattr(e, 'pgcode', '')}）→ {wait}s 後に再試行 ({i+1}/{attempts})")
+            time.sleep(wait)
         finally:
             if conn is not None:
                 conn.close()
@@ -136,8 +138,8 @@ def get_targets():
 
 
 def main():
-    ensure_table()
-    targets = get_targets()
+    targets = get_targets()   # 先に READ して Neon compute を起こす（cold start の read-only 窓を短くする）
+    ensure_table()            # その後に書き込み（テーブル作成）＝再試行つき
     active = [s for s in SOURCES if s in SOURCE_FUNCS and (s != "youtube" or YOUTUBE_API_KEY)]
     skipped = [s for s in SOURCES if s not in active]
     print(f"対象 {len(targets)} 件・ソース {active}"
