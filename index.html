@@ -255,6 +255,9 @@
   .chip.c-new{color:#3fa87f;background:rgba(63,168,127,.14);border:1px solid rgba(63,168,127,.36)}
   .chip.c-revival{color:#df8a4e;background:rgba(223,138,78,.15);border:1px solid rgba(223,138,78,.4)}
   .chip.c-jp{color:#d0605f;background:rgba(208,96,95,.13);border:1px solid rgba(208,96,95,.36)}
+  .chip.c-expect{color:#cf8f2a;background:rgba(207,143,42,.15);border:1px solid rgba(207,143,42,.4)}        /* 期待度 高（参考・実測シグナル） */
+  .chip.c-expect2{color:var(--ink-faint);background:transparent;border:1px solid var(--line)}              /* 期待度 中（控えめ） */
+  .chip.c-demo{color:#3fa87f;background:rgba(63,168,127,.14);border:1px solid rgba(63,168,127,.36)}          /* 体験版CCU（実測） */
   .rowsteam{font-size:10.5px;color:var(--ink-faint);text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:1px 7px;white-space:nowrap;margin-left:6px;transition:.2s}
   .rowsteam:hover{color:var(--accent);border-color:var(--accent)}
   .titlerow{display:flex;align-items:center;gap:2px;min-width:0}
@@ -413,7 +416,8 @@ const ICON={
  up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg>',
  revival:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12a8 8 0 0114-5l2 2M20 5v4h-4"/><path d="M20 12a8 8 0 01-14 5l-2-2M4 19v-4h4"/></svg>',
  cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M4 9h16M8 3v4M16 3v4"/></svg>',
- jp:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg>'
+ jp:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg>',
+ demo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="4"/><path d="M7 11v2M6 12h2"/><circle cx="16.5" cy="11" r="1"/><circle cx="18.5" cy="13.5" r="1"/></svg>'
 };
 const CAUSE_META={sale:{cls:"c-sale",ic:"sale"},news:{cls:"c-news",ic:"news"},launch:{cls:"c-launch",ic:"launch"},free_promo:{cls:"c-free",ic:"free"},review_surge:{cls:"c-review",ic:"review"},b1_discovery:{cls:"c-b1",ic:"b1"},b1_attention:{cls:"c-b1",ic:"b1"},jp_news:{cls:"c-jp",ic:"jp"}};
 // きっかけの表示優先度：国内で話題＞過去最安/無料＞その他（先頭2枠に価値の高いものを出す）
@@ -469,8 +473,8 @@ const BLURB={
      en:"Not a ranking — how much each game moved vs its own usual. ×N = recent concurrent players ≈ N× the usual (14-day median). With an estimated trigger."},
   L:{ja:"発売から日が浅く、いま動いている作品（now_ccu 上位内・実データ）。全ゲーム対象は new-games エクスポート後。",
      en:"Recently released and moving now (within top now_ccu · real data). Full coverage after the new-games export."},
-  3:{ja:"発売前に来そうなゲーム。跳ね予想はしません（データ基盤なし）。近日発売リストは coming_soon エクスポートで出せます。",
-     en:"Promising pre-release games. No spike forecasts (no basis). The upcoming list comes from the coming_soon export."},
+  3:{ja:"発売前のゲーム。体験版がどれだけ遊ばれているか・最近の公式告知など“実測シグナル”から期待度（参考）を出します。跳ねを断定する予測はしません。",
+     en:"Pre-release games. A reference 'buzz' level from measured signals (how much the demo is played, recent official news). Not a spike forecast."},
 };
 const NOTE={
   1:{cls:"",txt:{ja:"実データ：Steam公式APIの観測値（同時接続）。各appidの最新値・上位20件。",
@@ -479,8 +483,8 @@ const NOTE={
      en:"Real data: rise vs usual (in validation). Higher ranks tend to rise more than a raw player-count order (early test ≈1.8×)."}},
   L:{cls:"",txt:{ja:"実データ（一部）：now_ccu 上位内で発売から日が浅い作品を平常比で。本番P2は release_date 14日で全ゲーム対象（要 new-games エクスポート）。",
      en:"Partial data: recently released titles within top now_ccu, by rise vs usual. Full coverage after the new-games export."}},
-  3:{cls:"dummy",txt:{ja:"近日発売リストは coming_soon エクスポート待ち（games.coming_soon にデータあり）。跳ね予想はしない（P3結論）。",
-     en:"The upcoming list awaits the coming_soon export. No spike forecasts."}},
+  3:{cls:"dummy",txt:{ja:"発売前リストは coming_soon エクスポート待ち（games.coming_soon にデータあり）。期待度は実測シグナルの参考値・断定予測はしない（P3結論）。",
+     en:"The pre-release list awaits the coming_soon export. Buzz is a reference from measured signals, not a forecast."}},
 };
 const nf=new Intl.NumberFormat("ja-JP");
 // ===== i18n（日本語 / English 切替。海外流入の入口・④の指摘） =====
@@ -664,11 +668,25 @@ function viewItems(view){
     if(!(REAL_UP&&REAL_UP.length)) return [];
     return REAL_UP.map(g=>{
       const known=g.release_known&&g.release, relTxt=known?String(g.release).slice(0,10):(g.release||L("発売日 未定","Release TBD"));
+      const dc=(typeof g.demo_ccu==="number"&&g.demo_ccu>0)?g.demo_ccu:0;
+      // 期待度（参考）＝実測シグナルのみ。★跳ねの断定予測ではない（title に明記）。high/mid だけチップ表示、low は静かに。
+      const expTitle=esc(L("体験版の遊ばれ具合・最近の公式告知など“実測シグナル”から算出した参考値です。跳ねを断定する予測ではありません。","A reference value from measured signals (demo play, recent official news). Not a spike forecast."));
+      const expChip = g.expect==="high"
+        ? `<span class="chip c-expect ic" title="${expTitle}">${ICON.up}${L("期待度 高（参考）","Buzz: high (ref.)")}</span>`
+        : g.expect==="mid"
+        ? `<span class="chip c-expect2 ic" title="${expTitle}">${L("期待度 中（参考）","Buzz: some (ref.)")}</span>`
+        : "";
+      const demoChip = dc
+        ? `<span class="chip c-demo ic" title="${esc(L("体験版の直近14日の最大同時接続（実測）","Peak concurrent demo players, last 14 days (measured)"))}">${ICON.demo}${L("体験版 最大"+nf.format(dc)+"人","Demo peak "+nf.format(dc))}</span>`
+        : "";
+      const newsChip = g.has_news?`<span class="chip c-news ic">${ICON.news}${L("最近 告知あり","Recent news")}</span>`:"";
       return { key:"U_"+g.appid, appid:g.appid, title:g.name, detail:{genres:g.genres||[]},
-        tagsP:`<span class="chip ic">${ICON.cal}${known?(L("発売予定 ","Releases ")+esc(relTxt)):esc(relTxt)}</span>`+(g.has_news?`<span class="chip c-news ic">${ICON.news}${L("最近 告知あり","Recent news")}</span>`:""),
+        tagsP:`<span class="chip ic">${ICON.cal}${known?(L("発売予定 ","Releases ")+esc(relTxt)):esc(relTxt)}</span>`+expChip+demoChip+newsChip,
         tagsS:(g.genres&&g.genres.length)?g.genres.map(t=>`<span class="chip">${esc(genreLabel(t))}</span>`).join(""):"",
         detailBody:"",
-        metric:`<div class="when">${known?esc(relTxt):L("未定","TBD")}</div>` };
+        metric: dc
+          ? `<span class="num">${nf.format(dc)}</span><span class="unit">${L("人 体験版","demo")}</span><div class="base">${known?esc(relTxt):L("発売日 未定","TBD")}</div>`
+          : `<div class="when">${known?esc(relTxt):L("未定","TBD")}</div>` };
     });
   }
   return [];
@@ -924,7 +942,7 @@ loadRising();  // 02「いつもより伸び」を最新 view02_rising で上書
 loadFree();    // 無料配布レンズ（あれば表示・無ければ隠す）
 // B1'/B2：全ゲーム対象エクスポート（あれば view L/3 を差し替え・無ければ現状フォールバック）
 async function loadNewRising(){ try{ const r=await fetch("./data/new_rising.json?cb="+Date.now(),{cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); if(d&&Array.isArray(d.rows)&&d.rows.length){ REAL_L=d.rows; const ld=((d.params&&d.params.launch_days)||14); NOTE.L={cls:"",txt:{ja:"実データ：発売から日が浅く自己比で伸びている作品（全ゲーム対象・release_date "+ld+"日）。早期・低確信は明示。",en:"Real data: recently released titles rising vs their own usual (all games · release_date "+ld+"d). Early/low-confidence is marked."}}; if(current==="L"){buildGenreChips();render("L");} } }catch(e){} }
-async function loadUpcoming(){ try{ const r=await fetch("./data/upcoming.json?cb="+Date.now(),{cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); if(d&&Array.isArray(d.rows)&&d.rows.length){ REAL_UP=d.rows; NOTE[3]={cls:"",txt:"実データ：発売前の注目リスト（近日発売・最近の公式告知の有無）。跳ね予想はしません。"}; if(current==="3"){render("3");} } }catch(e){} }
+async function loadUpcoming(){ try{ const r=await fetch("./data/upcoming.json?cb="+Date.now(),{cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); if(d&&Array.isArray(d.rows)&&d.rows.length){ REAL_UP=d.rows; const nh=d.rows.filter(x=>x&&(x.demo_ccu||x.has_news)).length; NOTE[3]={cls:"",txt:{ja:"実データ：発売前リスト。期待度（参考）は体験版CCU（実測）と最近の告知から算出（"+nh+"件にシグナルあり）。跳ねは断定しません。",en:"Real data: pre-release list. 'Buzz' (reference) is from measured demo players and recent news ("+nh+" with a signal). No spike forecasts."}}; if(current==="3"){render("3");} } }catch(e){} }
 loadNewRising();
 loadUpcoming();
 if(consent&&consent.analytics) loadGA();
