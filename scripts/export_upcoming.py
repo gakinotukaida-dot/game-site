@@ -29,13 +29,20 @@ MODEL_PATH = os.environ.get("MODEL_PATH") or "data/prelaunch_model.json"
 GENRE_MAX = int(os.environ.get("GENRE_MAX") or "7")
 LIMIT = int(os.environ.get("LIMIT") or "200")
 
+UPCOMING_WHERE = "g.coming_soon IS TRUE OR (g.release_date IS NOT NULL AND g.release_date > now()::date)"
+
 QUERY = f"""
-WITH {F.cte_prelude()}
+WITH {F.cte_prelude()},
+self_up AS (
+  SELECT g.appid FROM games g WHERE {UPCOMING_WHERE}
+),
+{F.dev_best_cte('self_up', 'now()')}
 SELECT g.appid, g.name, g.release_date, g.release_date_text, g.genres, g.coming_soon,
-  {F.feature_sql(asof='now()')}
+  {F.feature_sql(asof='now()')},
+  db.dev_best_peak, db.dev_best_reviews
 FROM games g
-WHERE g.coming_soon IS TRUE
-   OR (g.release_date IS NOT NULL AND g.release_date > now()::date)
+LEFT JOIN dev_best db ON db.appid = g.appid
+WHERE {UPCOMING_WHERE}
 ORDER BY (g.release_date IS NULL), g.release_date ASC NULLS LAST, g.name ASC
 LIMIT %(limit)s
 """

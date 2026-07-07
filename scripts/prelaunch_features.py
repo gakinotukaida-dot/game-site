@@ -52,9 +52,28 @@ game_dev AS (
 )"""
 
 
+def dev_best_cte(self_from, asof_expr, name="dev_best"):
+    """開発元の実績（他作品の過去最高CCU・最大レビュー）を **1パスの集合演算** で全対象分まとめて算出する CTE。
+    相関サブクエリ（対象×game_dev の総当たり）を避けて高速化。as-of は FILTER(WHERE first_rec < asof) で per-row に効かせる。
+    self_from: (appid, asof用列) を持つCTE/サブクエリ名。asof_expr: s.release_date / now() 等の時刻式。"""
+    return f"""{name} AS (
+  SELECT s.appid,
+         max(pb.peak)        FILTER (WHERE pb.first_rec < {asof_expr}) AS dev_best_peak,
+         max(rb.max_reviews) FILTER (WHERE rb.first_rec < {asof_expr}) AS dev_best_reviews
+  FROM {self_from} s
+  JOIN game_dev sd ON sd.appid = s.appid
+  JOIN game_dev od ON od.dev = sd.dev AND od.appid <> s.appid
+  LEFT JOIN peak_by_app    pb ON pb.appid = od.appid
+  LEFT JOIN reviews_by_app rb ON rb.appid = od.appid
+  GROUP BY s.appid
+)"""
+
+
 def feature_sql(asof, demo_win=DEMO_WIN, tw_win=TW_WIN, news_win=NEWS_WIN):
-    """asof（SQLの時刻式：学習では g.release_date、推論では now()）より前だけを見る特徴量列を返す。
-    返り値は SELECT のカラム列（SQL_FEATURES の順）。外側は必ず `g` エイリアスを、クエリ先頭に cte_prelude() を置くこと。"""
+    """asof（SQLの時刻式：学習では g.release_date、推論では now()）より前だけを見る“軽い（appid索引で引ける）”特徴量列を返す。
+    開発元特徴（dev_best_peak/dev_best_reviews）は重いので feature_sql には含めず dev_best_cte で別途集合演算し、
+    外側で LEFT JOIN dev_best db → db.dev_best_peak, db.dev_best_reviews を SELECT に足すこと。
+    外側は必ず `g` エイリアスを、クエリ先頭に cte_prelude() を置くこと。"""
     return f"""
       (SELECT max(pc.player_count) FROM player_counts pc
          JOIN games dg ON dg.appid = pc.appid AND dg.fullgame_appid = g.appid
@@ -65,16 +84,6 @@ def feature_sql(asof, demo_win=DEMO_WIN, tw_win=TW_WIN, news_win=NEWS_WIN):
         WHERE sa.appid = g.appid AND sa.recorded_at < {asof} AND sa.recorded_at >= {asof} - make_interval(days => {tw_win})) AS streamers,
       (SELECT count(*) FROM announcements a
         WHERE a.appid = g.appid AND a.published_at < {asof} AND a.published_at >= {asof} - make_interval(days => {news_win})) AS news_count,
-      (SELECT max(pb.peak)
-         FROM game_dev sd
-         JOIN game_dev od ON od.dev = sd.dev AND od.appid <> g.appid
-         JOIN peak_by_app pb ON pb.appid = od.appid
-        WHERE sd.appid = g.appid AND pb.first_rec < {asof}) AS dev_best_peak,
-      (SELECT max(rb.max_reviews)
-         FROM game_dev sd
-         JOIN game_dev od ON od.dev = sd.dev AND od.appid <> g.appid
-         JOIN reviews_by_app rb ON rb.appid = od.appid
-        WHERE sd.appid = g.appid AND rb.first_rec < {asof}) AS dev_best_reviews,
       g.is_free AS is_free
     """
 
