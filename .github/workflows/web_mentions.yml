@@ -1,0 +1,42 @@
+# Web上の言及数（記事数・動画数など）を数えて web_mentions に貯める（分離テーブル・追記のみ）
+# 置き場所: .github/workflows/web_mentions.yml
+# 役割: そのゲームについてネット上で数えられるものを収集し、将来 羽根予想の特徴量にする土台。
+# 守る線: 分離テーブル web_mentions のみ作成・INSERTのみ＝既存に無影響・可逆。成人向けは数えない。
+# 有効化メモ: YouTube を使うには Settings → Secrets に YOUTUBE_API_KEY を追加（無料。Google Cloud で YouTube Data API v3 を有効化）。
+#            未設定でも note（認証不要・best-effort）は動く。
+name: web mentions (count sweep)
+
+on:
+  workflow_dispatch:
+    inputs:
+      cap:
+        description: "1回の対象上限（動作確認は 10 など。既定 50）"
+        default: "50"
+        required: false
+      sources:
+        description: "収集ソース（カンマ区切り。既定 youtube,note）"
+        default: "youtube,note"
+        required: false
+  schedule:
+    # 毎日 2:10 UTC（appdetails やエクスポートと時間帯を分散）。
+    - cron: "10 2 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install "psycopg2-binary>=2.9"
+      - name: Collect web mention counts (isolated table / INSERT only)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          MENTIONS_CAP: ${{ github.event.inputs.cap || '50' }}
+          MENTIONS_SOURCES: ${{ github.event.inputs.sources || 'youtube,note' }}
+        run: python scripts/web_mentions_sweep.py

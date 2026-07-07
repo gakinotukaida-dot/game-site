@@ -322,9 +322,9 @@ def ensure_schema():
 
 
 def main():
+    ensure_schema()            # クールダウンでスキップする場合でも列だけは必ず用意（エクスポートが参照するため）
     if not should_run():
         return
-    ensure_schema()
     targets = get_targets()
     print(f"今回appdetailsを観測する対象: {len(targets)} 件 "
           f"(cap={APPDETAILS_CAP}, rate={RATE_PER_SEC}/s, workers={WORKERS}, cc={CC}, flush={FLUSH_EVERY})")
