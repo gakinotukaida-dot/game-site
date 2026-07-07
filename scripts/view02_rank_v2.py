@@ -25,6 +25,8 @@ import urllib.request
 
 import psycopg2
 
+from _filters import not_adult
+
 DATABASE_URL = os.environ["DATABASE_URL"]
 CLIENT_ID = os.environ.get("TWITCH_CLIENT_ID")
 CLIENT_SECRET = os.environ.get("TWITCH_CLIENT_SECRET")
@@ -137,6 +139,7 @@ LEFT JOIN recent6 r ON r.appid = l.appid
 LEFT JOIN base b ON b.appid = l.appid
 LEFT JOIN win  w ON w.appid = l.appid
 WHERE l.current_ccu >= %(min_current)s AND b.n_points >= %(min_points)s
+  AND """ + not_adult("g") + """
 ORDER BY 1 + (b.n_points::float/(b.n_points+%(n0)s))
               * (COALESCE(r.recent_q, l.current_ccu)::float / NULLIF(b.baseline,0) - 1) DESC NULLS LAST
 LIMIT %(cand_n)s;

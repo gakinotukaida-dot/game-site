@@ -26,6 +26,8 @@ from datetime import datetime
 
 import psycopg2
 
+from _filters import not_adult
+
 DATABASE_URL = os.environ["DATABASE_URL"]
 OUT_PATH = os.environ.get("OUT_PATH") or "data/now_ccu.json"
 TOP_N = int(os.environ.get("TOP_N") or "100")
@@ -57,7 +59,9 @@ SELECT json_agg(
          ) ORDER BY l.player_count DESC
        ) AS now_list
 FROM (SELECT * FROM latest ORDER BY player_count DESC LIMIT %s) l
-JOIN games g ON g.appid = l.appid;
+JOIN games g ON g.appid = l.appid
+WHERE """ + not_adult("g") + """
+;
 """
 
 SIBLING_QUERY = """
@@ -66,6 +70,7 @@ SELECT g2.appid, g2.name,
         WHERE pc.appid = g2.appid ORDER BY pc.recorded_at DESC LIMIT 1) AS ccu
 FROM games g2
 WHERE g2.developers ?| %s AND g2.appid <> %s
+  AND """ + not_adult("g2") + """
 ORDER BY ccu DESC NULLS LAST
 LIMIT %s
 """
