@@ -2,7 +2,7 @@
   "view": "prelaunch_model",
   "schema": "prelaunch_model_v1",
   "note": "羽根予想モデル（自社実績で較正したスコアカード）。跳ね確率は log-odds 合算＝解釈可能・材料が薄いほど基準確率に寄る。強さ指標 top_decile_lift は 70/30 ホールドアウトの out-of-sample。readiness=collecting の間は控えめ運用。",
-  "generated_at": "2026-07-07T22:22:06.204469+00:00",
+  "generated_at": "2026-07-07T22:31:35.142538+00:00",
   "params": {
     "lookback_days": 180,
     "outcome_days": 14,
@@ -10,7 +10,7 @@
     "smooth": 8.0,
     "min_pairs": 300
   },
-  "readiness": "collecting",
+  "readiness": "validated",
   "n_pairs": 1628,
   "hits": 58,
   "base_rate": 0.035627,
@@ -37,8 +37,8 @@
     },
     "news_count": {
       "none": -0.93982,
-      "high": 1.11168,
-      "low": 0.14731
+      "low": 0.14731,
+      "high": 1.11168
     },
     "dev_best_peak": {
       "none": -0.18243,
@@ -48,8 +48,8 @@
     },
     "dev_best_reviews": {
       "none": -0.1781,
-      "low": -0.59246,
-      "high": 1.80318
+      "high": 1.80318,
+      "low": -0.59246
     },
     "is_free": {
       "paid": 0.0682,
@@ -63,11 +63,6 @@
     }
   },
   "genre_rates": {
-    "Simulation": {
-      "n": 502,
-      "hits": 22,
-      "rate": 0.0437
-    },
     "Casual": {
       "n": 763,
       "hits": 23,
@@ -78,20 +73,30 @@
       "hits": 29,
       "rate": 0.02594
     },
-    "Strategy": {
-      "n": 384,
-      "hits": 10,
-      "rate": 0.02624
-    },
-    "Action": {
-      "n": 484,
-      "hits": 25,
-      "rate": 0.05139
+    "Simulation": {
+      "n": 502,
+      "hits": 22,
+      "rate": 0.0437
     },
     "Adventure": {
       "n": 522,
       "hits": 25,
       "rate": 0.04771
+    },
+    "Strategy": {
+      "n": 384,
+      "hits": 10,
+      "rate": 0.02624
+    },
+    "Free To Play": {
+      "n": 262,
+      "hits": 7,
+      "rate": 0.02698
+    },
+    "Action": {
+      "n": 484,
+      "hits": 25,
+      "rate": 0.05139
     },
     "RPG": {
       "n": 342,
@@ -108,20 +113,15 @@
       "hits": 5,
       "rate": 0.07142
     },
-    "Massively Multiplayer": {
-      "n": 50,
-      "hits": 6,
-      "rate": 0.10836
-    },
-    "Free To Play": {
-      "n": 262,
-      "hits": 7,
-      "rate": 0.02698
-    },
     "Racing": {
       "n": 28,
       "hits": 0,
       "rate": 0.00792
+    },
+    "Massively Multiplayer": {
+      "n": 50,
+      "hits": 6,
+      "rate": 0.10836
     },
     "Utilities": {
       "n": 1,
@@ -129,7 +129,14 @@
       "rate": 0.03167
     }
   },
-  "validation_oos": {},
+  "validation_oos": {
+    "eval_n": 457,
+    "eval_base": 0.04376,
+    "top_decile_rate": 0.15556,
+    "top_decile_lift": 3.55,
+    "mean_prob_hit": 0.06631,
+    "mean_prob_miss": 0.01664
+  },
   "feature_report": {
     "demo_ccu": {
       "low": {
