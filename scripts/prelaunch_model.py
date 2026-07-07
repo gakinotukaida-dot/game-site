@@ -55,6 +55,12 @@ LEFT JOIN dev_best db ON db.appid = g.appid
 """
 
 
+def _holdout_is_train(appid):
+    """70/30 の決定的ホールドアウト割り当て（RNG不使用）。appidの末尾偏りを乗算ハッシュ(Knuth)で無相関化してから割る。"""
+    h = (int(appid) * 2654435761) & 0xFFFFFFFF
+    return (h % 100) < 70
+
+
 def _genres_list(genres):
     out = []
     if isinstance(genres, list):
@@ -156,6 +162,7 @@ def main():
         if lp is None:
             continue
         row = {name: d.get(name) for name in F.SQL_FEATURES}
+        row["appid"] = d.get("appid")
         row["genres"] = _genres_list(d.get("genres"))
         row["hit"] = int(lp) >= HIT_THRESHOLD
         rows.append(row)
@@ -163,13 +170,15 @@ def main():
     n_pairs = len(rows)
     base = (sum(1 for r in rows if r["hit"]) / n_pairs) if n_pairs else 0.0
 
-    # 70/30 ホールドアウト（appid で決定的に分割＝再現性・RNG不使用）で OOS の強さを測る
-    train = [r for r, rec in zip(rows, recs) if (dict(zip(cols, rec))["appid"] % 10) < 7]
-    test = [r for r, rec in zip(rows, recs) if (dict(zip(cols, rec))["appid"] % 10) >= 7]
+    # 70/30 ホールドアウト（appid で決定的に分割＝再現性・RNG不使用）で OOS の強さを測る。
+    # ※ Steam の appid は末尾0が多く %10 が激しく偏る（→testが空になる）ので、乗算ハッシュで無相関化してから割る。
+    train = [r for r in rows if _holdout_is_train(r["appid"])]
+    test = [r for r in rows if not _holdout_is_train(r["appid"])]
     oos = {}
     if len(train) >= 50 and len(test) >= 20:
         m_tr = learn(train, base=base)
         oos = evaluate(m_tr, test)
+    print(f"  ホールドアウト: train={len(train)} test={len(test)}")
 
     # 本番モデル＝全データで学習
     model = learn(rows, base=base)
