@@ -3,15 +3,22 @@
   "schema": "upcoming_v3",
   "source": "games(coming_soon/release_date) + 実測シグナル(体験版/Twitch/告知/開発元実績/ジャンル) + prelaunch_model",
   "note": "発売前の羽根予想。spike_prob=跳ね確率＝自社実績で較正したモデルの出力（参考・外れうる）。モデルが無い場合は expect のみ（実測シグナルの有無）。",
-  "generated_at": "2026-07-07T22:25:48.521415+00:00",
+  "generated_at": "2026-07-07T22:34:34.185157+00:00",
   "model": {
     "schema": "prelaunch_model_v1",
-    "readiness": "collecting",
+    "readiness": "validated",
     "base_rate": 0.035627,
     "n_pairs": 1628,
     "hit_threshold": 1000,
-    "validation_oos": {},
-    "generated_at": "2026-07-07T22:22:06.204469+00:00"
+    "validation_oos": {
+      "eval_n": 457,
+      "eval_base": 0.04376,
+      "top_decile_rate": 0.15556,
+      "top_decile_lift": 3.55,
+      "mean_prob_hit": 0.06631,
+      "mean_prob_miss": 0.01664
+    },
+    "generated_at": "2026-07-07T22:31:35.142538+00:00"
   },
   "params": {
     "limit": 200,
@@ -27,7 +34,7 @@
       "coming_soon": true,
       "spike_prob": 0.3194,
       "expect": "high",
-      "conf": "mid",
+      "conf": "high",
       "factors": [
         {
           "name": "dev_best_reviews",
