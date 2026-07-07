@@ -1,0 +1,271 @@
+{
+  "view": "prelaunch_model",
+  "schema": "prelaunch_model_v1",
+  "note": "羽根予想モデル（自社実績で較正したスコアカード）。跳ね確率は log-odds 合算＝解釈可能・材料が薄いほど基準確率に寄る。強さ指標 top_decile_lift は 70/30 ホールドアウトの out-of-sample。readiness=collecting の間は控えめ運用。",
+  "generated_at": "2026-07-07T22:22:06.204469+00:00",
+  "params": {
+    "lookback_days": 180,
+    "outcome_days": 14,
+    "hit_threshold": 1000,
+    "smooth": 8.0,
+    "min_pairs": 300
+  },
+  "readiness": "collecting",
+  "n_pairs": 1628,
+  "hits": 58,
+  "base_rate": 0.035627,
+  "features": [
+    "demo_ccu",
+    "twitch_peak",
+    "streamers",
+    "news_count",
+    "dev_best_peak",
+    "dev_best_reviews",
+    "is_free",
+    "genre"
+  ],
+  "woe": {
+    "demo_ccu": {
+      "none": 0.00508,
+      "low": -0.71145
+    },
+    "twitch_peak": {
+      "none": 0.0
+    },
+    "streamers": {
+      "none": 0.0
+    },
+    "news_count": {
+      "none": -0.93982,
+      "high": 1.11168,
+      "low": 0.14731
+    },
+    "dev_best_peak": {
+      "none": -0.18243,
+      "low": 0.43161,
+      "mid": 0.93067,
+      "high": 1.85109
+    },
+    "dev_best_reviews": {
+      "none": -0.1781,
+      "low": -0.59246,
+      "high": 1.80318
+    },
+    "is_free": {
+      "paid": 0.0682,
+      "free": -0.38123
+    },
+    "genre": {
+      "warm": -0.41242,
+      "hot": 0.75831,
+      "cold": -1.10209,
+      "na": -1.16424
+    }
+  },
+  "genre_rates": {
+    "Simulation": {
+      "n": 502,
+      "hits": 22,
+      "rate": 0.0437
+    },
+    "Casual": {
+      "n": 763,
+      "hits": 23,
+      "rate": 0.0302
+    },
+    "Indie": {
+      "n": 1121,
+      "hits": 29,
+      "rate": 0.02594
+    },
+    "Strategy": {
+      "n": 384,
+      "hits": 10,
+      "rate": 0.02624
+    },
+    "Action": {
+      "n": 484,
+      "hits": 25,
+      "rate": 0.05139
+    },
+    "Adventure": {
+      "n": 522,
+      "hits": 25,
+      "rate": 0.04771
+    },
+    "RPG": {
+      "n": 342,
+      "hits": 23,
+      "rate": 0.06653
+    },
+    "Early Access": {
+      "n": 242,
+      "hits": 12,
+      "rate": 0.04914
+    },
+    "Sports": {
+      "n": 66,
+      "hits": 5,
+      "rate": 0.07142
+    },
+    "Massively Multiplayer": {
+      "n": 50,
+      "hits": 6,
+      "rate": 0.10836
+    },
+    "Free To Play": {
+      "n": 262,
+      "hits": 7,
+      "rate": 0.02698
+    },
+    "Racing": {
+      "n": 28,
+      "hits": 0,
+      "rate": 0.00792
+    },
+    "Utilities": {
+      "n": 1,
+      "hits": 0,
+      "rate": 0.03167
+    }
+  },
+  "validation_oos": {},
+  "feature_report": {
+    "demo_ccu": {
+      "low": {
+        "n": 8,
+        "hits": 0,
+        "rate": 0.0,
+        "woe": -0.71145
+      },
+      "none": {
+        "n": 1620,
+        "hits": 58,
+        "rate": 0.0358,
+        "woe": 0.00508
+      }
+    },
+    "twitch_peak": {
+      "none": {
+        "n": 1628,
+        "hits": 58,
+        "rate": 0.0356,
+        "woe": 0.0
+      }
+    },
+    "streamers": {
+      "none": {
+        "n": 1628,
+        "hits": 58,
+        "rate": 0.0356,
+        "woe": 0.0
+      }
+    },
+    "news_count": {
+      "high": {
+        "n": 292,
+        "hits": 30,
+        "rate": 0.1027,
+        "woe": 1.11168
+      },
+      "low": {
+        "n": 340,
+        "hits": 14,
+        "rate": 0.0412,
+        "woe": 0.14731
+      },
+      "none": {
+        "n": 996,
+        "hits": 14,
+        "rate": 0.0141,
+        "woe": -0.93982
+      }
+    },
+    "dev_best_peak": {
+      "high": {
+        "n": 4,
+        "hits": 2,
+        "rate": 0.5,
+        "woe": 1.85109
+      },
+      "low": {
+        "n": 276,
+        "hits": 15,
+        "rate": 0.0543,
+        "woe": 0.43161
+      },
+      "mid": {
+        "n": 7,
+        "hits": 1,
+        "rate": 0.1429,
+        "woe": 0.93067
+      },
+      "none": {
+        "n": 1341,
+        "hits": 40,
+        "rate": 0.0298,
+        "woe": -0.18243
+      }
+    },
+    "dev_best_reviews": {
+      "high": {
+        "n": 70,
+        "hits": 14,
+        "rate": 0.2,
+        "woe": 1.80318
+      },
+      "low": {
+        "n": 256,
+        "hits": 5,
+        "rate": 0.0195,
+        "woe": -0.59246
+      },
+      "none": {
+        "n": 1302,
+        "hits": 39,
+        "rate": 0.03,
+        "woe": -0.1781
+      }
+    },
+    "is_free": {
+      "free": {
+        "n": 288,
+        "hits": 7,
+        "rate": 0.0243,
+        "woe": -0.38123
+      },
+      "paid": {
+        "n": 1340,
+        "hits": 51,
+        "rate": 0.0381,
+        "woe": 0.0682
+      }
+    },
+    "genre": {
+      "cold": {
+        "n": 98,
+        "hits": 1,
+        "rate": 0.0102,
+        "woe": -1.10209
+      },
+      "hot": {
+        "n": 420,
+        "hits": 31,
+        "rate": 0.0738,
+        "woe": 0.75831
+      },
+      "na": {
+        "n": 17,
+        "hits": 0,
+        "rate": 0.0,
+        "woe": -1.16424
+      },
+      "warm": {
+        "n": 1093,
+        "hits": 26,
+        "rate": 0.0238,
+        "woe": -0.41242
+      }
+    }
+  }
+}
