@@ -7,6 +7,9 @@ name: Upcoming discover (write games)
 
 on:
   workflow_dispatch: {}
+  schedule:
+    # 毎日。appdetails(3:23)の前に発売前ゲームを発見 → 発売日/ジャンルの付与に繋ぐ。
+    - cron: "40 2 * * *"
 
 permissions:
   contents: read

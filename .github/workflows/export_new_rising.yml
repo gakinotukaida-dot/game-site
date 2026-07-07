@@ -6,9 +6,9 @@ name: export new-rising JSON
 
 on:
   workflow_dispatch: {}
-  # 定期実行したくなったら有効化（頻度はオーナー確定・例は6時間ごと）:
-  # schedule:
-  #   - cron: "17 */6 * * *"
+  schedule:
+    # 1日2回。appdetails(:23)後に new_rising（新着で伸び・全ゲーム対象）を更新。
+    - cron: "20 5,17 * * *"
 
 permissions:
   contents: write

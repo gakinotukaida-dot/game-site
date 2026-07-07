@@ -7,8 +7,9 @@ name: export upcoming JSON
 
 on:
   workflow_dispatch: {}
-  # schedule:
-  #   - cron: "23 6 * * *"   # 例：1日1回（発売前は動きが遅いので低頻度で十分）
+  schedule:
+    # 1日2回。upcoming_discover(2:40)→appdetails(3:23)の後に upcoming.json を更新。
+    - cron: "45 4,16 * * *"
 
 permissions:
   contents: write

@@ -16,9 +16,9 @@ name: view02 rank v2 (JSON出力)
 
 on:
   workflow_dispatch: {}
-  # 定期実行したくなったら下を有効化（頻度はオーナー確定。例は6時間ごと）
-  # schedule:
-  #   - cron: "5 */6 * * *"
+  schedule:
+    # 1日4回。収集(sweep :11 / now_ccu :17)の後、make_feed(:25)の前に view02_rising を更新。
+    - cron: "18 1,7,13,19 * * *"
 
 permissions:
   contents: write   # data/view02_rising.json をコミットするために必要（これが無いと exit 128）
