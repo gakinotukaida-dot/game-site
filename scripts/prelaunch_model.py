@@ -41,14 +41,17 @@ released AS (
     AND g.release_date <= now()::date
     AND g.release_date >= (now() - make_interval(days => %(lookback)s))::date
     AND g.coming_soon IS NOT TRUE
-)
+),
+{F.dev_best_cte('released', 's.release_date')}
 SELECT g.appid, g.genres,
   {F.feature_sql(asof='g.release_date')},
+  db.dev_best_peak, db.dev_best_reviews,
   (SELECT max(pc.player_count) FROM player_counts pc
      WHERE pc.appid = g.appid
        AND pc.recorded_at >= g.release_date
        AND pc.recorded_at < g.release_date + make_interval(days => %(outcome_days)s)) AS launch_peak
 FROM released g
+LEFT JOIN dev_best db ON db.appid = g.appid
 """
 
 
