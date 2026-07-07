@@ -1,0 +1,38 @@
+# 伸びフィード（RSS + 任意のDiscord通知）を定期生成してコミット
+# 置き場所: .github/workflows/make_feed.yml
+# 入力: data/view02_rising.json（既存の view02 ランキング出力）。DB・鍵は不要（Discordは任意）。
+# 出力: data/rising_feed.xml。DISCORD_WEBHOOK シークレット設定時のみ、新規の伸び作品を Discord に通知。
+name: Rising feed (RSS + Discord)
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "25 1,7,13,19 * * *"   # view02 更新のあと（best-effort）。分は分散のため :25。
+
+permissions:
+  contents: write
+
+jobs:
+  feed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Generate rising_feed.xml (+ optional Discord)
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          SITE_URL: "https://gakinotukaida-dot.github.io/game-site/"
+        run: python scripts/make_feed.py
+      - name: Commit feed if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet -- data/rising_feed.xml; then
+            git add data/rising_feed.xml
+            git commit -m "feed: update rising_feed.xml [skip ci]"
+            git push
+          else
+            echo "変更なし（コミットしません）"
+          fi
