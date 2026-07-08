@@ -1,0 +1,45 @@
+# 羽根予想の“的中率スコアカード”（読み取り専用・公開の答え合わせ）を data/prediction_scorecard.json に出す
+# 置き場所: .github/workflows/prediction_scorecard.yml
+# 役割: 較正(calibration)・上位十分位リフト・Brier・直近の答え合わせ例を公開＝正直さと信頼構築の核。
+# 守る線: DBは読み取り専用（SELECTのみ）。書き込みは data/prediction_scorecard.json 1ファイルだけ・毎回上書き＝可逆。
+#         リーク無し（as-of）＝シグナルは発売前だけ・結果は発売後だけ。holdout は train だけで学習し test を採点。
+name: prediction scorecard (read-only)
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    # 毎日 5:55 UTC（prediction_log 2:48 の後＝当日の確定を反映）。
+    - cron: "55 5 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  scorecard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install "psycopg2-binary>=2.9"
+      - name: Build prediction scorecard (DB read-only / JSON書き出し)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # LOOKBACK_DAYS: "180"
+          # OUTCOME_DAYS: "14"
+          # HIT_THRESHOLD: "1000"
+          # EXAMPLES: "15"
+        run: python scripts/export_scorecard.py
+      - name: Commit JSON（変更があるときだけ）
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/prediction_scorecard.json
+          if git diff --cached --quiet; then echo "変更なし＝コミットしない"; exit 0; fi
+          git commit -m "data: update prediction_scorecard.json"
+          for i in 1 2 3; do
+            if git push; then echo "push成功"; exit 0; fi
+            echo "push失敗 → 取り込み直して再試行 ($i/3)"; git pull --rebase
+          done
+          echo "3回失敗。同時pushの衝突が続いている可能性 → ログ共有を"; exit 1
