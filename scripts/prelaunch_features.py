@@ -11,8 +11,13 @@
   news_count      公式告知の本数（＝話題の活発さ・種別/本数のみ、本文は取らない）
   dev_best_peak   開発元の“他の作品”の過去最高同時接続（＝作り手の実績。DB全体を横断＝総合相関の核）
   dev_best_reviews開発元の“他の作品”の最大レビュー数（＝作り手の到達度）
+  web_news        世界の多言語ニュース記事数（GDELT・地域中立。web_mentions の最新スナップショット）
+  web_reach       言語版Wikipediaの数（Wikidata sitelinks・言語横断の世界的知名度。同上）
   is_free         無料か（跳ねの出方が異なる）
   genre           ジャンルの過去命中率（学習時に算出したものを使う）
+
+★web_* は別テーブル web_mentions（分離・追記のみ）を **最新スナップショットで as-of 参照**する。
+  テーブルが無い/収集前は自動で none（NULL）＝無影響（feature_sql の web_ok で切替）。収集が貯まると学習が自動で重みを付ける。
 
 ★思想：跳ねは「予測」する。ただし数字は**自社の過去実績で較正**した確率＝当てずっぽうではない。
   外れうることは明示し、材料が薄い作品は自動的に控えめ（基準確率）に寄る。
@@ -21,13 +26,22 @@
 import math
 
 # 特徴量の順序（SQLの並びと一致させる）。genre はSQLではなくPython側で算出（学習した命中率が要るため）。
-SQL_FEATURES = ["demo_ccu", "twitch_peak", "streamers", "news_count", "dev_best_peak", "dev_best_reviews", "is_free"]
+# web_news / web_reach は web_mentions（分離テーブル）由来。テーブルが無ければ NULL＝none で無影響（自動フォールバック）。
+SQL_FEATURES = ["demo_ccu", "twitch_peak", "streamers", "news_count",
+                "web_news", "web_reach", "dev_best_peak", "dev_best_reviews", "is_free"]
 FEATURE_NAMES = SQL_FEATURES + ["genre"]
 
 # 窓（日数）。基準時刻 asof より前の直近この日数を見る。
 DEMO_WIN = 14
 TW_WIN = 30
 NEWS_WIN = 90
+
+
+def web_mentions_exists(cur):
+    """web_mentions（分離テーブル）が存在するかを to_regclass で判定。存在すれば web_* 特徴量を有効化。
+    未作成（収集前）でも読み取り専用クエリを壊さないための安全弁＝呼び出し側は結果を feature_sql(web_ok=) に渡す。"""
+    cur.execute("SELECT to_regclass('public.web_mentions')")
+    return cur.fetchone()[0] is not None
 
 
 def cte_prelude():
@@ -69,10 +83,25 @@ def dev_best_cte(self_from, asof_expr, name="dev_best"):
 )"""
 
 
-def feature_sql(asof, demo_win=DEMO_WIN, tw_win=TW_WIN, news_win=NEWS_WIN):
+def web_feature_sql(asof, web_ok):
+    """web_mentions（分離テーブル）から web_news/web_reach を **asof より前の最新スナップショット**で as-of 参照する列。
+    web_ok=False（テーブル未作成/収集前）のときは NULL 列を返す＝どのバケットも none 扱いで無影響（読み取り専用の他クエリを壊さない）。
+    ※ web_mentions は (appid, recorded_at DESC) の索引つき。source 別に最新1件を引くだけ＝軽い。"""
+    if not web_ok:
+        return "      NULL::bigint AS web_news,\n      NULL::bigint AS web_reach"
+    return f"""      (SELECT wm.mentions FROM web_mentions wm
+        WHERE wm.appid = g.appid AND wm.source = 'gdelt' AND wm.recorded_at < {asof}
+        ORDER BY wm.recorded_at DESC LIMIT 1) AS web_news,
+      (SELECT wm.mentions FROM web_mentions wm
+        WHERE wm.appid = g.appid AND wm.source = 'wikidata_sitelinks' AND wm.recorded_at < {asof}
+        ORDER BY wm.recorded_at DESC LIMIT 1) AS web_reach"""
+
+
+def feature_sql(asof, demo_win=DEMO_WIN, tw_win=TW_WIN, news_win=NEWS_WIN, web_ok=False):
     """asof（SQLの時刻式：学習では g.release_date、推論では now()）より前だけを見る“軽い（appid索引で引ける）”特徴量列を返す。
     開発元特徴（dev_best_peak/dev_best_reviews）は重いので feature_sql には含めず dev_best_cte で別途集合演算し、
     外側で LEFT JOIN dev_best db → db.dev_best_peak, db.dev_best_reviews を SELECT に足すこと。
+    web_ok：web_mentions テーブルが存在するとき True（呼び出し側が to_regclass で判定して渡す）。False なら web_* は NULL。
     外側は必ず `g` エイリアスを、クエリ先頭に cte_prelude() を置くこと。"""
     return f"""
       (SELECT max(pc.player_count) FROM player_counts pc
@@ -84,6 +113,7 @@ def feature_sql(asof, demo_win=DEMO_WIN, tw_win=TW_WIN, news_win=NEWS_WIN):
         WHERE sa.appid = g.appid AND sa.recorded_at < {asof} AND sa.recorded_at >= {asof} - make_interval(days => {tw_win})) AS streamers,
       (SELECT count(*) FROM announcements a
         WHERE a.appid = g.appid AND a.published_at < {asof} AND a.published_at >= {asof} - make_interval(days => {news_win})) AS news_count,
+{web_feature_sql(asof, web_ok)},
       g.is_free AS is_free
     """
 
@@ -116,6 +146,18 @@ def bucketize(name, v, genre_rates=None, base=None):
     if name == "dev_best_reviews":
         if v is None or v <= 0: return "none"
         if v < 1000: return "low"
+        return "high"
+    if name == "web_news":
+        # 世界の多言語ニュース記事数（GDELT・0..250）。まだ話題ゼロ〜大きく報じられている まで。
+        if v is None or v <= 0: return "none"
+        if v < 5: return "low"
+        if v < 25: return "mid"
+        return "high"
+    if name == "web_reach":
+        # 言語版Wikipediaの数（0..~40）。世界的知名度の広がり。
+        if v is None or v <= 0: return "none"
+        if v < 3: return "low"
+        if v < 8: return "mid"
         return "high"
     if name == "is_free":
         return "free" if v else "paid"

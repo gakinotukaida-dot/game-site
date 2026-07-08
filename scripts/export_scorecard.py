@@ -42,8 +42,9 @@ EXAMPLES = int(os.environ.get("EXAMPLES") or "15")
 # 較正ビン（予測確率の絶対区切り。base(≈0.036) 前後を細かく見る）。
 CALIB_EDGES = [0.0, 0.02, 0.05, 0.10, 0.20, 0.40, 1.01]
 
-# holdout 用：発売済み＋as-of 特徴量＋発売後ピーク（prelaunch_model.QUERY と同じ定義。name/release_date を追加）。
-QUERY = f"""
+# holdout 用：発売済み＋as-of 特徴量＋発売後ピーク（prelaunch_model.build_query と同じ定義。name/release_date を追加）。
+def build_query(web_ok):
+    return f"""
 WITH {F.cte_prelude()},
 released AS (
   SELECT g.appid, g.name, g.release_date, g.is_free, g.genres
@@ -56,7 +57,7 @@ released AS (
 ),
 {F.dev_best_cte('released', 's.release_date')}
 SELECT g.appid, g.name, g.release_date, g.genres,
-  {F.feature_sql(asof='g.release_date')},
+  {F.feature_sql(asof='g.release_date', web_ok=web_ok)},
   db.dev_best_peak, db.dev_best_reviews,
   (SELECT max(pc.player_count) FROM player_counts pc
      WHERE pc.appid = g.appid
@@ -128,7 +129,8 @@ def _metrics(scored):
 
 def holdout_scorecard(cur):
     """過去の発売済みを 70/30 分割し、train だけで学習→test を採点（honest なバックテスト）。"""
-    cur.execute(QUERY, {"lookback": LOOKBACK_DAYS, "outcome_days": OUTCOME_DAYS})
+    web_ok = F.web_mentions_exists(cur)   # web_mentions が無ければ web_* は NULL（無影響）
+    cur.execute(build_query(web_ok), {"lookback": LOOKBACK_DAYS, "outcome_days": OUTCOME_DAYS})
     cols = [d[0] for d in cur.description]
     recs = cur.fetchall()
 

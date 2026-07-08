@@ -33,7 +33,8 @@ HIT_THRESHOLD = int(os.environ.get("HIT_THRESHOLD") or "1000")
 SMOOTH = float(os.environ.get("SMOOTH") or "8")      # 加法スムージングの擬似件数（小さいbucketを基準へ収縮）
 MIN_PAIRS = int(os.environ.get("MIN_PAIRS") or "300")  # これ未満なら readiness=collecting（確率は控えめ運用推奨）
 
-QUERY = f"""
+def build_query(web_ok):
+    return f"""
 WITH {F.cte_prelude()},
 released AS (
   SELECT g.appid, g.name, g.release_date, g.developers, g.is_free, g.genres
@@ -46,7 +47,7 @@ released AS (
 ),
 {F.dev_best_cte('released', 's.release_date')}
 SELECT g.appid, g.genres,
-  {F.feature_sql(asof='g.release_date')},
+  {F.feature_sql(asof='g.release_date', web_ok=web_ok)},
   db.dev_best_peak, db.dev_best_reviews,
   (SELECT max(pc.player_count) FROM player_counts pc
      WHERE pc.appid = g.appid
@@ -150,7 +151,8 @@ def main():
     try:
         conn.set_session(readonly=True, autocommit=True)
         with conn.cursor() as cur:
-            cur.execute(QUERY, {"lookback": LOOKBACK_DAYS, "outcome_days": OUTCOME_DAYS})
+            web_ok = F.web_mentions_exists(cur)   # web_mentions が無ければ web_* は NULL（無影響）
+            cur.execute(build_query(web_ok), {"lookback": LOOKBACK_DAYS, "outcome_days": OUTCOME_DAYS})
             cols = [d[0] for d in cur.description]
             recs = cur.fetchall()
     finally:

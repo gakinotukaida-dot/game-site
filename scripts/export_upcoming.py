@@ -33,14 +33,15 @@ LIMIT = int(os.environ.get("LIMIT") or "200")
 UPCOMING_WHERE = ("(g.coming_soon IS TRUE OR (g.release_date IS NOT NULL AND g.release_date > now()::date))"
                   " AND " + not_adult("g"))   # ★成人向けは除外
 
-QUERY = f"""
+def build_query(web_ok):
+    return f"""
 WITH {F.cte_prelude()},
 self_up AS (
   SELECT g.appid FROM games g WHERE {UPCOMING_WHERE}
 ),
 {F.dev_best_cte('self_up', 'now()')}
 SELECT g.appid, g.name, g.release_date, g.release_date_text, g.genres, g.coming_soon,
-  {F.feature_sql(asof='now()')},
+  {F.feature_sql(asof='now()', web_ok=web_ok)},
   db.dev_best_peak, db.dev_best_reviews
 FROM games g
 LEFT JOIN dev_best db ON db.appid = g.appid
@@ -94,7 +95,8 @@ def compute_rows(conn, limit=None):
        conn のセッション（readonly 等）は呼び出し側が設定する。並べ替え・payload化は呼び出し側の責務。
     返り値: (rows, model, base, validated)"""
     with conn.cursor() as cur:
-        cur.execute(QUERY, {"limit": (limit if limit is not None else LIMIT)})
+        web_ok = F.web_mentions_exists(cur)   # web_mentions が無ければ web_* は NULL（無影響）
+        cur.execute(build_query(web_ok), {"limit": (limit if limit is not None else LIMIT)})
         cols = [d[0] for d in cur.description]
         recs = cur.fetchall()
 
@@ -158,6 +160,8 @@ def compute_rows(conn, limit=None):
             "has_news": has_news,
             "dev_best_peak": _iv(d.get("dev_best_peak")),
             "dev_best_reviews": _iv(d.get("dev_best_reviews")),
+            "web_news": _iv(d.get("web_news")),       # 世界の多言語ニュース記事数（GDELT・最新）
+            "web_reach": _iv(d.get("web_reach")),     # 言語版Wikipediaの数（Wikidata・最新）
             "is_free": bool(d.get("is_free")),
             "genres": genres,
         })
