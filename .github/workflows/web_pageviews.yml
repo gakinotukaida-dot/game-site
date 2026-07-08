@@ -1,0 +1,42 @@
+# 全言語版Wikipediaの直近ページビュー合計を web_mentions に貯める（源=wikipedia_pageviews・重いので専用）
+# 置き場所: .github/workflows/web_pageviews.yml
+# 役割: 地域に偏らない“実際の閲覧＝世界の関心”を集計し、羽根予想の特徴量 web_views の土台にする。
+# 守る線: 分離テーブル web_mentions のみ INSERT＝既存に無影響・可逆。成人向けは対象外。DBは分離テーブルのみ。
+# 重さ: 1作品につき言語版の数だけ Pageviews API を呼ぶ（Wikidata sitelinks で言語を特定）。ゆえに専用ワークフロー・低頻度。
+name: web pageviews (all-language sum)
+
+on:
+  workflow_dispatch:
+    inputs:
+      cap:
+        description: "1回の対象上限（動作確認は 5 など。既定 30）"
+        default: "30"
+        required: false
+      pageview_days:
+        description: "合計する直近日数（既定 14）"
+        default: "14"
+        required: false
+  schedule:
+    # 毎日 2:40 UTC（直前の 2:39 CCU スイープで書き込みcomputeが温まっている窓＝cold start を避ける）。
+    - cron: "40 2 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  pageviews:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install "psycopg2-binary>=2.9"
+      - name: Collect all-language Wikipedia pageviews (isolated table / INSERT only)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          MENTIONS_CAP: ${{ github.event.inputs.cap || '30' }}
+          MENTIONS_SOURCES: "wikipedia_pageviews"
+          PAGEVIEW_DAYS: ${{ github.event.inputs.pageview_days || '14' }}
+          DRY_RUN: "false"
+        run: python scripts/web_mentions_sweep.py

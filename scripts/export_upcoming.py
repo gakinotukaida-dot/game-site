@@ -161,6 +161,7 @@ def compute_rows(conn, limit=None):
             "dev_best_peak": _iv(d.get("dev_best_peak")),
             "dev_best_reviews": _iv(d.get("dev_best_reviews")),
             "web_news": _iv(d.get("web_news")),       # 世界の多言語ニュース記事数（GDELT・最新）
+            "web_views": _iv(d.get("web_views")),     # 全言語版Wikipediaの直近ページビュー合計（実閲覧・最新）
             "web_reach": _iv(d.get("web_reach")),     # 言語版Wikipediaの数（Wikidata・最新）
             "is_free": bool(d.get("is_free")),
             "genres": genres,
