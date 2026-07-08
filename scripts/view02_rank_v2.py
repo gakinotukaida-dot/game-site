@@ -26,6 +26,7 @@ import urllib.request
 import psycopg2
 
 from _filters import not_adult
+from web_mentions_sweep import src_gdelt   # Web話題（GDELT・世界の多言語ニュース）をオンザフライで照会（保存なし）
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 CLIENT_ID = os.environ.get("TWITCH_CLIENT_ID")
@@ -80,7 +81,12 @@ BOOST_FREE   = float(os.environ.get("BOOST_FREE")   or "0.05")
 BOOST_REVIEW = float(os.environ.get("BOOST_REVIEW") or "0.05")
 B1_DISCOVERY = float(os.environ.get("B1_DISCOVERY") or "0.10")  # 少数配信×高視聴の発掘
 B1_ATTENTION = float(os.environ.get("B1_ATTENTION") or "0.05")  # 配信注目
+BOOST_WEB    = float(os.environ.get("BOOST_WEB")    or "0.05")  # Web/ニュースで話題（GDELT・上限内）
 BOOST_CAP    = float(os.environ.get("BOOST_CAP")    or "0.30")  # 合計ブーストの上限
+# Web話題（GDELT・オンザフライ・保存なし。Twitchと同型＝計算時取得→使い捨て）
+WEB_CAND_N   = int(os.environ.get("WEB_CAND_N")   or "20")   # GDELTを照会する候補数（base順上位・遅いので絞る）
+WEB_NEWS_MIN = int(os.environ.get("WEB_NEWS_MIN") or "3")    # この記事数以上で「Web/ニュースで話題」を点灯
+GDELT_DELAY  = float(os.environ.get("GDELT_DELAY") or "1.0") # GDELT照会の間隔（429回避）
 # B1 しきい値（暫定）
 B1_FEW_CH    = int(os.environ.get("B1_FEW_CH")    or "10")   # 「少数配信」の上限
 B1_CONC_REF  = float(os.environ.get("B1_CONC_REF") or "300") # 視聴/配信 の基準（集中度）
@@ -319,6 +325,23 @@ def twitch_fetch(names):
     return out
 
 
+def web_fetch(names):
+    """ゲーム名 → GDELT 直近1週間の世界多言語ニュース記事数（オンザフライ・保存なし・きっかけ用）。
+    上位 WEB_CAND_N 件だけ照会（GDELTは遅いので絞る＝Twitchと同じ“計算時取得→使い捨て”）。
+    失敗/遅延はそのゲームだけ skip（点灯しないだけ・全体は壊れない）。鍵不要（公式GDELT API）。"""
+    out = {}
+    for n in names[:WEB_CAND_N]:
+        q = norm_name(n)
+        if not q or len(q) < 3:
+            continue  # 短すぎる名前は誤マッチ源＝照会しない
+        try:
+            out[n] = int(src_gdelt(q) or 0)
+        except Exception as e:
+            print(f"  ⚠ web(GDELT) skip '{(n or '')[:24]}': {type(e).__name__}")
+        time.sleep(GDELT_DELAY)
+    return out
+
+
 def b1_signal(current, tw):
     """戻り：(type_code or None, label or None, boost)。少数配信×高視聴=発掘 / 高視聴=注目。上限付き・暫定。
     type_code は公開JSON用（数値なし・②）。label は診断印字用（数値あり・公開しない）。"""
@@ -359,7 +382,8 @@ def main():
     finally:
         conn.close()
 
-    tw = twitch_fetch([r["name"] for r in cand])  # DB接続外でTwitch取得（保存なし）
+    tw = twitch_fetch([r["name"] for r in cand])   # DB接続外でTwitch取得（保存なし）
+    web = web_fetch([r["name"] for r in cand])      # DB接続外でWeb話題(GDELT)取得（保存なし）
 
     rows = []
     for r in cand:
@@ -389,6 +413,10 @@ def main():
         if r["appid"] in jpnews:  # C3: 国内話題（抽象・見出しなし）
             signals.append({"type": "jp_news", "layer": "trigger", "value": None})
             label_parts.append("国内で話題"); boost += BOOST_JP
+        wc = web.get(r["name"], 0)  # Web話題（GDELT・世界の多言語ニュース記事数・オンザフライ）
+        if wc >= WEB_NEWS_MIN:
+            signals.append({"type": "web_buzz", "layer": "trigger", "value": {"articles": int(wc)}})
+            label_parts.append(f"Web/ニュースで話題(記事{wc})"); boost += BOOST_WEB
         b1type, b1label, b1boost = b1_signal(r["current_ccu"], tw.get(r["name"]))
         if b1type:  # 公開JSONは種別のみ・数値なし（②）。弱い「配信あり」はシグナルにしない。
             signals.append({"type": b1type, "layer": "trigger", "value": None}); boost += b1boost
@@ -411,7 +439,7 @@ def main():
             label = " + ".join(label_parts) if label_parts else "（シグナルあり）"
         r.update({"shrunk": sr, "base": bs, "eff": eff, "label": label, "conf": conf,
                   "conf_code": conf_code, "signals": signals, "boost": boost,
-                  "boost_capped": boost_capped, "tw": tw.get(r["name"])})
+                  "boost_capped": boost_capped, "tw": tw.get(r["name"]), "web": web.get(r["name"])})
         rows.append(r)
 
     rows.sort(key=lambda x: x["eff"], reverse=True)
