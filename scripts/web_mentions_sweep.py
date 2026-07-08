@@ -37,7 +37,8 @@ DATABASE_URL = os.environ["DATABASE_URL"]
 MENTIONS_CAP = int(os.environ.get("MENTIONS_CAP") or "50")
 HTTP_TIMEOUT = float(os.environ.get("HTTP_TIMEOUT") or "12")
 YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY") or ""
-_DEFAULT_SOURCES = "youtube,note,wikipedia_en,wikipedia_ja,hackernews,gdelt"
+# note は自動アクセスを 403 で弾くため既定から外す（明示指定で試すことは可能）。
+_DEFAULT_SOURCES = "youtube,wikipedia_en,wikipedia_ja,hackernews,gdelt"
 SOURCES = [s.strip() for s in (os.environ.get("MENTIONS_SOURCES") or _DEFAULT_SOURCES).split(",") if s.strip()]
 DRY_RUN = (os.environ.get("DRY_RUN") or "").strip().lower() in ("1", "true", "yes", "on")
 UA = "trepa-web-mentions/1.0 (+https://github.com/gakinotukaida-dot/game-site)"
@@ -68,9 +69,9 @@ BROWSER_UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
               "(KHTML, like Gecko) Chrome/122.0 Safari/537.36")
 
 
-def _get_json(url, ua=None):
+def _get_json(url, ua=None, timeout=None):
     req = urllib.request.Request(url, headers={"User-Agent": ua or UA, "Accept": "application/json"})
-    with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT) as r:
+    with urllib.request.urlopen(req, timeout=(timeout or HTTP_TIMEOUT)) as r:
         return json.loads(r.read().decode("utf-8", "replace"))
 
 
@@ -133,9 +134,9 @@ def src_gdelt(name):
     """GDELT の直近1週間のニュース記事数（best-effort・上限まで）。公式API・キー不要。壊れたら例外→スキップ。
     GDELT はクエリに敏感：フレーズ（空白入り）は引用符・単語はそのまま。sort等の余計な指定は外す。"""
     query = f'"{name}"' if " " in (name or "") else (name or "")
-    q = urllib.parse.urlencode({"query": query, "mode": "artlist", "maxrecords": "250",
+    q = urllib.parse.urlencode({"query": query, "mode": "artlist", "maxrecords": "75",
                                 "timespan": "1w", "format": "json"})
-    data = _get_json("https://api.gdeltproject.org/api/v2/doc/doc?" + q)
+    data = _get_json("https://api.gdeltproject.org/api/v2/doc/doc?" + q, timeout=30)  # GDELTは遅いので長め
     arts = (data or {}).get("articles") or []
     return len(arts)
 
