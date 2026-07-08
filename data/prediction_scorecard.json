@@ -1,0 +1,229 @@
+{
+  "view": "prediction_scorecard",
+  "schema": "prediction_scorecard_v1",
+  "note": "羽根予想の答え合わせ（as-of・リーク無し）。holdout=過去を70/30分割しtrainだけで学習しtestを採点（honestなバックテスト）。live=発売前に記録した予測→発売後の結果（最も硬い真のout-of-sample・日々増える）。calibration は「◯%と予測した群が実際に何%跳ねたか」＝予測と実測が近いほど信頼できる。",
+  "generated_at": "2026-07-08T10:34:53.846744+00:00",
+  "params": {
+    "lookback_days": 180,
+    "outcome_days": 14,
+    "hit_threshold": 1000,
+    "calib_edges": [
+      0.0,
+      0.02,
+      0.05,
+      0.1,
+      0.2,
+      0.4,
+      1.01
+    ]
+  },
+  "holdout": {
+    "n_pairs": 1649,
+    "train_n": 1188,
+    "test_n": 461,
+    "ready": true,
+    "metrics": {
+      "n": 461,
+      "hits": 21,
+      "base_rate": 0.04555,
+      "top_decile_n": 46,
+      "top_decile_rate": 0.17391,
+      "top_decile_lift": 3.82,
+      "brier": 0.04272,
+      "high_conf_n": 9,
+      "high_conf_rate": 0.33333
+    },
+    "calibration": [
+      {
+        "range": [
+          0.0,
+          0.02
+        ],
+        "n": 368,
+        "pred_mean": 0.0058,
+        "actual_rate": 0.0245
+      },
+      {
+        "range": [
+          0.02,
+          0.05
+        ],
+        "n": 69,
+        "pred_mean": 0.025,
+        "actual_rate": 0.0725
+      },
+      {
+        "range": [
+          0.05,
+          0.1
+        ],
+        "n": 13,
+        "pred_mean": 0.054,
+        "actual_rate": 0.3077
+      },
+      {
+        "range": [
+          0.1,
+          0.2
+        ],
+        "n": 3,
+        "pred_mean": 0.132,
+        "actual_rate": 0.0
+      },
+      {
+        "range": [
+          0.2,
+          0.4
+        ],
+        "n": 5,
+        "pred_mean": 0.2751,
+        "actual_rate": 0.6
+      },
+      {
+        "range": [
+          0.4,
+          1.0
+        ],
+        "n": 3,
+        "pred_mean": 0.4638,
+        "actual_rate": 0.0
+      }
+    ],
+    "examples": [
+      {
+        "appid": 4540230,
+        "name": "Road To Glory",
+        "release": "2026-06-23",
+        "pred": 0.4638,
+        "hit": false,
+        "launch_peak": 3
+      },
+      {
+        "appid": 2805850,
+        "name": "Atre: Dominance Wars",
+        "release": "2026-06-08",
+        "pred": 0.4638,
+        "hit": false,
+        "launch_peak": 23
+      },
+      {
+        "appid": 2859100,
+        "name": "The Adventures of HILLS",
+        "release": "2026-06-18",
+        "pred": 0.4638,
+        "hit": false,
+        "launch_peak": 551
+      },
+      {
+        "appid": 3276050,
+        "name": "SpaceCraft",
+        "release": "2026-06-11",
+        "pred": 0.3322,
+        "hit": true,
+        "launch_peak": 7685
+      },
+      {
+        "appid": 2417470,
+        "name": "Beastro",
+        "release": "2026-06-11",
+        "pred": 0.3322,
+        "hit": false,
+        "launch_peak": 657
+      },
+      {
+        "appid": 4323990,
+        "name": "EMPULSE",
+        "release": "2026-06-24",
+        "pred": 0.237,
+        "hit": true,
+        "launch_peak": 2843
+      },
+      {
+        "appid": 3939700,
+        "name": "Treasure Beach",
+        "release": "2026-06-20",
+        "pred": 0.237,
+        "hit": false,
+        "launch_peak": 416
+      },
+      {
+        "appid": 2211170,
+        "name": "Unrailed 2: Back on Track",
+        "release": "2026-06-11",
+        "pred": 0.237,
+        "hit": true,
+        "launch_peak": 1140
+      },
+      {
+        "appid": 1454370,
+        "name": "STARSEEKER: Astroneer Expeditions",
+        "release": "2026-06-11",
+        "pred": 0.1515,
+        "hit": false,
+        "launch_peak": 701
+      },
+      {
+        "appid": 4366330,
+        "name": "Rift Wizard 3",
+        "release": "2026-06-23",
+        "pred": 0.1222,
+        "hit": false,
+        "launch_peak": 312
+      },
+      {
+        "appid": 4886470,
+        "name": "Starsandisland Modkit",
+        "release": "2026-06-25",
+        "pred": 0.1222,
+        "hit": false,
+        "launch_peak": 4
+      },
+      {
+        "appid": 3760100,
+        "name": "8 Ball by Pokerist",
+        "release": "2026-06-16",
+        "pred": 0.0557,
+        "hit": false,
+        "launch_peak": 167
+      },
+      {
+        "appid": 3608900,
+        "name": "NOMIA",
+        "release": "2026-05-31",
+        "pred": 0.0538,
+        "hit": false,
+        "launch_peak": 1
+      },
+      {
+        "appid": 4442710,
+        "name": "Spirit Dungeon",
+        "release": "2026-06-25",
+        "pred": 0.0538,
+        "hit": false,
+        "launch_peak": 60
+      },
+      {
+        "appid": 2261430,
+        "name": "LumenTale: Memories of Trey",
+        "release": "2026-05-26",
+        "pred": 0.0538,
+        "hit": true,
+        "launch_peak": 2180
+      }
+    ]
+  },
+  "live": {
+    "counts": {
+      "pending": {
+        "n": 502,
+        "hits": 0
+      }
+    },
+    "pending": 502,
+    "settling": 0,
+    "resolved": 0,
+    "metrics": {},
+    "calibration": [],
+    "examples": []
+  }
+}
