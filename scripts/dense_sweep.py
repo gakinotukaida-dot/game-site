@@ -36,6 +36,9 @@ RISER_ABS_FLOOR = int(os.environ.get("RISER_ABS_FLOOR") or "200")
 # 履歴ゼロでも launch を高解像度で捕まえる狙い。ウィンドウを過ぎれば自然に外れる（自己消滅）。
 LAUNCH_DAYS = int(os.environ.get("LAUNCH_DAYS") or "14")   # 発売後この日数まで
 LAUNCH_MAX  = int(os.environ.get("LAUNCH_MAX")  or "200")  # 上限件数（CCUキー10万/日の枠を守る）
+# --- 発売前の体験版（Next Fest 等で跳ねる＝羽根予想の最強シグナル）を高解像度で拾う。---
+# coming_soon の親を持つ体験版を密ティアへ一時編入。発売されれば親の coming_soon が外れて自然消滅。
+DEMO_MAX    = int(os.environ.get("DEMO_MAX")    or "300")  # 発売前デモの上限件数
 
 # --- 1発火あたりの観測パス（A案：GitHubのschedule発火が間引かれる対策）。すべて暫定・env可変。---
 # 1回の起動で PASSES 回観測し、6時間窓に複数点を確保する。発火が無い窓は依然薄い＝部分改善（引継ぎ §5）。
@@ -93,6 +96,7 @@ def get_targets():
         "abs_floor": RISER_ABS_FLOOR,
         "launch_days": LAUNCH_DAYS,
         "launch_max": LAUNCH_MAX,
+        "demo_max": DEMO_MAX,
     }
     sql = (
         "WITH latest AS ("
@@ -120,12 +124,17 @@ def get_targets():
         "    AND g.release_date IS NOT NULL"
         "    AND g.release_date >= (now()::date - %(launch_days)s)"
         "  ORDER BY g.release_date DESC LIMIT %(launch_max)s"
+        "), prelaunch_demos AS ("
+        "  SELECT d.appid FROM games d JOIN games p ON p.appid = d.fullgame_appid"
+        "  WHERE d.status <> 'dormant' AND p.coming_soon IS TRUE"
+        "  LIMIT %(demo_max)s"
         ") "
         "SELECT appid, bool_or(is_riser) AS is_riser, bool_or(is_launch) AS is_launch FROM ("
         "  SELECT appid, false AS is_riser, false AS is_launch FROM games WHERE status = 'watchlist'"
         "  UNION ALL SELECT appid, false, false FROM top_active"
         "  UNION ALL SELECT appid, true,  false FROM risers"
         "  UNION ALL SELECT appid, false, true  FROM launched"
+        "  UNION ALL SELECT appid, false, false FROM prelaunch_demos"
         ") u GROUP BY appid"
     )
     conn = psycopg2.connect(DATABASE_URL)
