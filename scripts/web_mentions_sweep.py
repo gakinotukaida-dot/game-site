@@ -63,8 +63,13 @@ LIMIT %(cap)s
 """.format(na=not_adult("g"))
 
 
-def _get_json(url):
-    req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "application/json"})
+# Wikipedia は「bot を名乗る説明的UA」を推奨、note 等は逆に bot UA を 403 で弾くことがあるためブラウザ風UAで取る。
+BROWSER_UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+              "(KHTML, like Gecko) Chrome/122.0 Safari/537.36")
+
+
+def _get_json(url, ua=None):
+    req = urllib.request.Request(url, headers={"User-Agent": ua or UA, "Accept": "application/json"})
     with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT) as r:
         return json.loads(r.read().decode("utf-8", "replace"))
 
@@ -81,9 +86,9 @@ def src_youtube(name):
 
 
 def src_note(name):
-    """note の検索ヒット記事数（非公式JSON・best-effort）。壊れたら例外→スキップ。"""
+    """note の検索ヒット記事数（非公式JSON・best-effort）。bot UA を弾くことがあるためブラウザ風UAで取る。"""
     q = urllib.parse.urlencode({"context": "note", "q": name, "size": "1", "start": "0"})
-    data = _get_json("https://note.com/api/v3/searches?" + q)
+    data = _get_json("https://note.com/api/v3/searches?" + q, ua=BROWSER_UA)
     d = (data or {}).get("data") or {}
     # 既知の形に順に当てる（版によって differ するため寛容に）
     for path in (("notes", "total_count"), ("total_count",), ("notes", "totalCount")):
@@ -125,9 +130,11 @@ def src_hackernews(name):
 
 
 def src_gdelt(name):
-    """GDELT の直近1週間のニュース記事数（best-effort・上限まで）。公式API・キー不要。壊れたら例外→スキップ。"""
-    q = urllib.parse.urlencode({"query": f'"{name}"', "mode": "artlist", "maxrecords": "250",
-                                "timespan": "1w", "format": "json", "sort": "datedesc"})
+    """GDELT の直近1週間のニュース記事数（best-effort・上限まで）。公式API・キー不要。壊れたら例外→スキップ。
+    GDELT はクエリに敏感：フレーズ（空白入り）は引用符・単語はそのまま。sort等の余計な指定は外す。"""
+    query = f'"{name}"' if " " in (name or "") else (name or "")
+    q = urllib.parse.urlencode({"query": query, "mode": "artlist", "maxrecords": "250",
+                                "timespan": "1w", "format": "json"})
     data = _get_json("https://api.gdeltproject.org/api/v2/doc/doc?" + q)
     arts = (data or {}).get("articles") or []
     return len(arts)
@@ -202,8 +209,11 @@ def main():
         for s in active:
             try:
                 n = SOURCE_FUNCS[s](name)
-            except (urllib.error.URLError, urllib.error.HTTPError, ValueError, TimeoutError, OSError) as e:
-                print(f"  [skip] {s} appid={appid} '{(name or '')[:30]}': {type(e).__name__}")
+            except urllib.error.HTTPError as e:
+                print(f"  [skip] {s:12} appid={appid} '{(name or '')[:24]}': HTTP {e.code}")
+                n = None
+            except (urllib.error.URLError, ValueError, TimeoutError, OSError) as e:
+                print(f"  [skip] {s:12} appid={appid} '{(name or '')[:24]}': {type(e).__name__}")
                 n = None
             if n is not None:
                 rows.append((appid, s, int(n)))
