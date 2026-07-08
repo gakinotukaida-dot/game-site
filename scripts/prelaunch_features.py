@@ -12,6 +12,7 @@
   dev_best_peak   開発元の“他の作品”の過去最高同時接続（＝作り手の実績。DB全体を横断＝総合相関の核）
   dev_best_reviews開発元の“他の作品”の最大レビュー数（＝作り手の到達度）
   web_news        世界の多言語ニュース記事数（GDELT・地域中立。web_mentions の最新スナップショット）
+  web_views       全言語版Wikipediaの直近ページビュー合計（実際の閲覧＝世界の関心。地域に偏らない実閲覧の総量。同上）
   web_reach       言語版Wikipediaの数（Wikidata sitelinks・言語横断の世界的知名度。同上）
   is_free         無料か（跳ねの出方が異なる）
   genre           ジャンルの過去命中率（学習時に算出したものを使う）
@@ -28,7 +29,7 @@ import math
 # 特徴量の順序（SQLの並びと一致させる）。genre はSQLではなくPython側で算出（学習した命中率が要るため）。
 # web_news / web_reach は web_mentions（分離テーブル）由来。テーブルが無ければ NULL＝none で無影響（自動フォールバック）。
 SQL_FEATURES = ["demo_ccu", "twitch_peak", "streamers", "news_count",
-                "web_news", "web_reach", "dev_best_peak", "dev_best_reviews", "is_free"]
+                "web_news", "web_views", "web_reach", "dev_best_peak", "dev_best_reviews", "is_free"]
 FEATURE_NAMES = SQL_FEATURES + ["genre"]
 
 # 窓（日数）。基準時刻 asof より前の直近この日数を見る。
@@ -88,10 +89,15 @@ def web_feature_sql(asof, web_ok):
     web_ok=False（テーブル未作成/収集前）のときは NULL 列を返す＝どのバケットも none 扱いで無影響（読み取り専用の他クエリを壊さない）。
     ※ web_mentions は (appid, recorded_at DESC) の索引つき。source 別に最新1件を引くだけ＝軽い。"""
     if not web_ok:
-        return "      NULL::bigint AS web_news,\n      NULL::bigint AS web_reach"
+        return ("      NULL::bigint AS web_news,\n"
+                "      NULL::bigint AS web_views,\n"
+                "      NULL::bigint AS web_reach")
     return f"""      (SELECT wm.mentions FROM web_mentions wm
         WHERE wm.appid = g.appid AND wm.source = 'gdelt' AND wm.recorded_at < {asof}
         ORDER BY wm.recorded_at DESC LIMIT 1) AS web_news,
+      (SELECT wm.mentions FROM web_mentions wm
+        WHERE wm.appid = g.appid AND wm.source = 'wikipedia_pageviews' AND wm.recorded_at < {asof}
+        ORDER BY wm.recorded_at DESC LIMIT 1) AS web_views,
       (SELECT wm.mentions FROM web_mentions wm
         WHERE wm.appid = g.appid AND wm.source = 'wikidata_sitelinks' AND wm.recorded_at < {asof}
         ORDER BY wm.recorded_at DESC LIMIT 1) AS web_reach"""
@@ -152,6 +158,12 @@ def bucketize(name, v, genre_rates=None, base=None):
         if v is None or v <= 0: return "none"
         if v < 5: return "low"
         if v < 25: return "mid"
+        return "high"
+    if name == "web_views":
+        # 全言語版Wikipediaの直近ページビュー合計（実閲覧＝関心）。無名〜世界的に読まれている まで。
+        if v is None or v <= 0: return "none"
+        if v < 2000: return "low"
+        if v < 20000: return "mid"
         return "high"
     if name == "web_reach":
         # 言語版Wikipediaの数（0..~40）。世界的知名度の広がり。

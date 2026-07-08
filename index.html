@@ -562,7 +562,7 @@ const moreWrap=document.getElementById("moreWrap");
 const freeSec=document.getElementById("freeSec"),freeBody=document.getElementById("freeBody");
 let favOnly=false; const favs=new Set(); let current="1"; let shown=20; let activeGenres=new Set(); let sortMode="rank"; let REAL_L=null; let REAL_UP=null; let UP_MODEL=null; let SCORE=null; let query=""; let imgOn=true;
 // 羽根予想の押し上げ要因ラベル（export の factors[].name → 表示名）
-const FACT_LABEL={demo_ccu:{ja:"体験版が遊ばれている",en:"Demo being played"},twitch_peak:{ja:"配信で注目",en:"Twitch buzz"},streamers:{ja:"配信者が多い",en:"Many streamers"},news_count:{ja:"告知が活発",en:"Active news"},web_news:{ja:"世界で報道",en:"Global news"},web_reach:{ja:"世界的な知名度",en:"Global reach"},dev_best_peak:{ja:"開発元の実績",en:"Dev track record"},dev_best_reviews:{ja:"開発元の評価",en:"Dev reputation"},genre:{ja:"人気ジャンル",en:"Popular genre"},is_free:{ja:"無料",en:"Free"}};
+const FACT_LABEL={demo_ccu:{ja:"体験版が遊ばれている",en:"Demo being played"},twitch_peak:{ja:"配信で注目",en:"Twitch buzz"},streamers:{ja:"配信者が多い",en:"Many streamers"},news_count:{ja:"告知が活発",en:"Active news"},web_news:{ja:"世界で報道",en:"Global news"},web_views:{ja:"世界で読まれている",en:"Global readership"},web_reach:{ja:"世界的な知名度",en:"Global reach"},dev_best_peak:{ja:"開発元の実績",en:"Dev track record"},dev_best_reviews:{ja:"開発元の評価",en:"Dev reputation"},genre:{ja:"人気ジャンル",en:"Popular genre"},is_free:{ja:"無料",en:"Free"}};
 function factLabel(n){ const m=FACT_LABEL[n]; return m?(lang==="en"?m.en:m.ja):n; }
 const FAV_KEY="radar_favs_v1";
 const IMG_KEY="radar_img_v1"; try{ if(localStorage.getItem(IMG_KEY)==="0") imgOn=false; }catch(e){}
@@ -727,6 +727,7 @@ function viewItems(view){
       if(tw) rawS.push(`<span class="chip">${L("配信 最大"+nf.format(tw)+"人","Twitch peak "+nf.format(tw))}</span>`);
       if(g.news_count) rawS.push(`<span class="chip">${L("告知 "+g.news_count+"件","News "+g.news_count)}</span>`);
       if(g.web_news) rawS.push(`<span class="chip">${L("世界のニュース "+nf.format(g.web_news)+"件","World news "+nf.format(g.web_news))}</span>`);
+      if(g.web_views) rawS.push(`<span class="chip">${L("世界の閲覧 "+nf.format(g.web_views),"Global views "+nf.format(g.web_views))}</span>`);
       if(g.web_reach) rawS.push(`<span class="chip">${L("言語版Wiki "+nf.format(g.web_reach),"Lang wikis "+nf.format(g.web_reach))}</span>`);
       if(g.dev_best_peak) rawS.push(`<span class="chip">${L("開発元ベスト "+nf.format(g.dev_best_peak)+"人","Dev best "+nf.format(g.dev_best_peak))}</span>`);
       const genreS=(g.genres&&g.genres.length)?g.genres.map(t=>`<span class="chip">${esc(genreLabel(t))}</span>`).join(""):"";
