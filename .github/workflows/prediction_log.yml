@@ -1,0 +1,36 @@
+# 羽根予想を“発売前に記録→発売後に答え合わせ”して prediction_log に貯める（分離テーブル・追記/更新のみ）
+# 置き場所: .github/workflows/prediction_log.yml
+# 役割: 実運用の「予測→結果」の対を積み、公開の的中率スコアカード(export_scorecard)の最も硬い証拠にする。
+# 守る線: 分離テーブル prediction_log のみ作成・INSERT/UPDATE＝既存に無影響・可逆。成人向けは対象外。予測値はサイト表示と同一。
+name: prediction log (record & resolve)
+
+on:
+  workflow_dispatch:
+    inputs:
+      pred_limit:
+        description: "1回に記録する発売前作品の上限（既定 800）"
+        default: "800"
+        required: false
+  schedule:
+    # 毎日 2:48 UTC（web_mentions 2:10 の後・エクスポート群と分散）。定時運用は compute が温まっていて安定。
+    - cron: "48 2 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  log:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install "psycopg2-binary>=2.9"
+      - name: Record & resolve spike predictions (isolated table / INSERT+UPDATE only)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PRED_LIMIT: ${{ github.event.inputs.pred_limit || '800' }}
+          # OUTCOME_DAYS: "14"   # 発売直後の跳ねを測る窓（model と一致）
+          # HIT_THRESHOLD: "1000"
+        run: python scripts/prediction_log_sweep.py

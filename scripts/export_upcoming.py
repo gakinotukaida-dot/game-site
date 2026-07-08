@@ -88,16 +88,15 @@ def _iv(v):
     return int(v) if v is not None else None
 
 
-def main():
-    conn = psycopg2.connect(DATABASE_URL)
-    try:
-        conn.set_session(readonly=True, autocommit=True)
-        with conn.cursor() as cur:
-            cur.execute(QUERY, {"limit": LIMIT})
-            cols = [d[0] for d in cur.description]
-            recs = cur.fetchall()
-    finally:
-        conn.close()
+def compute_rows(conn, limit=None):
+    """発売前ゲームを読み、各作品の羽根予想（spike_prob/expect/conf/factors…）を付けた行リストを返す。
+    ※ 予測の“単一の源”：これを export（表示）と prediction_log（記録）の両方が使う＝表示と記録の値が必ず一致（skew防止）。
+       conn のセッション（readonly 等）は呼び出し側が設定する。並べ替え・payload化は呼び出し側の責務。
+    返り値: (rows, model, base, validated)"""
+    with conn.cursor() as cur:
+        cur.execute(QUERY, {"limit": (limit if limit is not None else LIMIT)})
+        cols = [d[0] for d in cur.description]
+        recs = cur.fetchall()
 
     model = _load_model()
     base = (model.get("base_rate") if model else None) or 0.03
@@ -162,6 +161,17 @@ def main():
             "is_free": bool(d.get("is_free")),
             "genres": genres,
         })
+
+    return rows, model, base, validated
+
+
+def main():
+    conn = psycopg2.connect(DATABASE_URL)
+    try:
+        conn.set_session(readonly=True, autocommit=True)
+        rows, model, base, validated = compute_rows(conn)
+    finally:
+        conn.close()
 
     # ★羽根予想の高い順に並べる（核＝跳ねそうな作品を上に）。モデル無しは expect→発売日で代替。
     _rank = {"high": 0, "mid": 1, "low": 2}
