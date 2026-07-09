@@ -37,6 +37,7 @@ DATABASE_URL = os.environ["DATABASE_URL"]
 LOOKBACK_DAYS = int(os.environ.get("LOOKBACK_DAYS") or "180")   # 学習窓と一致（この範囲の発売済みを覆う）
 PAGEVIEW_DAYS = int(os.environ.get("PAGEVIEW_DAYS") or "14")    # 発売前の実閲覧を測る窓（日次収集と一致）
 BACKFILL_CAP = int(os.environ.get("BACKFILL_CAP") or "50")     # 1回の処理件数（言語数ぶんAPIを叩くので控えめに）
+FLUSH_EVERY = int(os.environ.get("FLUSH_EVERY") or "10")       # この件数ごとに書き込む＝計算(HTTP)中も write-primary を温存し cold-start を回避
 
 # 発売済み（直近LOOKBACK日）で、まだ“発売前 web_views”を持たない作品。発売日が新しい順に少しずつ。
 TARGET_QUERY = f"""
@@ -99,6 +100,12 @@ def get_targets():
         conn.close()
 
 
+def _flush(rows):
+    """rows を一括 INSERT（recorded_at＝発売日前日）。書き込み＝Neon cold-start に再試行つき。"""
+    if rows:
+        _connect_retry(lambda conn: execute_batch(conn.cursor(), INSERT_SQL, rows, page_size=200))
+
+
 def main():
     # 1) テーブルを保証（無ければ作成＝収集前でも backfill 単体で動く）。書き込み＝再試行つき。
     _connect_retry(lambda conn: conn.cursor().execute(DDL))
@@ -113,8 +120,11 @@ def main():
         print("[web-backfill] 発売前 web_views 未取得の対象なし＝バックフィル完了済み（または対象0）。")
         return 0
 
-    # 3) 各作品の発売前 [release_date-PAGEVIEW_DAYS, release_date] の全言語ページビュー合計を計算（HTTP・DB接続外）。
-    rows = []
+    # 3) 各作品の発売前 [release_date-PAGEVIEW_DAYS, release_date] の全言語ページビュー合計を計算し、
+    #    FLUSH_EVERY 件ごとに書き込む。★計算(HTTP)は数分かかるため、こまめに書いて write-primary を温存
+    #    ＝長い無書き込み時間で compute が scale-to-zero → 最後の一括書き込みが cold-start で落ちる、を防ぐ。
+    buffer = []
+    written = 0
     for appid, name, rd in targets:
         start = rd - timedelta(days=PAGEVIEW_DAYS)
         try:
@@ -123,17 +133,19 @@ def main():
             print(f"  [skip] appid={appid} '{(name or '')[:28]}': {type(e).__name__}")
             continue
         rec_at = rd - timedelta(days=1)   # 発売日前日＝as-of で“発売前”に入る
-        rows.append((appid, total, rec_at))
+        buffer.append((appid, total, rec_at))
         print(f"  web_views(発売前) appid={appid:>9} {total:>9}  発売 {rd}  {(name or '')[:34]}")
+        if len(buffer) >= FLUSH_EVERY:
+            _flush(buffer)
+            written += len(buffer)
+            buffer = []
+    _flush(buffer)
+    written += len(buffer)
 
-    if not rows:
+    if not written:
         print("[web-backfill] 記録行 0（全件失敗/該当なし）。")
         return 0
-
-    # 4) 一括 INSERT（recorded_at＝発売日前日）。書き込み＝再試行つき。
-    _connect_retry(lambda conn: execute_batch(
-        conn.cursor(), INSERT_SQL, rows, page_size=200))
-    print(f"[web-backfill] 記録 {len(rows)} 件（発売前 web_views・recorded_at=発売日前日）。"
+    print(f"[web-backfill] 記録 {written} 件（発売前 web_views・recorded_at=発売日前日・{FLUSH_EVERY}件ごとに書込）。"
           f"次回のモデル再学習(04:20)が特徴量として拾い、web_views の重みが自動で付き始めます。")
     return 0
 
