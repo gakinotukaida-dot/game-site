@@ -190,14 +190,12 @@ def src_wikidata_sitelinks(name):
     return len(_wd_sitelinks_map(name))
 
 
-def _pageviews_sum(project, title, days):
-    """指定 project（例 en.wikipedia）の記事 title の直近 days 日の合計ページビュー（人間アクセスのみ）。
-    その言語版に閲覧データが無い(404)は0。公式 Wikimedia Pageviews API・キー不要。"""
-    end = datetime.now(timezone.utc).date()
-    start = end - timedelta(days=days)
+def _pageviews_range(project, title, start_date, end_date):
+    """指定 project（例 en.wikipedia）の記事 title の [start_date, end_date] 合計ページビュー（人間アクセスのみ）。
+    その言語版に閲覧データが無い(404)は0。公式 Wikimedia Pageviews API・キー不要（過去の任意期間も引ける）。"""
     art = urllib.parse.quote(title.replace(" ", "_"), safe="")
     url = (f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/"
-           f"{project}/all-access/user/{art}/daily/{start:%Y%m%d}/{end:%Y%m%d}")
+           f"{project}/all-access/user/{art}/daily/{start_date:%Y%m%d}/{end_date:%Y%m%d}")
     try:
         data = _get_json(url)
     except urllib.error.HTTPError as e:
@@ -208,29 +206,36 @@ def _pageviews_sum(project, title, days):
     return sum(int(it.get("views") or 0) for it in items)
 
 
-def src_wikipedia_pageviews(name):
-    """★全言語版Wikipediaの直近ページビュー合計＝地域に偏らない“実際の閲覧＝関心”の総量。
-    「世界中の記事をまんべんなく」の理想に最も近い“実閲覧”シグナル（件数ではなく人が読んだ回数）。
-    Wikidata sitelinks で各言語の記事タイトルを得て、言語ごとに Pageviews API を合算。公式API・キー不要。"""
+def pageviews_between(name, start_date, end_date, max_langs=None):
+    """全言語版Wikipediaの [start_date, end_date] のページビュー合計。任意期間版（日次収集＝現在窓／backfill＝発売前窓 の両方が使う）。
+    Wikidata sitelinks で各言語の記事タイトルを得て、言語ごとに合算。公式API・キー不要。1言語だけの失敗はスキップ（合計は返す）。"""
     smap = _wd_sitelinks_map(name)
     if not smap:
         return 0
+    cap = max_langs or MAX_PV_LANGS
     total = 0
     used = 0
     for key, title in smap.items():
-        if used >= MAX_PV_LANGS:
+        if used >= cap:
             break
         lang = key[:-4]                       # "enwiki" -> "en"、"zh_yuewiki" -> "zh_yue"
         if not lang:
             continue
         project = f"{lang.replace('_', '-')}.wikipedia"   # "zh_yue" -> "zh-yue.wikipedia"
         try:
-            total += _pageviews_sum(project, title, PAGEVIEW_DAYS)
+            total += _pageviews_range(project, title, start_date, end_date)
         except (urllib.error.URLError, ValueError, OSError):
             pass                              # その言語版だけ諦めて続行（合計は返す）
         used += 1
         time.sleep(0.05)                      # 各言語版に優しく
     return total
+
+
+def src_wikipedia_pageviews(name):
+    """★全言語版Wikipediaの直近ページビュー合計＝地域に偏らない“実際の閲覧＝関心”の総量（日次収集・現在窓）。
+    「世界中の記事をまんべんなく」の理想に最も近い“実閲覧”シグナル（件数ではなく人が読んだ回数）。公式API・キー不要。"""
+    end = datetime.now(timezone.utc).date()
+    return pageviews_between(name, end - timedelta(days=PAGEVIEW_DAYS), end)
 
 
 def src_gdelt(name):

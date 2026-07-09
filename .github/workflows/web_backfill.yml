@@ -1,0 +1,37 @@
+# web_views の“発売前ページビュー”を過去分バックフィルし、羽根予想モデルの web 特徴を自動で本活性化する
+# 置き場所: .github/workflows/web_backfill.yml
+# 役割: 学習対象（直近180日の発売済み）に発売前の実閲覧(web_views)を as-of で補い、毎日04:20の再学習が重みを付け始める。
+# 守る線: 分離テーブル web_mentions のみ INSERT・冪等・可逆。DBは分離テーブルのみ。成人向けは対象外。
+# 進み方: 1回 BACKFILL_CAP 件ずつ・発売日が新しい順。数日かけて学習窓を覆い、その都度モデルの web_views 重みが強まる。
+name: web backfill (pre-release pageviews)
+
+on:
+  workflow_dispatch:
+    inputs:
+      cap:
+        description: "1回の処理件数（既定 50）"
+        default: "50"
+        required: false
+  schedule:
+    # 1日4回・warm窓（直前 :54 の CCU スイープで書き込みcomputeが温まっている）。分を :55 に分散。
+    - cron: "55 3,9,15,21 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install "psycopg2-binary>=2.9"
+      - name: Backfill pre-release pageviews (isolated table / INSERT only / idempotent)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          BACKFILL_CAP: ${{ github.event.inputs.cap || '50' }}
+          # LOOKBACK_DAYS: "180"   # 学習窓と一致
+          # PAGEVIEW_DAYS: "14"    # 発売前の実閲覧を測る窓
+        run: python scripts/web_backfill.py
