@@ -9,12 +9,13 @@ on:
   workflow_dispatch:
     inputs:
       cap:
-        description: "1回の処理件数（既定 50）"
-        default: "50"
+        description: "1回の処理件数（既定 100）"
+        default: "100"
         required: false
   schedule:
-    # 1日4回・warm窓（直前 :54 の CCU スイープで書き込みcomputeが温まっている）。分を :55 に分散。
-    - cron: "55 3,9,15,21 * * *"
+    # 加速：3時間おき・warm窓（直前 :54 の CCU スイープで書き込みcomputeが温まっている）。分は :55。
+    # 100件/回 × 8回/日 ＝ 約800件/日 → 学習窓(約1,600件)を約2日で一巡。完了後は READ のみで即終了（no-op）。
+    - cron: "55 */3 * * *"
 
 permissions:
   contents: read
