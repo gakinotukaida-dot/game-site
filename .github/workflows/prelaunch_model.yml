@@ -8,8 +8,9 @@ name: prelaunch model (learn spike scorecard)
 on:
   workflow_dispatch: {}
   schedule:
-    # 毎日 4:20 UTC（export_upcoming 4:45 の前）。モデルを更新→当日のエクスポートが最新の較正を使う。
-    - cron: "20 4 * * *"
+    # 1日2回 4:20 / 16:20 UTC（各 export_upcoming 4:45 / 16:45 の前）。バックフィルの進捗を当日中に2回取り込む
+    # ＝web_views の重み活性化のラグを半日に短縮（加速）。モデルを更新→直後のエクスポートが最新の較正を使う。
+    - cron: "20 4,16 * * *"
 
 permissions:
   contents: write
