@@ -267,7 +267,8 @@ def _write(sql_fn):
     """書き込みを実行。Neon はアイドルで compute が scale-to-zero するため、最初の書き込みが
     復帰中の一時 read-only 窓（SQLSTATE 25006）に当たりやすい。指数バックオフで多め（既定6回・
     合計~75s）に再接続・再試行して cold start を吸収する。トランザクション失敗はロールバック＝二重書き込みなし。"""
-    attempts = int(os.environ.get("WRITE_RETRIES") or "9")   # scale-to-zero の書き込み復帰が遅い時があるため多め（合計~2.7分）
+    attempts = int(os.environ.get("WRITE_RETRIES") or "14")  # write-primary の cold-start が数分かかる時があるため長め（合計~8分）
+    cap = int(os.environ.get("WRITE_BACKOFF_CAP") or "45")
     for i in range(attempts):
         conn = None
         try:
@@ -279,7 +280,7 @@ def _write(sql_fn):
             transient = (getattr(e, "pgcode", None) == "25006") or isinstance(e, psycopg2.OperationalError)
             if not transient or i == attempts - 1:
                 raise
-            wait = min(30, 3 * (2 ** i))
+            wait = min(cap, 3 * (2 ** i))
             print(f"[retry] 一時的な read-only/接続断（{getattr(e, 'pgcode', '')}）→ {wait}s 後に再試行 ({i+1}/{attempts})")
             time.sleep(wait)
         finally:
