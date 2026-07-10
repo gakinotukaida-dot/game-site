@@ -66,7 +66,7 @@ INSERT_SQL = ("INSERT INTO web_mentions (appid, source, mentions, recorded_at) "
 def _connect_retry(fn, attempts=None):
     """接続して fn(conn) を実行。Neon の write-primary は深いアイドルからの復帰(cold-start)が数分かかることがあるため、
     一時 read-only(25006)/接続断に **長め**の指数バックオフ再試行（既定14回・cap45s＝合計~8分）で吸収する。"""
-    attempts = attempts or int(os.environ.get("WRITE_RETRIES") or "14")
+    attempts = attempts or int(os.environ.get("WRITE_RETRIES") or "10")
     cap = int(os.environ.get("WRITE_BACKOFF_CAP") or "45")
     for i in range(attempts):
         conn = None
@@ -94,7 +94,7 @@ def _warmup():
     """発売前の長い計算(全言語ページビュー)に入る前に、CREATE TABLE IF NOT EXISTS で **write-primary を先に起こす**。
     cold-start をここ（計算前）で吸収し、以降の FLUSH_EVERY 件ごとの書き込みは温存された primary に速く入る＝最後にまとめて落ちない。"""
     _connect_retry(lambda conn: conn.cursor().execute(DDL),
-                   attempts=int(os.environ.get("WARMUP_RETRIES") or "18"))
+                   attempts=int(os.environ.get("WARMUP_RETRIES") or "11"))
 
 
 def get_targets():
