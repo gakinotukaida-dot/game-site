@@ -37,7 +37,7 @@ DATABASE_URL = os.environ["DATABASE_URL"]
 LOOKBACK_DAYS = int(os.environ.get("LOOKBACK_DAYS") or "180")   # 学習窓と一致（この範囲の発売済みを覆う）
 PAGEVIEW_DAYS = int(os.environ.get("PAGEVIEW_DAYS") or "14")    # 発売前の実閲覧を測る窓（日次収集と一致）
 BACKFILL_CAP = int(os.environ.get("BACKFILL_CAP") or "100")    # 1回の処理件数（言語数ぶんAPIを叩く。加速のため増量・10件ごと書込で安全）
-FLUSH_EVERY = int(os.environ.get("FLUSH_EVERY") or "10")       # この件数ごとに書き込む＝計算(HTTP)中も write-primary を温存し cold-start を回避
+FLUSH_EVERY = int(os.environ.get("FLUSH_EVERY") or "5")        # この件数ごとに書き込む＝計算(HTTP)中も write-primary を温存し cold-start を回避（短め）
 
 # 発売済み（直近LOOKBACK日）で、まだ“発売前 web_views”を持たない作品。発売日が新しい順に少しずつ。
 TARGET_QUERY = f"""
@@ -63,9 +63,11 @@ INSERT_SQL = ("INSERT INTO web_mentions (appid, source, mentions, recorded_at) "
               "VALUES (%s, 'wikipedia_pageviews', %s, %s)")
 
 
-def _connect_retry(fn):
-    """接続して fn(conn) を実行。Neon cold-start の一時 read-only(25006)/接続断に指数バックオフ再試行。"""
-    attempts = int(os.environ.get("WRITE_RETRIES") or "9")
+def _connect_retry(fn, attempts=None):
+    """接続して fn(conn) を実行。Neon の write-primary は深いアイドルからの復帰(cold-start)が数分かかることがあるため、
+    一時 read-only(25006)/接続断に **長め**の指数バックオフ再試行（既定14回・cap45s＝合計~8分）で吸収する。"""
+    attempts = attempts or int(os.environ.get("WRITE_RETRIES") or "14")
+    cap = int(os.environ.get("WRITE_BACKOFF_CAP") or "45")
     for i in range(attempts):
         conn = None
         try:
@@ -80,12 +82,19 @@ def _connect_retry(fn):
             transient = (getattr(e, "pgcode", None) == "25006") or isinstance(e, psycopg2.OperationalError)
             if not transient or i == attempts - 1:
                 raise
-            wait = min(30, 3 * (2 ** i))
+            wait = min(cap, 3 * (2 ** i))
             print(f"[retry] 一時 read-only/接続断（{getattr(e, 'pgcode', '')}）→ {wait}s 後に再試行 ({i+1}/{attempts})")
             time.sleep(wait)
         finally:
             if conn is not None:
                 conn.close()
+
+
+def _warmup():
+    """発売前の長い計算(全言語ページビュー)に入る前に、CREATE TABLE IF NOT EXISTS で **write-primary を先に起こす**。
+    cold-start をここ（計算前）で吸収し、以降の FLUSH_EVERY 件ごとの書き込みは温存された primary に速く入る＝最後にまとめて落ちない。"""
+    _connect_retry(lambda conn: conn.cursor().execute(DDL),
+                   attempts=int(os.environ.get("WARMUP_RETRIES") or "18"))
 
 
 def get_targets():
@@ -126,16 +135,22 @@ def main():
     # 1) 読み取り優先：テーブルが有り未処理が無ければ「書き込みゼロ」で即終了（頻繁な定時実行でも cold-start 失敗を出さない）。
     targets = get_targets_or_none()
     if targets is None:
-        # テーブル未作成（初回）＝作成してから対象取得。書き込み＝再試行つき。
-        _connect_retry(lambda conn: conn.cursor().execute(DDL))
+        # テーブル未作成（初回）＝warmup（作成＋primary起こし）してから対象取得。
+        _warmup()
         try:
             targets = get_targets()
         except psycopg2.Error as e:
             print(f"[web-backfill] 対象取得に失敗（{getattr(e, 'pgcode', '')}）→ 今回はスキップ。")
             return 0
-    if not targets:
+        if not targets:
+            print("[web-backfill] 対象0（完了済み/該当なし）。")
+            return 0
+    elif not targets:
         print("[web-backfill] 発売前 web_views 未取得の対象なし＝バックフィル完了済み（または対象0）。")
         return 0
+    else:
+        # テーブルは有る＝長い計算に入る前に write-primary を起こしておく（cold-start をここで吸収）。
+        _warmup()
 
     # 3) 各作品の発売前 [release_date-PAGEVIEW_DAYS, release_date] の全言語ページビュー合計を計算し、
     #    FLUSH_EVERY 件ごとに書き込む。★計算(HTTP)は数分かかるため、こまめに書いて write-primary を温存
