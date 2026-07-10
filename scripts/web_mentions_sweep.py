@@ -267,7 +267,7 @@ def _write(sql_fn):
     """書き込みを実行。Neon はアイドルで compute が scale-to-zero するため、最初の書き込みが
     復帰中の一時 read-only 窓（SQLSTATE 25006）に当たりやすい。指数バックオフで多め（既定6回・
     合計~75s）に再接続・再試行して cold start を吸収する。トランザクション失敗はロールバック＝二重書き込みなし。"""
-    attempts = int(os.environ.get("WRITE_RETRIES") or "14")  # write-primary の cold-start が数分かかる時があるため長め（合計~8分）
+    attempts = int(os.environ.get("WRITE_RETRIES") or "10")  # write-primary の cold-start を吸収（合計~4.5分）。恒久策は Neon autosuspend 無効化。
     cap = int(os.environ.get("WRITE_BACKOFF_CAP") or "45")
     for i in range(attempts):
         conn = None
