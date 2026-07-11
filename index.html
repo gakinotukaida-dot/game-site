@@ -484,6 +484,8 @@ function usualChip(ratio){
   const lab=L("いつもより ×"+ratio.toFixed(1),"×"+ratio.toFixed(1)+" vs usual");
   return ratio>=1.3 ? `<span class="chip c-up ic">${ICON.up}${lab}</span>` : `<span class="chip">${lab}</span>`;
 }
+// 平常値のサブ行（全ビュー共通）：見出しの下に「平常 N」を静かに添える。書式をタブ間で揃える（現在数は各ビューの見出し／詳細ページに集約）。
+function baseLine(usual){ return usual ? `<div class="base">${L("平常","usual")} ${nf.format(usual)}</div>` : ""; }
 /* v3/L は未配線＝ダミー（架空・仮）。実データ化はこの箱が動いてから順次。 */
 const DUMMY={
   v2:[
@@ -668,7 +670,7 @@ function viewItems(view){
         ratio:(ratio==null?-1:ratio), rel:g.detail&&g.detail.release,
         tagsP:revChip+ratChip, tagsS:l1Secondary(g.detail), detailBody:detailBodyReal(g.detail),
         surge:sparkline(g.detail&&g.detail.history, bl),  // A2：ミニ折れ線（平常線つき）
-        metric:`<span class="num">${nf.format(g.ccu)}</span><span class="unit">${L("人","players")}</span>${bl?`<div class="base">${L("平常","usual")} ${nf.format(bl)}</div>`:""}` };
+        metric:`<span class="num">${nf.format(g.ccu)}</span><span class="unit">${L("人","players")}</span>${baseLine(bl)}` };
     });
   }
   if(view==="2"){
@@ -682,7 +684,7 @@ function viewItems(view){
         r:g.r, ratio:g.r, now:g.now, base:g.base, cf:g.cf, causes:cs,
         tagsP:causes, tagsS:genres, detailBody:"",
         surge:`<div class="surgebar"><div class="surgetrack"><div class="surgefill" style="width:${(frac*100).toFixed(1)}%"></div></div></div>`,
-        metric:`<span class="num mult ${ratioClass(g.r)}">×${g.r.toFixed(1)}</span>${confMeter(g.cf)}<div class="base">${L("今","now")} ${nf.format(g.now)} ／ ${L("平常","usual")} ${nf.format(g.base)}</div>` };
+        metric:`<span class="num mult ${ratioClass(g.r)}">×${g.r.toFixed(1)}</span>${confMeter(g.cf)}${baseLine(g.base)}` };
     });
   }
   if(view==="L"){
@@ -700,7 +702,7 @@ function viewItems(view){
         tagsP:(rev?`<span class="chip c-revival ic">${ICON.revival}${L("復活","Revived")}</span>`:"")+(days!=null?`<span class="chip c-new ic">${ICON.launch}${L("発売 "+days+"日目","Day "+days)}</span>`:"")+(ratio!=null?usualChip(ratio):""),
         tagsS:l1Secondary(g.detail), detailBody:detailBodyReal(g.detail),
         surge:sparkline(g.detail&&g.detail.history, bl),
-        metric:`<span class="num">${nf.format(g.ccu)}</span><span class="unit">${L("人","players")}</span>${bl?`<div class="base">${L("平常","usual")} ${nf.format(bl)}</div>`:""}` };
+        metric:`<span class="num">${nf.format(g.ccu)}</span><span class="unit">${L("人","players")}</span>${baseLine(bl)}` };
     }).sort((a,b)=> b.ratio-a.ratio);
   }
   if(view==="3"){
