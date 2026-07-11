@@ -124,9 +124,13 @@
   .r2top{display:flex;align-items:baseline;gap:9px;min-width:0}
   .r2top .title{flex:1;min-width:0}
   .r2primary{flex:none;text-align:right}
+  .r2primary .num{font-size:19px;font-weight:700}      /* 主指標＝行の焦点（大きく・太く） */
+  .r2primary .num.pct{color:var(--accent)}             /* 跳ね予想%は強調色で視線を誘導 */
+  .r2primary .unit{color:var(--ink-soft)}
   .rowchev{flex:none;color:var(--ink-faint);font-size:15px;line-height:1}
   .row2:hover{background:var(--bg-2)}
   .row2:hover .rowchev{color:var(--accent)}
+  .row2:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:5px}  /* キーボード操作 */
   .r2kick{font-size:11.5px;color:var(--ink-soft);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   /* L1「この作品の見立て」：一覧から外したチップ・タグをここに整列 */
   .assess{display:flex;flex-direction:column;gap:8px}
@@ -302,7 +306,7 @@
   .chip.c-spike{color:var(--accent);background:var(--accent-weak);border:1px solid color-mix(in srgb,var(--accent) 46%,transparent);font-weight:600}  /* 跳ね予想（核） */
   .chip.c-fac{color:#c98b3f;background:rgba(201,139,63,.12);border:1px solid rgba(201,139,63,.32)}          /* 押し上げ要因 */
   /* ===== 跳ね予想の答え合わせ（スコアカード） ===== */
-  .scorecard{margin:2px 0 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg-2);overflow:hidden}
+  .scorecard{margin:18px 0 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg-2);overflow:hidden}
   .scorecard>summary{list-style:none;cursor:pointer;padding:11px 14px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
   .scorecard>summary::-webkit-details-marker{display:none}
   .scorecard>summary::after{content:"▾";color:var(--ink-faint);margin-left:auto;font-size:12px;transition:.2s}
@@ -482,7 +486,6 @@
   </div>
   <div class="obs" id="obs"></div>
   <div class="blurb" id="blurb"></div>
-  <details id="scoreSec" class="scorecard" hidden></details>
   <div class="searchbar"><input id="q" class="qinput" type="search" data-i18n-ph="search.ph" placeholder="🔍 この一覧から作品名でさがす" autocomplete="off" aria-label="作品名でさがす"></div>
   <div class="filters" id="filters">
     <span class="flabel" data-i18n="filter.genre">ジャンル</span>
@@ -491,6 +494,7 @@
   </div>
   <ul class="list" id="list"></ul>
   <div id="moreWrap"></div>
+  <details id="scoreSec" class="scorecard" hidden></details><!-- 答え合わせ（根拠/L2）は一覧の下＝掘る位置に -->
 
   <section id="freeSec" class="freesec" hidden>
     <h2 class="freehd" data-i18n="free.hd">無料でもらえる</h2>
@@ -756,7 +760,7 @@ function detailBodyReal(d){
 function rowHtml(o){
   const rank=(typeof o.i==="number")?(o.i+1):"";
   const kick=o.kicker?`<div class="r2kick">${o.kicker}</div>`:"";
-  return `<li class="row2 ${favs.has(o.key)?'faved':''}" data-detail="${o.i}" style="animation-delay:${o.i*30}ms">
+  return `<li class="row2 ${favs.has(o.key)?'faved':''}" data-detail="${o.i}" role="button" tabindex="0" aria-label="${esc(o.title)}（${L("詳しく","details")}）" style="animation-delay:${o.i*30}ms">
       <div class="r2rank">${rank}</div>
       ${favBtn(o.key)}
       <div class="r2body"><div class="r2top">${titleCell(o.title)}<span class="metric r2primary">${o.primary||o.metric||""}</span><span class="rowchev" aria-hidden="true">›</span></div>${kick}</div>
@@ -880,9 +884,9 @@ function viewItems(view){
         tagsP:`<span class="chip ic">${ICON.cal}${known?(L("発売予定 ","Releases ")+esc(relTxt)):esc(relTxt)}</span>`+predChip+cfChip+factChips,
         tagsS:rawS.join("")+genreS,
         detailBody:"",
-        primary: hasP ? `<span class="num">${pctTxt}</span><span class="unit">%</span>`
+        primary: hasP ? `<span class="num pct">${pctTxt}</span><span class="unit">%</span>`
           : (dc?`<span class="num">${nf.format(dc)}</span><span class="unit">${L("人 体験版","demo")}</span>`
-             :`<span class="when">${known?esc(relTxt):L("未定","TBD")}</span>`),  // L0主指標＝跳ね予想%
+             :`<span class="when">${known?esc(relTxt):L("未定","TBD")}</span>`),  // L0主指標＝跳ね予想%（強調色）
         kicker: (known?L("発売予定 ","Releases ")+esc(relTxt):esc(relTxt))+((g.factors&&g.factors.length)?" ・"+esc(factLabel(g.factors[0].name)):(hasP&&ratio&&ratio>=1.2?" ・"+L("ふつう×"+ratio.toFixed(1),"×"+ratio.toFixed(1)):"")),
         metric: hasP
           ? `<span class="num">${pctTxt}</span><span class="unit">%</span><div class="base">${L("跳ね予想","spike")}${ratio&&ratio>=1.2?" ・"+L("ふつう×"+ratio.toFixed(1),"×"+ratio.toFixed(1)):""}</div>`
@@ -936,6 +940,12 @@ listEl.addEventListener("click",e=>{
   if(f){ const k=f.dataset.fav; favs.has(k)?favs.delete(k):favs.add(k); saveFavs(); render(current); return; }
   const row=e.target.closest("[data-detail]");
   if(row){ openDetail(row.dataset.detail); }
+});
+// キーボード操作：行(role=button)に Enter/Space でも詳細を開く。行内のボタン/リンク上での操作は各要素に任せる。
+listEl.addEventListener("keydown",e=>{
+  if(e.key!=="Enter"&&e.key!==" "&&e.key!=="Spacebar") return;
+  const row=e.target.closest(".row2[data-detail]");
+  if(row && e.target===row){ e.preventDefault(); openDetail(row.dataset.detail); }
 });
 // お気に入りセグメント（すべて⇄★・タブ近くに常時表示）
 const favAllEl=document.getElementById("favAll"), favStarEl=document.getElementById("favStar");
