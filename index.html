@@ -114,6 +114,25 @@
   .metric .num{font-size:18px;font-weight:600;letter-spacing:.2px;font-variant-numeric:tabular-nums}
   .metric .unit{font-size:11px;color:var(--ink-soft);margin-left:3px}
   .metric .mult{font-weight:700}
+  /* L0＝2行/件（順位・タイトル・主指標＋きっかけ）。行をタップで L1（詳細）へ掘る。 */
+  .row2{display:grid;grid-template-columns:auto auto 1fr;align-items:center;gap:0 11px;padding:11px 2px;
+    border-bottom:1px solid var(--line);cursor:pointer;opacity:0;transform:translateY(6px);
+    animation:rise .5s cubic-bezier(.2,.7,.2,1) forwards}
+  .r2rank{font-family:var(--serif);font-size:13px;color:var(--ink-faint);font-variant-numeric:tabular-nums;
+    min-width:20px;text-align:right}
+  .r2body{min-width:0}
+  .r2top{display:flex;align-items:baseline;gap:9px;min-width:0}
+  .r2top .title{flex:1;min-width:0}
+  .r2primary{flex:none;text-align:right}
+  .rowchev{flex:none;color:var(--ink-faint);font-size:15px;line-height:1}
+  .row2:hover{background:var(--bg-2)}
+  .row2:hover .rowchev{color:var(--accent)}
+  .r2kick{font-size:11.5px;color:var(--ink-soft);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* L1「この作品の見立て」：一覧から外したチップ・タグをここに整列 */
+  .assess{display:flex;flex-direction:column;gap:8px}
+  .assessrow{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .assesstags .chip{font-size:10px;color:var(--ink-faint);background:transparent;border:1px solid var(--line)}
+  .go.ghost{background:transparent}
   .metric .mult.r1{color:var(--ink-soft)}                 /* 小さい伸び＝控えめ */
   .metric .mult.r2{color:var(--accent)}                   /* 中 */
   .metric .mult.r3{color:var(--accent);font-size:22px}    /* 大きい伸び＝主役 */
@@ -182,6 +201,10 @@
     .plain,.tagline{display:none}
     .wordmark{font-size:22px}
     li.row{grid-template-columns:20px 1fr auto;gap:9px;padding:11px 0}
+    .row2{gap:0 9px;padding:11px 0}
+    .r2rank{min-width:16px;font-size:12px}
+    .r2top .title{font-size:14.5px}
+    .r2top{gap:7px}
     .cover{width:60px;height:28px}
     .metaImg{gap:8px}
     .title{font-size:14.5px}
@@ -729,15 +752,15 @@ function detailBodyReal(d){
   return rows;
 }
 // v10：行内アコーディオンは廃止。詳細は openDetail() の詳細ページへ一本化（#3）。
+// L0（一覧）＝2行/件：順位・タイトル・主指標＋「きっかけ」だけ。チップ/タグ/折れ線/Steam/共有は L1（詳細の「見立て」）へ送る。
 function rowHtml(o){
-  const steam=o.appid?`<a class="rowsteam" href="https://store.steampowered.com/app/${o.appid}/" target="_blank" rel="noopener noreferrer">Steam ↗</a>`:"";
-  const share=o.appid?`<button class="rowshare" type="button" data-share="${o.appid}" data-title="${esc(o.title)}" title="${esc(L("共有する","Share"))}" aria-label="${esc(L("共有する","Share"))}">${L("共有","Share")}</button>`:"";
-  return `<li class="row ${favs.has(o.key)?'faved':''}" data-detail="${o.i}" style="animation-delay:${o.i*30}ms">
+  const rank=(typeof o.i==="number")?(o.i+1):"";
+  const kick=o.kicker?`<div class="r2kick">${o.kicker}</div>`:"";
+  return `<li class="row2 ${favs.has(o.key)?'faved':''}" data-detail="${o.i}" style="animation-delay:${o.i*30}ms">
+      <div class="r2rank">${rank}</div>
       ${favBtn(o.key)}
-      <div class="meta"><div class="metaImg">${coverImg(o.appid)}<div class="metatext"><div class="titlerow">${titleCell(o.title)}${steam}${share}</div>${o.tagsP?`<div class="tags tags-primary">${o.tagsP}</div>`:""}${o.tagsS?`<div class="tags tags-secondary">${o.tagsS}</div>`:""}</div></div></div>
-      <div class="metric">${o.metric}</div>
-      ${o.surge||""}
-      ${followLine()}</li>`; }
+      <div class="r2body"><div class="r2top">${titleCell(o.title)}<span class="metric r2primary">${o.primary||o.metric||""}</span><span class="rowchev" aria-hidden="true">›</span></div>${kick}</div>
+    </li>`; }
 
 // ダミー件数を増やして「もっと見る」を体験できるようにする（mk(k) で k 番目の仮データを作る）。
 function padDummy(list, mk, n){ const out=list.slice(); let k=out.length+1; while(out.length<n){ out.push(mk(k)); k++; } return out; }
@@ -761,11 +784,14 @@ function viewItems(view){
       // A1：平常比。1.3倍以上は「いつもより上」を強調（きっかけ色）、それ未満は控えめに実数を出す。呼称は全タブ共通（usualChip）。
       const ratChip = ratio!=null ? usualChip(ratio)
         : `<span class="chip tagmuted">${L("平常値 準備中","usual: pending")}</span>`;
-      const revChip = isRevival(g.detail&&g.detail.history, st, g.ccu) ? `<span class="chip c-revival ic">${ICON.revival}${L("復活","Revived")}</span>` : "";
+      const rev = isRevival(g.detail&&g.detail.history, st, g.ccu);
+      const revChip = rev ? `<span class="chip c-revival ic">${ICON.revival}${L("復活","Revived")}</span>` : "";
       return { key:g.name, appid:g.appid, title:g.name, ccu:g.ccu, detail:g.detail,
         ratio:(ratio==null?-1:ratio), rel:g.detail&&g.detail.release,
         tagsP:revChip+ratChip, tagsS:l1Secondary(g.detail), detailBody:detailBodyReal(g.detail),
         surge:sparkline(g.detail&&g.detail.history, bl),  // A2：ミニ折れ線（平常線つき）
+        primary:`<span class="num">${nf.format(g.ccu)}</span><span class="unit">${L("人","players")}</span>`,  // L0主指標＝今の人数
+        kicker:(rev?L("復活・","Revived · "):"")+(ratio!=null?L("ふだんの ×"+ratio.toFixed(1),"×"+ratio.toFixed(1)+" of usual"):L("平常値 準備中","usual: pending")),
         metric:`<span class="num">${nf.format(g.ccu)}</span><span class="unit">${L("人","players")}</span>${baseLine(bl)}` };
     });
   }
@@ -789,6 +815,8 @@ function viewItems(view){
         r:g.r, ratio:g.r, now:g.now, base:g.base, cf:g.cf, causes:cs,
         tagsP:causes, tagsS:genres, detailBody:"",
         surge:surge,
+        primary:`<span class="num mult ${ratioClass(g.r)}">×${g.r.toFixed(1)}</span>`,  // L0主指標＝平常比
+        kicker: cs.length ? L("きっかけ：","Trigger: ")+esc(causeLabel(cs[0].t)) : L("原因不明","Cause unknown"),
         metric:`<span class="num mult ${ratioClass(g.r)}">×${g.r.toFixed(1)}</span>${confMeter(g.cf)}${baseLine(g.base)}` };
     });
   }
@@ -807,6 +835,8 @@ function viewItems(view){
         tagsP:(rev?`<span class="chip c-revival ic">${ICON.revival}${L("復活","Revived")}</span>`:"")+(days!=null?`<span class="chip c-new ic">${ICON.launch}${L("発売 "+days+"日目","Day "+days)}</span>`:"")+(ratio!=null?usualChip(ratio):""),
         tagsS:l1Secondary(g.detail), detailBody:detailBodyReal(g.detail),
         surge:sparkline(g.detail&&g.detail.history, bl),
+        primary: ratio!=null ? `<span class="num mult ${ratioClass(ratio)}">×${ratio.toFixed(1)}</span>` : `<span class="num">${nf.format(g.ccu)}</span><span class="unit">${L("人","players")}</span>`,  // L0主指標＝平常比（無ければ人数）
+        kicker:(rev?L("復活・","Revived · "):"")+(days!=null?L("発売 "+days+"日目","Day "+days)+" ・":"")+L(nf.format(g.ccu)+"人",nf.format(g.ccu)+" players"),
         metric:`<span class="num">${nf.format(g.ccu)}</span><span class="unit">${L("人","players")}</span>${baseLine(bl)}` };
     }).sort((a,b)=> b.ratio-a.ratio);
   }
@@ -850,6 +880,10 @@ function viewItems(view){
         tagsP:`<span class="chip ic">${ICON.cal}${known?(L("発売予定 ","Releases ")+esc(relTxt)):esc(relTxt)}</span>`+predChip+cfChip+factChips,
         tagsS:rawS.join("")+genreS,
         detailBody:"",
+        primary: hasP ? `<span class="num">${pctTxt}</span><span class="unit">%</span>`
+          : (dc?`<span class="num">${nf.format(dc)}</span><span class="unit">${L("人 体験版","demo")}</span>`
+             :`<span class="when">${known?esc(relTxt):L("未定","TBD")}</span>`),  // L0主指標＝跳ね予想%
+        kicker: (known?L("発売予定 ","Releases ")+esc(relTxt):esc(relTxt))+((g.factors&&g.factors.length)?" ・"+esc(factLabel(g.factors[0].name)):(hasP&&ratio&&ratio>=1.2?" ・"+L("ふつう×"+ratio.toFixed(1),"×"+ratio.toFixed(1)):"")),
         metric: hasP
           ? `<span class="num">${pctTxt}</span><span class="unit">%</span><div class="base">${L("跳ね予想","spike")}${ratio&&ratio>=1.2?" ・"+L("ふつう×"+ratio.toFixed(1),"×"+ratio.toFixed(1)):""}</div>`
           : (dc?`<span class="num">${nf.format(dc)}</span><span class="unit">${L("人 体験版","demo")}</span><div class="base">${known?esc(relTxt):L("発売日 未定","TBD")}</div>`
@@ -1063,11 +1097,15 @@ function showDetail(o){
   const infoSec=o.detailBody?`<div class="dvsection"><div class="dvlabel">${L("情報","Info")}</div><div class="drillbody">${o.detailBody}</div></div>`
     :((o.view==="2"||o.view==="hop")?"":`<div class="dvsection"><div class="dvlabel">${L("情報","Info")}</div><div class="dvmuted">${L("詳細情報は準備中（appdetails 収集後に表示）。","Details pending (shown after appdetails collection).")}</div></div>`);
   const conns=buildConnections(o);
+  // L1「見立て」：一覧(L0)の行から外したチップ（平常比・確度・きっかけ・予想・タグ）をここに整列（掘れば全部見える）。
+  const assess=(o.tagsP||o.tagsS)?`<div class="dvsection"><div class="dvlabel">${L("この作品の見立て","At a glance")}</div><div class="assess">${o.tagsP?`<div class="assessrow">${o.tagsP}</div>`:""}${o.tagsS?`<div class="assessrow assesstags">${o.tagsS}</div>`:""}</div></div>`:"";
+  const dshare=o.appid?`<button class="go ghost" type="button" data-share="${o.appid}" data-title="${esc(o.title)}">${L("共有","Share")}</button>`:"";
   dvBody.innerHTML=trailHtml()
     +`<div class="dvhead">${cover}<div><h2 class="dvtitle">${esc(o.title)}</h2><div class="dvmetric">${o.metric||""}</div></div></div>`
+    +assess
     +(why?`<div class="dvsection"><div class="dvlabel">${L("なぜ拾ったか","Why picked")}</div>${why}</div>`:"")
     +histSec+infoSec+conns
-    +(steam?`<div class="dvactions">${steam}</div>`:"");
+    +((steam||dshare)?`<div class="dvactions">${steam}${dshare}</div>`:"");
   mainViewEl.hidden=true; detailEl.hidden=false; try{window.scrollTo({top:0,behavior:"instant"});}catch(e){window.scrollTo(0,0);}
 }
 function renderDetail(){ const o=trail[trail.length-1]; if(o) showDetail(o); }
@@ -1083,6 +1121,7 @@ function openDetailByAppid(appid){
 function jumpTrail(i){ if(i<0||i>=trail.length) return; trail=trail.slice(0,i+1); renderDetail(); }
 // 詳細内クリック：つながり（data-hop）で潜る／パンくず（data-crumb）で戻る。
 dvBody.addEventListener("click",e=>{
+  const sh=e.target.closest("[data-share]"); if(sh){ shareGame(sh.dataset.share, sh.dataset.title); return; }
   const hop=e.target.closest("[data-hop]"); if(hop){ openDetailByAppid(hop.dataset.hop); return; }
   const cr=e.target.closest("[data-crumb]"); if(cr){ jumpTrail(Number(cr.dataset.crumb)); return; }
 });
