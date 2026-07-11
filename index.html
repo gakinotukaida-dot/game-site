@@ -41,6 +41,19 @@
   .data-note.dummy{border-style:dashed}
   .data-note .sq{width:6px;height:6px;border-radius:2px;background:var(--accent);display:inline-block}
   .data-note.dummy .sq{background:var(--ink-faint)}
+  /* 注記は既定で畳む：ⓘ ラベルだけ見せ、本文はクリックで展開（面を浅く／掘れる） */
+  .data-note{align-items:flex-start}
+  .noteToggle{display:inline-flex;align-items:center;gap:8px;flex:none;white-space:nowrap;background:transparent;
+    border:0;padding:0;margin:0;font-family:inherit;font-size:11px;color:var(--ink-soft);cursor:pointer}
+  .noteToggle .noteLbl{font-weight:600;white-space:nowrap}
+  .noteToggle:hover .noteLbl{color:var(--accent)}
+  .noteToggle .noteChev{color:var(--ink-faint);font-size:12px}
+  #dataNoteText{margin-left:2px;flex:1;min-width:0}
+  /* 見出し横の ？：この見方の説明(blurb)を開閉 */
+  .ttlq{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-left:8px;
+    vertical-align:middle;border:1px solid var(--line);border-radius:50%;background:transparent;
+    color:var(--ink-faint);font-size:11px;font-family:inherit;cursor:pointer;line-height:1;padding:0}
+  .ttlq:hover,.ttlq[aria-expanded="true"]{color:var(--accent);border-color:var(--accent)}
   nav.views{display:flex;gap:0;margin:24px 0 2px;border-bottom:1px solid var(--line);flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
   nav.views::-webkit-scrollbar{display:none}
   nav.views button{appearance:none;background:none;border:0;cursor:pointer;font-family:var(--sans);
@@ -163,6 +176,10 @@
   footer a{color:var(--ink-faint);text-decoration:none;border-bottom:1px solid var(--line)}
   @media(max-width:560px){
     .wrap{padding:24px 15px 60px}
+    /* ヘッダの塔を潰す：縦積み＋ツールバー折返し＋説明2行はモバイルで隠す（サブ見出しが役割を兼ねる） */
+    header{flex-direction:column;align-items:stretch;gap:10px}
+    .toolbar{flex-wrap:wrap;justify-content:flex-end}
+    .plain,.tagline{display:none}
     .wordmark{font-size:22px}
     li.row{grid-template-columns:20px 1fr auto;gap:9px;padding:11px 0}
     .cover{width:60px;height:28px}
@@ -343,16 +360,22 @@
   .connext .conngo{color:var(--ink-soft)}
   @media(max-width:560px){ .connwhy{display:none} }
 
-  /* はじめての方へ（B1）：4タブの平易な説明帯 */
-  .intro{position:relative;margin:14px 0 2px;padding:16px 18px;border:1px solid var(--line);
-    border-radius:12px;background:var(--bg-2)}
-  .introclose{position:absolute;top:8px;right:9px;width:26px;height:26px;border:0;border-radius:7px;
-    background:transparent;color:var(--ink-faint);font-size:18px;line-height:1;cursor:pointer}
+  /* はじめての方へ（B1）：既定は薄い1行バー・タップで展開（浅い入口／掘れる） */
+  .intro{margin:12px 0 2px;border:1px solid var(--line);border-radius:12px;background:var(--bg-2);overflow:hidden}
+  .introbar{display:flex;align-items:stretch}
+  .introtoggle{flex:1;min-width:0;display:flex;align-items:center;gap:8px;background:transparent;border:0;
+    cursor:pointer;font-family:inherit;font-size:12.5px;color:var(--ink);text-align:left;padding:10px 6px 10px 14px}
+  .introtoggle .qmark{flex:none;width:18px;height:18px;border-radius:50%;border:1px solid var(--line);
+    color:var(--ink-soft);font-size:11px;line-height:16px;text-align:center}
+  .introtoggle .introbarlbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+  .introtoggle .introchev{margin-left:auto;color:var(--ink-faint);font-size:13px}
+  .introtoggle:hover .introbarlbl{color:var(--accent)}
+  .introclose{flex:none;width:34px;border:0;border-left:1px solid var(--line);
+    background:transparent;color:var(--ink-faint);font-size:17px;line-height:1;cursor:pointer}
   .introclose:hover{color:var(--ink);background:var(--chip)}
-  .introttl{font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.02em;margin-bottom:2px}
-  .introlead{font-size:12.5px;color:var(--ink-soft);margin:0 0 11px;max-width:62ch;line-height:1.6}
-  .introlist{list-style:none;margin:0;padding:0;display:grid;gap:8px 18px;
-    grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .introlead{font-size:12.5px;color:var(--ink-soft);margin:0;padding:0 14px 2px;max-width:62ch;line-height:1.6}
+  .introlist{list-style:none;margin:0;padding:8px 14px 14px;display:grid;gap:8px 18px;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
   .introlist li{display:flex;gap:9px;align-items:baseline;font-size:13px;line-height:1.5}
   .introlist .itag{flex:none;color:var(--accent);font-weight:700;white-space:nowrap}
   .introlist .idesc{color:var(--ink-soft)}
@@ -400,7 +423,7 @@
       <span class="heroratio" id="heroRatio"></span>
     </button>
   </section>
-  <div class="data-note" id="dataNote"><span class="sq"></span><span id="dataNoteText"></span></div>
+  <div class="data-note" id="dataNote"><button class="noteToggle" id="noteToggle" type="button" aria-expanded="false" aria-controls="dataNoteText"><span class="sq"></span><span class="noteLbl" id="noteLbl">データについて</span><span class="noteChev" aria-hidden="true">›</span></button><span id="dataNoteText" hidden></span></div>
 
   <nav class="views" role="tablist" aria-label="表示の切り口">
     <button role="tab" aria-selected="true"  data-view="3"><span class="idx">01</span><span data-i18n="nav.3">これから来そう</span></button>
@@ -639,6 +662,9 @@ function loadFavs(){ try{ const a=JSON.parse(localStorage.getItem(FAV_KEY)||"[]"
 function saveFavs(){ try{ localStorage.setItem(FAV_KEY, JSON.stringify([...favs])); }catch(e){} }
 let detailMap={};
 const viewTitleEl=document.getElementById("viewTitle");
+// 見出しの ？ で「この見方の説明」(blurb)、注記の ⓘ で「データについて」(note) を開閉。既定は畳む＝掘れる（面を浅く保つ）。
+viewTitleEl.addEventListener("click",e=>{ const b=e.target.closest("#ttlHelp"); if(!b) return; blurbEl.hidden=!blurbEl.hidden; b.setAttribute("aria-expanded",String(!blurbEl.hidden)); });
+noteEl.addEventListener("click",e=>{ const b=e.target.closest("#noteToggle"); if(!b) return; noteTxt.hidden=!noteTxt.hidden; b.setAttribute("aria-expanded",String(!noteTxt.hidden)); const cv=b.querySelector(".noteChev"); if(cv) cv.textContent=noteTxt.hidden?"›":"▾"; });
 const VIEWTITLE={1:["02","今のプレイヤー数","Current players"],2:["03","いつもより伸びている","Rising more than usual"],L:["04","新着で伸びている","New & rising"],3:["01","これから来そう（発売前）","Upcoming (pre-release)"]};
 function fmtJST(iso){ return iso ? new Date(iso).toLocaleString("ja-JP",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}) : "—"; }
 
@@ -833,9 +859,12 @@ function viewItems(view){
   return [];
 }
 function render(view){
-  current=view; blurbEl.textContent=BLURB[view][lang]; syncHeroVis();
-  viewTitleEl.innerHTML=`<span class="vi">${VIEWTITLE[view][0]}</span>${VIEWTITLE[view][lang==="en"?2:1]}`;
-  noteEl.className="data-note "+NOTE[view].cls; noteTxt.textContent=NOTE[view].txt[lang];
+  current=view; blurbEl.textContent=BLURB[view][lang]; blurbEl.hidden=true; syncHeroVis();  // 説明は既定で畳む（見出しの ？ で展開＝掘れる）
+  viewTitleEl.innerHTML=`<span class="vi">${VIEWTITLE[view][0]}</span>${VIEWTITLE[view][lang==="en"?2:1]}`
+    +`<button class="ttlq" id="ttlHelp" type="button" aria-label="${esc(L("この見方の説明","About this view"))}" aria-expanded="false">？</button>`;
+  noteEl.className="data-note "+NOTE[view].cls; noteTxt.textContent=NOTE[view].txt[lang]; noteTxt.hidden=true;  // 注記も既定で畳む
+  document.getElementById("noteLbl").textContent=L("データについて","About the data");
+  const nt=document.getElementById("noteToggle"); if(nt) nt.setAttribute("aria-expanded","false");
   if(view==="1"){ obsEl.innerHTML=L(`観測時刻 <b>${fmtJST(OBSERVED_AT)}</b>（JST）・公式API（いま遊んでいる人数）`,`Observed <b>${fmtJST(OBSERVED_AT)}</b> (JST) · official API (players in-game now)`); }
   else { obsEl.textContent=""; }
   renderScorecard();   // 跳ね予想(view3)の答え合わせパネル（他ビューでは自動で隠す）
@@ -1091,6 +1120,7 @@ function shareGame(appid, title){
 // ---- はじめての方へ（B1）：4つのタブを平易に説明。初回だけ自動表示・×で閉じたら記憶・「？使い方」で再表示。----
 const INTRO_KEY="radar_intro_dismissed_v1";
 const introEl=document.getElementById("intro");
+let introExpanded=false;
 function introRows(){
   return [
     ["これから来そう","Upcoming",       "発売前に、これから跳ねそうな新作。","Pre-release titles likely to take off."],
@@ -1101,18 +1131,27 @@ function introRows(){
 }
 function buildIntro(){
   if(!introEl) return;
-  const lead=L("気になるゲームだけ、静かに追えるサイトです。まずは4つの見方から。","A quiet way to follow just the games you care about — start with these four views.");
-  const items=introRows().map(r=>`<li><span class="itag">${esc(L(r[0],r[1]))}</span><span class="idesc">${esc(L(r[2],r[3]))}</span></li>`).join("");
-  introEl.innerHTML=`<button class="introclose" id="introClose" type="button" aria-label="${esc(L("閉じる","Close"))}">×</button>`
-    +`<div class="introttl">${esc(L("はじめての方へ","New here?"))}</div>`
-    +`<p class="introlead">${esc(lead)}</p>`
-    +`<ul class="introlist">${items}</ul>`;
+  const barLbl=L("はじめての方へ — 4つの見方","New here? — the four views");
+  let html=`<div class="introbar">`
+    +`<button class="introtoggle" id="introToggle" type="button" aria-expanded="${introExpanded}">`
+    +`<span class="qmark" aria-hidden="true">？</span><span class="introbarlbl">${esc(barLbl)}</span>`
+    +`<span class="introchev" aria-hidden="true">${introExpanded?"▾":"›"}</span></button>`
+    +`<button class="introclose" id="introClose" type="button" aria-label="${esc(L("閉じる","Close"))}">×</button>`
+    +`</div>`;
+  if(introExpanded){
+    const lead=L("気になるゲームだけ、静かに追えるサイトです。","A quiet way to follow just the games you care about.");
+    const items=introRows().map(r=>`<li><span class="itag">${esc(L(r[0],r[1]))}</span><span class="idesc">${esc(L(r[2],r[3]))}</span></li>`).join("");
+    html+=`<p class="introlead">${esc(lead)}</p><ul class="introlist">${items}</ul>`;
+  }
+  introEl.innerHTML=html;
+  const t=document.getElementById("introToggle");
+  if(t) t.addEventListener("click",()=>{ introExpanded=!introExpanded; buildIntro(); });
   const c=document.getElementById("introClose");
   if(c) c.addEventListener("click",()=>{ introEl.hidden=true; try{localStorage.setItem(INTRO_KEY,"1");}catch(e){} });
 }
 let introDismissed=false; try{ introDismissed=localStorage.getItem(INTRO_KEY)==="1"; }catch(e){}
 buildIntro(); introEl.hidden=introDismissed;
-document.getElementById("helpBtn").addEventListener("click",()=>{ buildIntro(); introEl.hidden=false; try{ introEl.scrollIntoView({behavior:"smooth",block:"nearest"}); }catch(e){} });
+document.getElementById("helpBtn").addEventListener("click",()=>{ introExpanded=true; buildIntro(); introEl.hidden=false; try{ introEl.scrollIntoView({behavior:"smooth",block:"nearest"}); }catch(e){} });
 
 // ---- 文字の大きさ（D1）：標準/大/特大。px指定のUIでも確実に効くよう body の zoom で拡大。端末内に記憶。----
 const FONT_KEY="radar_fontscale_v1";
