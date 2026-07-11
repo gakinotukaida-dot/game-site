@@ -16,7 +16,7 @@ env：GENRE_MAX / LIMIT / MODEL_PATH。
 
 import json
 import os
-from datetime import datetime
+from datetime import datetime, date
 
 import psycopg2
 
@@ -29,9 +29,18 @@ MODEL_PATH = os.environ.get("MODEL_PATH") or "data/prelaunch_model.json"
 
 GENRE_MAX = int(os.environ.get("GENRE_MAX") or "7")
 LIMIT = int(os.environ.get("LIMIT") or "200")
+# 発売済み（居座り）を落とすと表示枠が減るので、多めに取得してから絞る（絞った後に LIMIT まで）。
+OVERFETCH = float(os.environ.get("UPCOMING_OVERFETCH") or "1.6")
 
+# ★「これから来そう」に載せる条件（＝まだ発売前）。
+#   - coming_soon フラグ、または未来の確定発売日。
+#   - ただし発売日が確定していて過去なら除外（coming_soon が古いままでも居座らせない）。
+#     ※ appdetails 再取得の遅れで coming_soon=true が残る“居座り”は、列が NULL のことが多い。
+#       その取りこぼしは compute_rows の _is_released（release_date_text の日付判定）で拾う。
+#   - 成人向けは除外。
 UPCOMING_WHERE = ("(g.coming_soon IS TRUE OR (g.release_date IS NOT NULL AND g.release_date > now()::date))"
-                  " AND " + not_adult("g"))   # ★成人向けは除外
+                  " AND (g.release_date IS NULL OR g.release_date > now()::date)"
+                  " AND " + not_adult("g"))
 
 def build_query(web_ok):
     return f"""
@@ -74,6 +83,60 @@ def _release_iso(rd, text):
         return str(rd)
 
 
+# Steam の release_date.date（表示用文字列）を粒度つきで解釈するための書式。
+# 日付まで揃うもの／月まで／年だけ、をそれぞれ判別する（粗い表記の過剰除外を防ぐため）。
+_REL_DATE_FORMATS = (
+    ("%d %b, %Y", "day"), ("%d %b %Y", "day"), ("%b %d, %Y", "day"), ("%B %d, %Y", "day"),
+    ("%d %B %Y", "day"), ("%b %Y", "month"), ("%B %Y", "month"), ("%Y", "year"),
+)
+
+
+def _parse_release_period(text):
+    """release_date_text を (precision, year, month, day) に。precision は 'day'/'month'/'year'。
+    読めなければ None（＝発売済みとは判定しない＝安全側で残す）。
+    ※ coming_soon の表示日は「2026」「Jul 2026」のように粒度が粗いことがあるので、
+      粒度を保って“期間が丸ごと過去のときだけ発売済み”と扱う（過剰除外を避ける）。"""
+    if not text:
+        return None
+    t = str(text).strip()
+    for fmt, prec in _REL_DATE_FORMATS:
+        try:
+            dt = datetime.strptime(t, fmt)
+        except ValueError:
+            continue
+        if prec == "year":
+            return ("year", dt.year, None, None)
+        if prec == "month":
+            return ("month", dt.year, dt.month, None)
+        return ("day", dt.year, dt.month, dt.day)
+    return None
+
+
+def _is_released(release_date, release_date_text, today):
+    """今日時点で「もう発売済み」なら True（＝これから来そうから除外）。判定は保守的に：
+      1) release_date 列が確定していて今日以前（coming_soon が古くても発売済みは落とす）。
+      2) 列が無くても release_date_text が“日付まで揃った”表記で今日以前
+         （appdetails 再取得の遅れで coming_soon=true が残る“居座り”対策）。
+      3) 月だけ/年だけの粗い表記は、その期間が丸ごと過去のときだけ発売済み扱い（過剰除外を避ける）。"""
+    if release_date is not None:
+        try:
+            if release_date <= today:
+                return True
+        except TypeError:
+            pass
+    p = _parse_release_period(release_date_text)
+    if not p:
+        return False
+    prec, y, m, d = p
+    if prec == "day":
+        return date(y, m, d) <= today
+    if prec == "month":
+        return (y, m) < (today.year, today.month)
+    if prec == "year":
+        return y < today.year
+    return False
+
+
 def _load_model():
     try:
         with open(MODEL_PATH, encoding="utf-8") as f:
@@ -94,9 +157,14 @@ def compute_rows(conn, limit=None):
     ※ 予測の“単一の源”：これを export（表示）と prediction_log（記録）の両方が使う＝表示と記録の値が必ず一致（skew防止）。
        conn のセッション（readonly 等）は呼び出し側が設定する。並べ替え・payload化は呼び出し側の責務。
     返り値: (rows, model, base, validated)"""
+    eff_limit = limit if limit is not None else LIMIT
+    # 発売済み（居座り）を _is_released で落とすと枠が減るので、多めに取得してから絞る。
+    fetch_limit = max(eff_limit + 50, int(eff_limit * OVERFETCH))
     with conn.cursor() as cur:
+        cur.execute("SELECT now()::date")   # SQL の now()::date と同一基準の“今日”（発売済み判定に使う）
+        today = cur.fetchone()[0]
         web_ok = F.web_mentions_exists(cur)   # web_mentions が無ければ web_* は NULL（無影響）
-        cur.execute(build_query(web_ok), {"limit": (limit if limit is not None else LIMIT)})
+        cur.execute(build_query(web_ok), {"limit": fetch_limit})
         cols = [d[0] for d in cur.description]
         recs = cur.fetchall()
 
@@ -107,6 +175,10 @@ def compute_rows(conn, limit=None):
     rows = []
     for rec in recs:
         d = dict(zip(cols, rec))
+        # ★発売済み（＝もう「これから来そう」ではない）はここで除外。
+        #   coming_soon フラグが古いままでも、確定日 or 表示日が今日以前なら落とす（居座り対策）。
+        if _is_released(d.get("release_date"), d.get("release_date_text"), today):
+            continue
         genres = _descs(d.get("genres"), GENRE_MAX)
         sqlvals = {k: d.get(k) for k in F.SQL_FEATURES}
         news_count = _iv(d.get("news_count")) or 0
@@ -166,6 +238,8 @@ def compute_rows(conn, limit=None):
             "is_free": bool(d.get("is_free")),
             "genres": genres,
         })
+        if len(rows) >= eff_limit:   # 発売済みを除いた“発売前のみ”で LIMIT 件に達したら打ち切り
+            break
 
     return rows, model, base, validated
 
@@ -191,7 +265,8 @@ def main():
         "schema": "upcoming_v3",
         "source": "games(coming_soon/release_date) + 実測シグナル(体験版/Twitch/告知/開発元実績/ジャンル) + prelaunch_model",
         "note": ("発売前の羽根予想。spike_prob=跳ね確率＝自社実績で較正したモデルの出力（参考・外れうる）。"
-                 "モデルが無い場合は expect のみ（実測シグナルの有無）。"),
+                 "モデルが無い場合は expect のみ（実測シグナルの有無）。"
+                 "発売日が今日以前の作品は除外（coming_soon フラグが古い“居座り”も落とす）。"),
         "generated_at": datetime.now().astimezone().isoformat(),
         "model": ({"schema": model.get("schema"), "readiness": model.get("readiness"),
                    "base_rate": model.get("base_rate"), "n_pairs": model.get("n_pairs"),

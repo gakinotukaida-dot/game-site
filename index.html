@@ -650,6 +650,17 @@ function rowHtml(o){
 // ダミー件数を増やして「もっと見る」を体験できるようにする（mk(k) で k 番目の仮データを作る）。
 function padDummy(list, mk, n){ const out=list.slice(); let k=out.length+1; while(out.length<n){ out.push(mk(k)); k++; } return out; }
 // 各ビューの行データ（共通の {key,appid,title,tagsP,tagsS,drill,metric} 配列）を返す。
+// 「これから来そう」で発売済みが居座らないための保守的ガード（export の _is_released と同じ考え方）。
+// upcoming.json は1日2回更新なので、その合間に発売した作品もクライアント側で即座に落とす。
+// 過剰除外を避けるため“日付まで揃った”表記のときだけ落とし、「2026」「Jul 2026」「未定」等は残す。
+const UP_MON_RE=/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i;
+function upIsReleased(g){
+  const nowMs=Date.now();
+  if(g.release_known && g.release){ const t=Date.parse(String(g.release).slice(0,10)); if(!isNaN(t)&&t<=nowMs) return true; }
+  const s=String(g.release||"").trim();
+  if(UP_MON_RE.test(s) && /\b([1-9]|[12]\d|3[01])\b/.test(s)){ const t=Date.parse(s); if(!isNaN(t)&&t<=nowMs) return true; }
+  return false;
+}
 function viewItems(view){
   if(view==="1"){
     return REAL_V1.map(g=>{
@@ -704,7 +715,8 @@ function viewItems(view){
     // upcoming.json（全ゲーム対象・export済）があれば近日発売リスト、無ければ正直に空（emptyMsg）。
     if(!(REAL_UP&&REAL_UP.length)) return [];
     const base=(UP_MODEL&&UP_MODEL.base_rate)||0.03;
-    return REAL_UP.map(g=>{
+    // 発売済み（居座り）はここでも落とす（export の取りこぼし・更新の合間の保険）。
+    return REAL_UP.filter(g=>!upIsReleased(g)).map(g=>{
       const known=g.release_known&&g.release, relTxt=known?String(g.release).slice(0,10):(g.release||L("発売日 未定","Release TBD"));
       const dc=(typeof g.demo_ccu==="number"&&g.demo_ccu>0)?g.demo_ccu:0;
       const tw=(typeof g.twitch_peak==="number"&&g.twitch_peak>0)?g.twitch_peak:0;
