@@ -479,6 +479,11 @@ function isRevival(hist, st, cur){
 function ratioClass(r){ return r>=3 ? "r3" : (r>=1.8 ? "r2" : "r1"); }
 // 確度メーター：high=●●●／mid=●●○／low=●○○。ラベルは title に（静か＝根幹9）。
 function confMeter(cf){ const lv= cf==='high'?3 : cf==='low'?1 : 2; const lab= cf==='high'?L('高','High') : cf==='low'?L('低','Low') : L('中','Mid'); let s=""; for(let i=0;i<3;i++) s+=`<span class="${i<lv?'on':'d'}">●</span>`; return `<div class="conf conf-${cf||'mid'}" title="${L('確度','Confidence')} ${lab}（${L('伸びの推定の確からしさ','how reliable the rise estimate is')}）"><span class="dots">${s}</span><span class="conflab">${L('確度 ','Conf ')}${lab}</span></div>`; }
+// 平常比チップ（全ビュー共通）：現在が平常（過去14日の中央値）の何倍か。1.3倍以上は「いつもより上」を強調。呼称は全タブ「いつもより ×N」で統一（タブ間で表記を揃える）。
+function usualChip(ratio){
+  const lab=L("いつもより ×"+ratio.toFixed(1),"×"+ratio.toFixed(1)+" vs usual");
+  return ratio>=1.3 ? `<span class="chip c-up ic">${ICON.up}${lab}</span>` : `<span class="chip">${lab}</span>`;
+}
 /* v3/L は未配線＝ダミー（架空・仮）。実データ化はこの箱が動いてから順次。 */
 const DUMMY={
   v2:[
@@ -654,11 +659,9 @@ function viewItems(view){
   if(view==="1"){
     return REAL_V1.map(g=>{
       const st=(g.detail&&g.detail.stats)||{}, bl=st.baseline;
-      const ratio=(bl&&g.ccu)?g.ccu/bl:null, up=ratio!=null&&ratio>=1.3;
-      // A1：平常比。1.3倍以上は「いつもより上」を強調（きっかけ色）、それ未満は控えめに実数を出す。
-      const ratChip = ratio!=null
-        ? (up ? `<span class="chip c-up ic">${ICON.up}${L("いつもより ×"+ratio.toFixed(1),"×"+ratio.toFixed(1)+" vs usual")}</span>`
-              : `<span class="chip">${L("いつもより ×"+ratio.toFixed(1),"×"+ratio.toFixed(1)+" vs usual")}</span>`)
+      const ratio=(bl&&g.ccu)?g.ccu/bl:null;
+      // A1：平常比。1.3倍以上は「いつもより上」を強調（きっかけ色）、それ未満は控えめに実数を出す。呼称は全タブ共通（usualChip）。
+      const ratChip = ratio!=null ? usualChip(ratio)
         : `<span class="chip tagmuted">${L("平常値 準備中","usual: pending")}</span>`;
       const revChip = isRevival(g.detail&&g.detail.history, st, g.ccu) ? `<span class="chip c-revival ic">${ICON.revival}${L("復活","Revived")}</span>` : "";
       return { key:g.name, appid:g.appid, title:g.name, ccu:g.ccu, detail:g.detail,
@@ -694,7 +697,7 @@ function viewItems(view){
       const days=isNaN(tt)?null:Math.floor((now-tt)/86400000);
       const rev=isRevival(g.detail&&g.detail.history, st, g.ccu);
       return { key:"L_"+g.appid, appid:g.appid, title:g.name, ccu:g.ccu, detail:g.detail, ratio:(ratio==null?-1:ratio),
-        tagsP:(rev?`<span class="chip c-revival ic">${ICON.revival}${L("復活","Revived")}</span>`:"")+(days!=null?`<span class="chip c-new ic">${ICON.launch}${L("発売 "+days+"日目","Day "+days)}</span>`:"")+(ratio!=null?(ratio>=1.3?`<span class="chip c-up ic">${ICON.up}${L("平常比 ×"+ratio.toFixed(1),"×"+ratio.toFixed(1)+" vs usual")}</span>`:`<span class="chip">${L("平常比 ×"+ratio.toFixed(1),"×"+ratio.toFixed(1)+" vs usual")}</span>`):""),
+        tagsP:(rev?`<span class="chip c-revival ic">${ICON.revival}${L("復活","Revived")}</span>`:"")+(days!=null?`<span class="chip c-new ic">${ICON.launch}${L("発売 "+days+"日目","Day "+days)}</span>`:"")+(ratio!=null?usualChip(ratio):""),
         tagsS:l1Secondary(g.detail), detailBody:detailBodyReal(g.detail),
         surge:sparkline(g.detail&&g.detail.history, bl),
         metric:`<span class="num">${nf.format(g.ccu)}</span><span class="unit">${L("人","players")}</span>${bl?`<div class="base">${L("平常","usual")} ${nf.format(bl)}</div>`:""}` };
