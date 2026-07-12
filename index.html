@@ -1110,7 +1110,12 @@ function showDetail(o){
   const why=(o.view==="2")?whyPicked(o):"";
   const hasHist=o.detail&&(o.detail.stats||(o.detail.history&&o.detail.history.length));
   // ホップで来た作品は観測履歴が無ければ節ごと出さない（「準備中」を並べない）。既存ビューの表示は従来どおり。
-  const histSec=(o.view==="2")?"":((o.view==="hop"&&!hasHist)?""
+  // view02（いつもより伸び）は detail に stats を持たないため historySection は使えない。
+  // 一覧(L0)から外した折れ線（o.surge＝now_ccu 履歴を借りたスパークライン／無ければ伸びバー）を
+  // ここ（L1）に出す＝「折れ線は詳細へ移動」を view02 でも成立させる（欠測時は surge が空で節ごと省略）。
+  const histSec=(o.view==="2")
+    ? (o.surge?`<div class="dvsection"><div class="dvlabel">${L("観測の履歴","Observation history")}</div>${o.surge}</div>`:"")
+    : ((o.view==="hop"&&!hasHist)?""
     :`<div class="dvsection"><div class="dvlabel">${L("観測の履歴","Observation history")}</div>${historySection(o)}</div>`);
   const infoSec=o.detailBody?`<div class="dvsection"><div class="dvlabel">${L("情報","Info")}</div><div class="drillbody">${o.detailBody}</div></div>`
     :((o.view==="2"||o.view==="hop")?"":`<div class="dvsection"><div class="dvlabel">${L("情報","Info")}</div><div class="dvmuted">${L("詳細情報は準備中（appdetails 収集後に表示）。","Details pending (shown after appdetails collection).")}</div></div>`);
