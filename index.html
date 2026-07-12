@@ -138,6 +138,10 @@
   .row2:hover .rowchev{color:var(--accent)}
   .row2:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:5px}  /* キーボード操作 */
   .r2kick{font-size:11.5px;color:var(--ink-soft);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* L0の折れ線（ミニ・復活）：行内は低めに抑える（密度）。履歴が無い作品は付かない＝崩れない。 */
+  .r2spark{margin-top:5px}
+  .r2spark .sparkrow{margin:0}
+  .r2spark .sparksvg{height:22px;max-width:230px}
   /* L1「この作品の見立て」：一覧から外したチップ・タグをここに整列 */
   .assess{display:flex;flex-direction:column;gap:8px}
   .assessrow{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
@@ -791,7 +795,7 @@ function rowHtml(o){
       <div class="r2rank">${rank}</div>
       ${favBtn(o.key)}
       ${cover}
-      <div class="r2body"><div class="r2top">${titleCell(o.title)}<span class="metric r2primary">${o.primary||o.metric||""}</span><span class="rowchev" aria-hidden="true">›</span></div>${kick}</div>
+      <div class="r2body"><div class="r2top">${titleCell(o.title)}<span class="metric r2primary">${o.primary||o.metric||""}</span><span class="rowchev" aria-hidden="true">›</span></div>${kick}${o.surge?`<div class="r2spark">${o.surge}</div>`:""}</div>
     </li>`; }
 
 // ダミー件数を増やして「もっと見る」を体験できるようにする（mk(k) で k 番目の仮データを作る）。
