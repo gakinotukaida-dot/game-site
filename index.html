@@ -120,11 +120,12 @@
     animation:rise .5s cubic-bezier(.2,.7,.2,1) forwards}
   .row2.hascover{grid-template-columns:auto auto auto 1fr}  /* サムネ有効時だけ4列（発見性↑）。無効時は従来の3列（密度↑） */
   .r2rank{font-family:var(--serif);font-size:13px;color:var(--ink-faint);font-variant-numeric:tabular-nums;
-    min-width:20px;text-align:right}
+    width:26px;text-align:right}  /* 固定幅：桁数(1〜3桁)でタイトル左端がブレないように */
   /* 行サムネ（小）：発見性↑⇄密度↓のトレードオフ。読み込み前/失敗時は薄いプレースホルダで面を保つ（崩れない） */
   .r2cover{width:54px;height:25px;flex:none;border-radius:4px;overflow:hidden;border:1px solid var(--line);
     background:linear-gradient(135deg,var(--chip),var(--bg-2))}
   .r2cover img{width:100%;height:100%;object-fit:cover;display:block}
+  .r2cover.blank{background:none;border-color:transparent}  /* 画像なし＝同じ幅の空白で桁だけ確保（枠は出さない・左端を揃える） */
   .r2body{min-width:0}
   .r2top{display:flex;align-items:baseline;gap:9px;min-width:0}
   .r2top .title{flex:1;min-width:0}
@@ -211,7 +212,7 @@
     .wordmark{font-size:22px}
     li.row{grid-template-columns:20px 1fr auto;gap:9px;padding:11px 0}
     .row2{gap:0 9px;padding:11px 0}
-    .r2rank{min-width:16px;font-size:12px}
+    .r2rank{width:22px;font-size:12px}
     .r2cover{width:46px;height:21px}
     .r2top .title{font-size:14.5px}
     .r2top{gap:7px}
@@ -778,10 +779,15 @@ function detailBodyReal(d){
 function rowHtml(o){
   const rank=(typeof o.i==="number")?(o.i+1):"";
   const kick=o.kicker?`<div class="r2kick">${o.kicker}</div>`:"";
-  // 行サムネ（小・発見性↑）：imgOn かつ appid のときだけ。読み込み失敗は img を隠してプレースホルダを残す（面を保つ＝崩れない）。
-  const showCover=imgOn&&o.appid;
-  const cover=showCover?`<div class="r2cover"><img src="https://cdn.cloudflare.steamstatic.com/steam/apps/${o.appid}/header.jpg" alt="" loading="lazy" onerror="this.style.visibility='hidden'"></div>`:"";
-  return `<li class="row2 ${showCover?'hascover ':''}${favs.has(o.key)?'faved':''}" data-detail="${o.i}" role="button" tabindex="0" aria-label="${esc(o.title)}（${L("詳しく","details")}）" style="animation-delay:${o.i*30}ms">
+  // 行サムネ（小・発見性↑）：imgOn のときは全行でサムネ列を確保する。画像がある作品は表示し、
+  // 画像が無い作品（appid欠落・ダミー行）は同じ幅の空白セルで桁だけ揃える＝スクロールしても
+  // タイトルの左端がブレない（視認性）。読み込み失敗は img を隠してプレースホルダ枠を残す（崩れない）。
+  const cover=imgOn
+    ? (o.appid
+        ? `<div class="r2cover"><img src="https://cdn.cloudflare.steamstatic.com/steam/apps/${o.appid}/header.jpg" alt="" loading="lazy" onerror="var b=this.closest('.r2cover'); if(b) b.classList.add('blank'); this.remove();"></div>`
+        : `<div class="r2cover blank"></div>`)
+    : "";
+  return `<li class="row2 ${imgOn?'hascover ':''}${favs.has(o.key)?'faved':''}" data-detail="${o.i}" role="button" tabindex="0" aria-label="${esc(o.title)}（${L("詳しく","details")}）" style="animation-delay:${o.i*30}ms">
       <div class="r2rank">${rank}</div>
       ${favBtn(o.key)}
       ${cover}
