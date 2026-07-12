@@ -122,13 +122,13 @@
   .r2rank{font-family:var(--serif);font-size:13px;color:var(--ink-faint);font-variant-numeric:tabular-nums;
     width:26px;text-align:right}  /* 固定幅：桁数(1〜3桁)でタイトル左端がブレないように */
   /* 行サムネ（小）：発見性↑⇄密度↓のトレードオフ。読み込み前/失敗時は薄いプレースホルダで面を保つ（崩れない） */
-  .r2cover{width:54px;height:25px;flex:none;border-radius:4px;overflow:hidden;border:1px solid var(--line);
+  .r2cover{width:72px;height:34px;flex:none;border-radius:5px;overflow:hidden;border:1px solid var(--line);
     background:linear-gradient(135deg,var(--chip),var(--bg-2))}
   .r2cover img{width:100%;height:100%;object-fit:cover;display:block}
   .r2cover.blank{background:none;border-color:transparent}  /* 画像なし＝同じ幅の空白で桁だけ確保（枠は出さない・左端を揃える） */
   .r2body{min-width:0}
   .r2top{display:flex;align-items:baseline;gap:9px;min-width:0}
-  .r2top .title{flex:1;min-width:0}
+  .r2top .title{flex:1;min-width:0;font-size:16px;font-weight:600;color:var(--ink)}  /* 役割＝作品名（識別）＝しっかり見せる */
   .r2primary{flex:none;text-align:right}
   .r2primary .num{font-size:19px;font-weight:700}      /* 主指標＝行の焦点（大きく・太く） */
   .r2primary .num.pct,.r2primary .num.mult{color:var(--accent)}  /* 跳ね%・×平常比＝強調色（color-mix非対応時のフォールバック） */
@@ -137,7 +137,7 @@
   .row2:hover{background:var(--bg-2)}
   .row2:hover .rowchev{color:var(--accent)}
   .row2:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:5px}  /* キーボード操作 */
-  .r2kick{font-size:11.5px;color:var(--ink-soft);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .r2kick{font-size:11px;color:var(--ink-soft);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}  /* 役割＝補足（きっかけ等）＝控えめ */
   /* L0の折れ線（ミニ・復活）：行内は低めに抑える（密度）。履歴が無い作品は付かない＝崩れない。 */
   .r2spark{margin-top:5px}
   .r2spark .sparkrow{margin:0}
@@ -217,8 +217,8 @@
     li.row{grid-template-columns:20px 1fr auto;gap:9px;padding:11px 0}
     .row2{gap:0 9px;padding:11px 0}
     .r2rank{width:22px;font-size:12px}
-    .r2cover{width:46px;height:21px}
-    .r2top .title{font-size:14.5px}
+    .r2cover{width:60px;height:28px}
+    .r2top .title{font-size:15px}
     .r2top{gap:7px}
     .cover{width:60px;height:28px}
     .metaImg{gap:8px}
