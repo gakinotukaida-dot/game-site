@@ -11,7 +11,7 @@
 <link rel="alternate" type="application/rss+xml" title="トレパ — いつもより伸びているPCゲーム" href="./data/rising_feed.xml">
 <style>
   :root{
-    --bg:#14161a; --bg-2:#181b20; --ink:#e7e4dc; --ink-soft:#aab0b2; --ink-faint:#7d8488;
+    --bg:#14161a; --bg-2:#181b20; --ink:#e7e4dc; --ink-soft:#b4b9bb; --ink-faint:#8f9599;
     --line:#252a30; --accent:#79c0ab; --accent-weak:#1b2521; --chip:#20252b; --chip-ink:#9aa0a2;
     --serif:"Fraunces","Hiragino Mincho ProN","Yu Mincho",serif;
     --sans:"Hanken Grotesk","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;
@@ -41,6 +41,19 @@
   .data-note.dummy{border-style:dashed}
   .data-note .sq{width:6px;height:6px;border-radius:2px;background:var(--accent);display:inline-block}
   .data-note.dummy .sq{background:var(--ink-faint)}
+  /* 注記は既定で畳む：ⓘ ラベルだけ見せ、本文はクリックで展開（面を浅く／掘れる） */
+  .data-note{align-items:flex-start}
+  .noteToggle{display:inline-flex;align-items:center;gap:8px;flex:none;white-space:nowrap;background:transparent;
+    border:0;padding:0;margin:0;font-family:inherit;font-size:11px;color:var(--ink-soft);cursor:pointer}
+  .noteToggle .noteLbl{font-weight:600;white-space:nowrap}
+  .noteToggle:hover .noteLbl{color:var(--accent)}
+  .noteToggle .noteChev{color:var(--ink-faint);font-size:12px}
+  #dataNoteText{margin-left:2px;flex:1;min-width:0}
+  /* 見出し横の ？：この見方の説明(blurb)を開閉 */
+  .ttlq{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-left:8px;
+    vertical-align:middle;border:1px solid var(--line);border-radius:50%;background:transparent;
+    color:var(--ink-faint);font-size:11px;font-family:inherit;cursor:pointer;line-height:1;padding:0}
+  .ttlq:hover,.ttlq[aria-expanded="true"]{color:var(--accent);border-color:var(--accent)}
   nav.views{display:flex;gap:0;margin:24px 0 2px;border-bottom:1px solid var(--line);flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
   nav.views::-webkit-scrollbar{display:none}
   nav.views button{appearance:none;background:none;border:0;cursor:pointer;font-family:var(--sans);
@@ -84,7 +97,7 @@
   .cover{width:84px;height:39px;object-fit:cover;border-radius:5px;flex-shrink:0;border:1px solid var(--line);display:block;filter:saturate(.9)}
   .metatext{min-width:0}
   .titlelink{color:inherit;text-decoration:none}
-  .titlelink:hover{color:var(--accent)}
+  .titlelink:hover{color:var(--accent);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
   .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
   .tagmuted{opacity:.75;border:1px dashed var(--line);background:transparent;color:var(--ink-faint)}
   .tags-secondary{margin-top:4px}
@@ -101,6 +114,29 @@
   .metric .num{font-size:18px;font-weight:600;letter-spacing:.2px;font-variant-numeric:tabular-nums}
   .metric .unit{font-size:11px;color:var(--ink-soft);margin-left:3px}
   .metric .mult{font-weight:700}
+  /* L0＝2行/件（順位・タイトル・主指標＋きっかけ）。行をタップで L1（詳細）へ掘る。 */
+  .row2{display:grid;grid-template-columns:auto auto 1fr;align-items:center;gap:0 11px;padding:11px 2px;
+    border-bottom:1px solid var(--line);cursor:pointer;opacity:0;transform:translateY(6px);
+    animation:rise .5s cubic-bezier(.2,.7,.2,1) forwards}
+  .r2rank{font-family:var(--serif);font-size:13px;color:var(--ink-faint);font-variant-numeric:tabular-nums;
+    min-width:20px;text-align:right}
+  .r2body{min-width:0}
+  .r2top{display:flex;align-items:baseline;gap:9px;min-width:0}
+  .r2top .title{flex:1;min-width:0}
+  .r2primary{flex:none;text-align:right}
+  .r2primary .num{font-size:19px;font-weight:700}      /* 主指標＝行の焦点（大きく・太く） */
+  .r2primary .num.pct{color:var(--accent)}             /* 跳ね予想%は強調色で視線を誘導 */
+  .r2primary .unit{color:var(--ink-soft)}
+  .rowchev{flex:none;color:var(--ink-faint);font-size:15px;line-height:1}
+  .row2:hover{background:var(--bg-2)}
+  .row2:hover .rowchev{color:var(--accent)}
+  .row2:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:5px}  /* キーボード操作 */
+  .r2kick{font-size:11.5px;color:var(--ink-soft);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* L1「この作品の見立て」：一覧から外したチップ・タグをここに整列 */
+  .assess{display:flex;flex-direction:column;gap:8px}
+  .assessrow{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .assesstags .chip{font-size:10px;color:var(--ink-faint);background:transparent;border:1px solid var(--line)}
+  .go.ghost{background:transparent}
   .metric .mult.r1{color:var(--ink-soft)}                 /* 小さい伸び＝控えめ */
   .metric .mult.r2{color:var(--accent)}                   /* 中 */
   .metric .mult.r3{color:var(--accent);font-size:22px}    /* 大きい伸び＝主役 */
@@ -163,8 +199,16 @@
   footer a{color:var(--ink-faint);text-decoration:none;border-bottom:1px solid var(--line)}
   @media(max-width:560px){
     .wrap{padding:24px 15px 60px}
+    /* ヘッダの塔を潰す：縦積み＋ツールバー折返し＋説明2行はモバイルで隠す（サブ見出しが役割を兼ねる） */
+    header{flex-direction:column;align-items:stretch;gap:10px}
+    .toolbar{flex-wrap:wrap;justify-content:flex-end}
+    .plain,.tagline{display:none}
     .wordmark{font-size:22px}
     li.row{grid-template-columns:20px 1fr auto;gap:9px;padding:11px 0}
+    .row2{gap:0 9px;padding:11px 0}
+    .r2rank{min-width:16px;font-size:12px}
+    .r2top .title{font-size:14.5px}
+    .r2top{gap:7px}
     .cover{width:60px;height:28px}
     .metaImg{gap:8px}
     .title{font-size:14.5px}
@@ -259,10 +303,10 @@
   .chip.c-expect{color:#cf8f2a;background:rgba(207,143,42,.15);border:1px solid rgba(207,143,42,.4)}        /* 期待度 高（参考・実測シグナル） */
   .chip.c-expect2{color:var(--ink-faint);background:transparent;border:1px solid var(--line)}              /* 期待度 中（控えめ）／確度 */
   .chip.c-demo{color:#3fa87f;background:rgba(63,168,127,.14);border:1px solid rgba(63,168,127,.36)}          /* 体験版CCU（実測） */
-  .chip.c-spike{color:var(--accent);background:var(--accent-weak);border:1px solid color-mix(in srgb,var(--accent) 46%,transparent);font-weight:600}  /* 羽根予想（核） */
+  .chip.c-spike{color:var(--accent);background:var(--accent-weak);border:1px solid color-mix(in srgb,var(--accent) 46%,transparent);font-weight:600}  /* 跳ね予想（核） */
   .chip.c-fac{color:#c98b3f;background:rgba(201,139,63,.12);border:1px solid rgba(201,139,63,.32)}          /* 押し上げ要因 */
-  /* ===== 羽根予想の答え合わせ（スコアカード） ===== */
-  .scorecard{margin:2px 0 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg-2);overflow:hidden}
+  /* ===== 跳ね予想の答え合わせ（スコアカード） ===== */
+  .scorecard{margin:18px 0 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg-2);overflow:hidden}
   .scorecard>summary{list-style:none;cursor:pointer;padding:11px 14px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
   .scorecard>summary::-webkit-details-marker{display:none}
   .scorecard>summary::after{content:"▾";color:var(--ink-faint);margin-left:auto;font-size:12px;transition:.2s}
@@ -293,8 +337,8 @@
   .titlerow{display:flex;align-items:center;gap:2px;min-width:0}
   .titlerow .title{min-width:0}
   .sparkrow{grid-column:2 / -1;margin-top:8px;display:flex;align-items:center;gap:10px}
-  .sparksvg{width:100%;max-width:280px;height:26px;flex:none}
-  .sparkline{fill:none;stroke:var(--accent);stroke-width:1.5;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
+  .sparksvg{width:100%;max-width:280px;height:34px;flex:none}
+  .sparkline{fill:none;stroke:var(--accent);stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
   .sparkbase{stroke:var(--ink-faint);stroke-width:1;stroke-dasharray:3 3;vector-effect:non-scaling-stroke}
   .sparkdot{fill:var(--accent)}
   .sparklbl{font-size:10px;color:var(--ink-faint);white-space:nowrap}
@@ -342,6 +386,39 @@
   .conngo{color:var(--accent);font-size:12px;flex-shrink:0}
   .connext .conngo{color:var(--ink-soft)}
   @media(max-width:560px){ .connwhy{display:none} }
+
+  /* はじめての方へ（B1）：既定は薄い1行バー・タップで展開（浅い入口／掘れる） */
+  .intro{margin:12px 0 2px;border:1px solid var(--line);border-radius:12px;background:var(--bg-2);overflow:hidden}
+  .introbar{display:flex;align-items:stretch}
+  .introtoggle{flex:1;min-width:0;display:flex;align-items:center;gap:8px;background:transparent;border:0;
+    cursor:pointer;font-family:inherit;font-size:12.5px;color:var(--ink);text-align:left;padding:10px 6px 10px 14px}
+  .introtoggle .qmark{flex:none;width:18px;height:18px;border-radius:50%;border:1px solid var(--line);
+    color:var(--ink-soft);font-size:11px;line-height:16px;text-align:center}
+  .introtoggle .introbarlbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+  .introtoggle .introchev{margin-left:auto;color:var(--ink-faint);font-size:13px}
+  .introtoggle:hover .introbarlbl{color:var(--accent)}
+  .introclose{flex:none;width:34px;border:0;border-left:1px solid var(--line);
+    background:transparent;color:var(--ink-faint);font-size:17px;line-height:1;cursor:pointer}
+  .introclose:hover{color:var(--ink);background:var(--chip)}
+  .introlead{font-size:12.5px;color:var(--ink-soft);margin:0;padding:0 14px 2px;max-width:62ch;line-height:1.6}
+  .introlist{list-style:none;margin:0;padding:8px 14px 14px;display:grid;gap:8px 18px;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  .introlist li{display:flex;gap:9px;align-items:baseline;font-size:13px;line-height:1.5}
+  .introlist .itag{flex:none;color:var(--accent);font-weight:700;white-space:nowrap}
+  .introlist .idesc{color:var(--ink-soft)}
+
+  /* 共有ボタン（E1）：Steamリンクと並ぶ控えめなアクション */
+  .rowshare{font-size:10.5px;color:var(--ink-faint);background:transparent;border:1px solid var(--line);
+    border-radius:6px;padding:1px 7px;white-space:nowrap;margin-left:5px;cursor:pointer;
+    font-family:inherit;transition:.2s}
+  .rowshare:hover{color:var(--accent);border-color:var(--accent)}
+
+  /* トースト（コピー完了の通知） */
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(10px);
+    background:var(--ink);color:var(--bg);font-size:13px;padding:9px 16px;border-radius:9px;
+    box-shadow:0 6px 24px rgba(0,0,0,.28);opacity:0;pointer-events:none;z-index:60;transition:opacity .2s,transform .2s}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @media (prefers-reduced-motion:reduce){ .toast{transition:opacity .2s} }
 </style>
 </head>
 <body>
@@ -353,6 +430,8 @@
       <div class="tagline" data-i18n="brand.tagline">頼んでいない情報は出しません。追いたいゲームだけ、静かに。</div>
     </div>
     <div class="toolbar">
+      <button class="pill" id="helpBtn" type="button" title="このサイトの使い方" data-i18n="help.btn">？ 使い方</button>
+      <button class="pill" id="fontBtn" type="button" title="文字の大きさを変える">文字 標準</button>
       <button class="pill" id="langBtn" type="button" title="日本語 / English" data-i18n="lang.btn">EN</button>
       <button class="pill" id="imgBtn" type="button" aria-pressed="true" title="サムネイル画像の表示切り替え">画像 on</button>
       <button class="pill" id="themeBtn" type="button" title="配色を明るく／暗く">背景を明るく</button>
@@ -371,14 +450,16 @@
       <span class="heroratio" id="heroRatio"></span>
     </button>
   </section>
-  <div class="data-note" id="dataNote"><span class="sq"></span><span id="dataNoteText"></span></div>
+  <div class="data-note" id="dataNote"><button class="noteToggle" id="noteToggle" type="button" aria-expanded="false" aria-controls="dataNoteText"><span class="sq"></span><span class="noteLbl" id="noteLbl">データについて</span><span class="noteChev" aria-hidden="true">›</span></button><span id="dataNoteText" hidden></span></div>
 
   <nav class="views" role="tablist" aria-label="表示の切り口">
-    <button role="tab" aria-selected="true"  data-view="1"><span class="idx">01</span><span data-i18n="nav.1">今の人数</span></button>
-    <button role="tab" aria-selected="false" data-view="2"><span class="idx">02</span><span data-i18n="nav.2">いつもより伸び</span></button>
-    <button role="tab" aria-selected="false" data-view="L"><span class="idx">03</span><span data-i18n="nav.L">新着で伸び</span></button>
-    <button role="tab" aria-selected="false" data-view="3"><span class="idx">04</span><span data-i18n="nav.3">これから来そう</span></button>
+    <button role="tab" aria-selected="true"  data-view="3"><span class="idx">01</span><span data-i18n="nav.3">これから来そう</span></button>
+    <button role="tab" aria-selected="false" data-view="1"><span class="idx">02</span><span data-i18n="nav.1">今の人数</span></button>
+    <button role="tab" aria-selected="false" data-view="2"><span class="idx">03</span><span data-i18n="nav.2">いつもより伸び</span></button>
+    <button role="tab" aria-selected="false" data-view="L"><span class="idx">04</span><span data-i18n="nav.L">新着で伸び</span></button>
   </nav>
+
+  <section id="intro" class="intro" hidden aria-label="このサイトの使い方"></section>
 
   <details class="ctlbox">
     <summary data-i18n="ctl.summary">並び替え</summary>
@@ -405,7 +486,6 @@
   </div>
   <div class="obs" id="obs"></div>
   <div class="blurb" id="blurb"></div>
-  <details id="scoreSec" class="scorecard" hidden></details>
   <div class="searchbar"><input id="q" class="qinput" type="search" data-i18n-ph="search.ph" placeholder="🔍 この一覧から作品名でさがす" autocomplete="off" aria-label="作品名でさがす"></div>
   <div class="filters" id="filters">
     <span class="flabel" data-i18n="filter.genre">ジャンル</span>
@@ -414,6 +494,7 @@
   </div>
   <ul class="list" id="list"></ul>
   <div id="moreWrap"></div>
+  <details id="scoreSec" class="scorecard" hidden></details><!-- 答え合わせ（根拠/L2）は一覧の下＝掘る位置に -->
 
   <section id="freeSec" class="freesec" hidden>
     <h2 class="freehd" data-i18n="free.hd">無料でもらえる</h2>
@@ -430,6 +511,7 @@
   <footer>
     <div class="disc" data-i18n="foot.disc1">本サイトは Valve Corporation（Steam）、Twitch、および各ゲームの開発・販売元とは一切提携・関係しておらず、公認・後援も受けていません。「Steam」およびゲーム名等は各権利者の商標です。公開データに基づく非公式の情報サイトです。</div>
     <div class="disc" data-i18n="foot.disc2">数値・順位・「推定きっかけ」は公開データから自動算出した観測・実験的な指標であり、正確性・完全性・最新性を保証しません。投資・購入を勧める助言ではありません。「予測」は外れることがあり、原因が特定できないときは「原因不明」と表示します。</div>
+    <div class="disc" data-i18n="foot.obs2">「今の人数」はSteamの“ゲーム”を対象に観測しています（ソフトウェア区分・アダルト作品は対象外）。観測が途切れた作品も定期的に再確認して拾い直します。</div>
     <div class="disc dev" id="devLine"></div>
     <div style="margin-top:12px"><a href="./data/rising_feed.xml" target="_blank" rel="noopener noreferrer" data-i18n="foot.rss">RSS（伸びフィード）</a> · <a href="#" id="ppLink" onclick="return false" data-i18n="foot.pp">プライバシーポリシー（未設定）</a> · <a href="#" id="cookieSettings" data-i18n="foot.cookie">Cookie設定</a> · <span data-i18n="foot.obs">観測記録（Steam公式API）</span></div>
   </footer>
@@ -505,7 +587,8 @@ function confMeter(cf){ const lv= cf==='high'?3 : cf==='low'?1 : 2; const lab= c
 // 平常比チップ（全ビュー共通）：現在が平常（過去14日の中央値）の何倍か。1.3倍以上は「いつもより上」を強調。呼称は全タブ「いつもより ×N」で統一（タブ間で表記を揃える）。
 function usualChip(ratio){
   const lab=L("いつもより ×"+ratio.toFixed(1),"×"+ratio.toFixed(1)+" vs usual");
-  return ratio>=1.3 ? `<span class="chip c-up ic">${ICON.up}${lab}</span>` : `<span class="chip">${lab}</span>`;
+  const tip=esc(L("ふだん（過去14日の中央値）と比べて今どれだけ人が多いか。×2なら“いつもの2倍”。","How many more players than usual (median of the last 14 days). ×2 = twice the usual."));
+  return ratio>=1.3 ? `<span class="chip c-up ic" title="${tip}">${ICON.up}${lab}</span>` : `<span class="chip" title="${tip}">${lab}</span>`;
 }
 // 平常値のサブ行（全ビュー共通）：見出しの下に「平常 N」を静かに添える。書式をタブ間で揃える（現在数は各ビューの見出し／詳細ページに集約）。
 function baseLine(usual){ return usual ? `<div class="base">${L("平常","usual")} ${nf.format(usual)}</div>` : ""; }
@@ -541,8 +624,8 @@ const BLURB={
      en:"Predicts how much each pre-release game will spike at launch. A calibrated spike probability from demo play, streaming buzz, news, and the developer's track record. Predictions can be wrong."},
 };
 const NOTE={
-  1:{cls:"",txt:{ja:"実データ：Steam公式APIの観測値（同時接続）。各appidの最新値・上位20件。",
-     en:"Real data: official Steam API observations (concurrent). Latest per appid · top 20."}},
+  1:{cls:"",txt:{ja:"実データ：Steam公式APIの観測値（いま遊んでいる人数）。各作品の最新値・上位20件。",
+     en:"Real data: official Steam API observations (players in-game now). Latest per title · top 20."}},
   2:{cls:"",txt:{ja:"実データ：平常比の伸び（検証中）。生の人数順より上位ほど伸びやすい傾向（初期検証・約1.8倍）。",
      en:"Real data: rise vs usual (in validation). Higher ranks tend to rise more than a raw player-count order (early test ≈1.8×)."}},
   L:{cls:"",txt:{ja:"実データ（一部）：now_ccu 上位内で発売から日が浅い作品を平常比で。本番P2は release_date 14日で全ゲーム対象（要 new-games エクスポート）。",
@@ -577,6 +660,8 @@ const I18N={
  "cookie.accept":{ja:"同意する",en:"Accept"},"cookie.decline":{ja:"拒否する",en:"Decline"},
  "lang.btn":{ja:"EN",en:"日本語"},
  "hero.kick":{ja:"いま、いつもより伸びている",en:"Rising more than usual now"},
+ "help.btn":{ja:"？ 使い方",en:"？ Guide"},
+ "foot.obs2":{ja:"「今の人数」はSteamの“ゲーム”を対象に観測しています（ソフトウェア区分・アダルト作品は対象外）。観測が途切れた作品も定期的に再確認して拾い直します。",en:"\"Now playing\" observes Steam games only (software-category and adult titles are excluded). Titles whose tracking lapsed are periodically re-checked and picked back up."},
  "dev.pre":{ja:"開発元・権利者の方へ：掲載の停止（オプトアウト）や情報の訂正のご依頼は ",en:"Developers / rights holders: to request removal (opt-out) or a correction, please "},
  "dev.link":{ja:"こちら",en:"contact us"},
  "dev.post":{ja:" からご連絡ください。ご連絡後すみやかに対応します。サムネイル画像は公式ストアの画像を参照表示しており、当サイトでの再配布は行っていません。",en:". We respond promptly. Thumbnails reference official store images and are not re-hosted here."},
@@ -593,9 +678,16 @@ function wireOptout(){ if(typeof CONTACT_URL==="string" && CONTACT_URL){ const o
 const listEl=document.getElementById("list"),blurbEl=document.getElementById("blurb"),obsEl=document.getElementById("obs");
 const noteEl=document.getElementById("dataNote"),noteTxt=document.getElementById("dataNoteText");
 const moreWrap=document.getElementById("moreWrap");
+// 無限スクロール：一覧末尾が近づいたら自動で+20（rootMargin で手前から先読み）。moreHas は render が更新。
+// 「もっと見る」ボタンは手動フォールバックとして残す（キーボード／IO非対応でも進める）。
+let moreHas=false;
+if("IntersectionObserver" in window){
+  const io=new IntersectionObserver(es=>{ if(moreHas && es.some(e=>e.isIntersecting)){ shown+=20; render(current); } }, {rootMargin:"400px 0px"});
+  io.observe(moreWrap);
+}
 const freeSec=document.getElementById("freeSec"),freeBody=document.getElementById("freeBody");
-let favOnly=false; const favs=new Set(); let current="1"; let shown=20; let activeGenres=new Set(); let sortMode="rank"; let REAL_L=null; let REAL_UP=null; let UP_MODEL=null; let SCORE=null; let query=""; let imgOn=true;
-// 羽根予想の押し上げ要因ラベル（export の factors[].name → 表示名）
+let favOnly=false; const favs=new Set(); let current="3"; let shown=20; let activeGenres=new Set(); let sortMode="rank"; let REAL_L=null; let REAL_UP=null; let UP_MODEL=null; let SCORE=null; let query=""; let imgOn=true;
+// 跳ね予想の押し上げ要因ラベル（export の factors[].name → 表示名）
 const FACT_LABEL={demo_ccu:{ja:"体験版が遊ばれている",en:"Demo being played"},twitch_peak:{ja:"配信で注目",en:"Twitch buzz"},streamers:{ja:"配信者が多い",en:"Many streamers"},news_count:{ja:"告知が活発",en:"Active news"},web_news:{ja:"世界で報道",en:"Global news"},web_views:{ja:"世界で読まれている",en:"Global readership"},web_reach:{ja:"世界的な知名度",en:"Global reach"},dev_best_peak:{ja:"開発元の実績",en:"Dev track record"},dev_best_reviews:{ja:"開発元の評価",en:"Dev reputation"},genre:{ja:"人気ジャンル",en:"Popular genre"},is_free:{ja:"無料",en:"Free"}};
 function factLabel(n){ const m=FACT_LABEL[n]; return m?(lang==="en"?m.en:m.ja):n; }
 const FAV_KEY="radar_favs_v1";
@@ -604,7 +696,10 @@ function loadFavs(){ try{ const a=JSON.parse(localStorage.getItem(FAV_KEY)||"[]"
 function saveFavs(){ try{ localStorage.setItem(FAV_KEY, JSON.stringify([...favs])); }catch(e){} }
 let detailMap={};
 const viewTitleEl=document.getElementById("viewTitle");
-const VIEWTITLE={1:["01","今のプレイヤー数","Current players"],2:["02","いつもより伸びている","Rising more than usual"],L:["03","新着で伸びている","New & rising"],3:["04","これから来そう（発売前）","Upcoming (pre-release)"]};
+// 見出しの ？ で「この見方の説明」(blurb)、注記の ⓘ で「データについて」(note) を開閉。既定は畳む＝掘れる（面を浅く保つ）。
+viewTitleEl.addEventListener("click",e=>{ const b=e.target.closest("#ttlHelp"); if(!b) return; blurbEl.hidden=!blurbEl.hidden; b.setAttribute("aria-expanded",String(!blurbEl.hidden)); });
+noteEl.addEventListener("click",e=>{ const b=e.target.closest("#noteToggle"); if(!b) return; noteTxt.hidden=!noteTxt.hidden; b.setAttribute("aria-expanded",String(!noteTxt.hidden)); const cv=b.querySelector(".noteChev"); if(cv) cv.textContent=noteTxt.hidden?"›":"▾"; });
+const VIEWTITLE={1:["02","今のプレイヤー数","Current players"],2:["03","いつもより伸びている","Rising more than usual"],L:["04","新着で伸びている","New & rising"],3:["01","これから来そう（発売前）","Upcoming (pre-release)"]};
 function fmtJST(iso){ return iso ? new Date(iso).toLocaleString("ja-JP",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}) : "—"; }
 
 function chip(r){ if(!r) return ""; return `<span class="chip ${r[1]==='note'?'note':''}">${r[0]}</span>`; }
@@ -668,14 +763,15 @@ function detailBodyReal(d){
   return rows;
 }
 // v10：行内アコーディオンは廃止。詳細は openDetail() の詳細ページへ一本化（#3）。
+// L0（一覧）＝2行/件：順位・タイトル・主指標＋「きっかけ」だけ。チップ/タグ/折れ線/Steam/共有は L1（詳細の「見立て」）へ送る。
 function rowHtml(o){
-  const steam=o.appid?`<a class="rowsteam" href="https://store.steampowered.com/app/${o.appid}/" target="_blank" rel="noopener noreferrer">Steam ↗</a>`:"";
-  return `<li class="row ${favs.has(o.key)?'faved':''}" data-detail="${o.i}" style="animation-delay:${o.i*30}ms">
+  const rank=(typeof o.i==="number")?(o.i+1):"";
+  const kick=o.kicker?`<div class="r2kick">${o.kicker}</div>`:"";
+  return `<li class="row2 ${favs.has(o.key)?'faved':''}" data-detail="${o.i}" role="button" tabindex="0" aria-label="${esc(o.title)}（${L("詳しく","details")}）" style="animation-delay:${o.i*30}ms">
+      <div class="r2rank">${rank}</div>
       ${favBtn(o.key)}
-      <div class="meta"><div class="metaImg">${coverImg(o.appid)}<div class="metatext"><div class="titlerow">${titleCell(o.title)}${steam}</div>${o.tagsP?`<div class="tags tags-primary">${o.tagsP}</div>`:""}${o.tagsS?`<div class="tags tags-secondary">${o.tagsS}</div>`:""}</div></div></div>
-      <div class="metric">${o.metric}</div>
-      ${o.surge||""}
-      ${followLine()}</li>`; }
+      <div class="r2body"><div class="r2top">${titleCell(o.title)}<span class="metric r2primary">${o.primary||o.metric||""}</span><span class="rowchev" aria-hidden="true">›</span></div>${kick}</div>
+    </li>`; }
 
 // ダミー件数を増やして「もっと見る」を体験できるようにする（mk(k) で k 番目の仮データを作る）。
 function padDummy(list, mk, n){ const out=list.slice(); let k=out.length+1; while(out.length<n){ out.push(mk(k)); k++; } return out; }
@@ -699,25 +795,39 @@ function viewItems(view){
       // A1：平常比。1.3倍以上は「いつもより上」を強調（きっかけ色）、それ未満は控えめに実数を出す。呼称は全タブ共通（usualChip）。
       const ratChip = ratio!=null ? usualChip(ratio)
         : `<span class="chip tagmuted">${L("平常値 準備中","usual: pending")}</span>`;
-      const revChip = isRevival(g.detail&&g.detail.history, st, g.ccu) ? `<span class="chip c-revival ic">${ICON.revival}${L("復活","Revived")}</span>` : "";
+      const rev = isRevival(g.detail&&g.detail.history, st, g.ccu);
+      const revChip = rev ? `<span class="chip c-revival ic">${ICON.revival}${L("復活","Revived")}</span>` : "";
       return { key:g.name, appid:g.appid, title:g.name, ccu:g.ccu, detail:g.detail,
         ratio:(ratio==null?-1:ratio), rel:g.detail&&g.detail.release,
         tagsP:revChip+ratChip, tagsS:l1Secondary(g.detail), detailBody:detailBodyReal(g.detail),
         surge:sparkline(g.detail&&g.detail.history, bl),  // A2：ミニ折れ線（平常線つき）
+        primary:`<span class="num">${nf.format(g.ccu)}</span><span class="unit">${L("人","players")}</span>`,  // L0主指標＝今の人数
+        kicker:(rev?L("復活・","Revived · "):"")+(ratio!=null?L("ふだんの ×"+ratio.toFixed(1),"×"+ratio.toFixed(1)+" of usual"):L("平常値 準備中","usual: pending")),
         metric:`<span class="num">${nf.format(g.ccu)}</span><span class="unit">${L("人","players")}</span>${baseLine(bl)}` };
     });
   }
   if(view==="2"){
+    // 折れ線グラフ（他タブと表現を統一）。view02_rising.json には時系列が無いため、同一 appid の
+    // now_ccu 観測履歴（REAL_V1 の detail.history＝6hバケット・平常値ライン付き）を借りて描く。
+    // 履歴が取れない作品だけ従来の「伸びバー」にフォールバック（＝欠測でも崩れない）。
+    const ncByApp={}; (REAL_V1||[]).forEach(x=>{ if(x&&x.appid!=null) ncByApp[x.appid]=x; });
     return REAL_V2.map(g=>{
       // きっかけの表示順を優先度で並べ替え（国内で話題・過去最安・無料 を先頭2枠に出す＝②⑨の指摘）
       const cs=(g.c&&g.c.length)?g.c.slice().sort((a,b)=>catPri(b)-catPri(a)):[];
       const causes = cs.length ? cs.slice(0,2).map(causeChip).join("")+(cs.length>2?`<span class="chip more">+${cs.length-2}</span>`:"") : `<span class="chip tagmuted">${L("原因不明","Cause unknown")}</span>`;
       const genres=(g.g&&g.g.length)? g.g.slice(0,2).map(t=>`<span class="chip gq">${esc(genreLabel(t))}</span>`).join("")+(g.g.length>2?`<span class="chip gq more">+${g.g.length-2}</span>`:"") : "";
+      // まず自分の履歴（view02_rising.json の history）で線を引く。無ければ同一appidの now_ccu 履歴を借りる。
+      const nc=ncByApp[g.a], ncd=nc&&nc.detail;
+      const spark = (g.hist ? sparkline(g.hist, g.base)
+                            : sparkline(ncd&&ncd.history, (ncd&&ncd.stats&&ncd.stats.baseline)||g.base));
       const frac=Math.max(0,Math.min(1,(g.r-1)/5));
+      const surge = spark || `<div class="surgebar"><div class="surgetrack"><div class="surgefill" style="width:${(frac*100).toFixed(1)}%"></div></div></div>`;
       return { key:"v2_"+g.a, appid:g.a, title:g.n, ccu:g.now, detail:{genres:g.g||[]},
         r:g.r, ratio:g.r, now:g.now, base:g.base, cf:g.cf, causes:cs,
         tagsP:causes, tagsS:genres, detailBody:"",
-        surge:`<div class="surgebar"><div class="surgetrack"><div class="surgefill" style="width:${(frac*100).toFixed(1)}%"></div></div></div>`,
+        surge:surge,
+        primary:`<span class="num mult ${ratioClass(g.r)}">×${g.r.toFixed(1)}</span>`,  // L0主指標＝平常比
+        kicker: cs.length ? L("きっかけ：","Trigger: ")+esc(causeLabel(cs[0].t)) : L("原因不明","Cause unknown"),
         metric:`<span class="num mult ${ratioClass(g.r)}">×${g.r.toFixed(1)}</span>${confMeter(g.cf)}${baseLine(g.base)}` };
     });
   }
@@ -736,6 +846,8 @@ function viewItems(view){
         tagsP:(rev?`<span class="chip c-revival ic">${ICON.revival}${L("復活","Revived")}</span>`:"")+(days!=null?`<span class="chip c-new ic">${ICON.launch}${L("発売 "+days+"日目","Day "+days)}</span>`:"")+(ratio!=null?usualChip(ratio):""),
         tagsS:l1Secondary(g.detail), detailBody:detailBodyReal(g.detail),
         surge:sparkline(g.detail&&g.detail.history, bl),
+        primary: ratio!=null ? `<span class="num mult ${ratioClass(ratio)}">×${ratio.toFixed(1)}</span>` : `<span class="num">${nf.format(g.ccu)}</span><span class="unit">${L("人","players")}</span>`,  // L0主指標＝平常比（無ければ人数）
+        kicker:(rev?L("復活・","Revived · "):"")+(days!=null?L("発売 "+days+"日目","Day "+days)+" ・":"")+L(nf.format(g.ccu)+"人",nf.format(g.ccu)+" players"),
         metric:`<span class="num">${nf.format(g.ccu)}</span><span class="unit">${L("人","players")}</span>${baseLine(bl)}` };
     }).sort((a,b)=> b.ratio-a.ratio);
   }
@@ -755,7 +867,7 @@ function viewItems(view){
       const pctTxt=hasP?(pct>=10?Math.round(pct):pct.toFixed(1)):null;
       const cfLabel={high:L("確度 高","Conf: high"),mid:L("確度 中","Conf: med"),low:L("確度 低","Conf: low")}[g.conf]||"";
       const cfClass={high:"c-launch",mid:"c-expect2",low:"c-expect2"}[g.conf]||"c-expect2";
-      // ★羽根予想チップ（核）：跳ね確率＝ふつうの×N。押し上げ要因を続けて出す。
+      // ★跳ね予想チップ（核）：跳ね確率＝ふつうの×N。押し上げ要因を続けて出す。
       const predTitle=esc(L("複数の実測シグナル（体験版・配信・告知・開発元の実績など）を自社の過去実績で較正したモデルの出力です。予測は外れることがあります。","Model output calibrated on our own history from measured signals (demo, streams, news, dev track record). Predictions can be wrong."));
       const predChip=hasP
         ? `<span class="chip c-spike ic" title="${predTitle}">${ICON.up}${L("跳ね予想 "+pctTxt+"%","Spike "+pctTxt+"%")}${ratio&&ratio>=1.2?`<span class="cval">${L("ふつう×"+ratio.toFixed(1),"×"+ratio.toFixed(1))}</span>`:""}</span>`
@@ -779,6 +891,10 @@ function viewItems(view){
         tagsP:`<span class="chip ic">${ICON.cal}${known?(L("発売予定 ","Releases ")+esc(relTxt)):esc(relTxt)}</span>`+predChip+cfChip+factChips,
         tagsS:rawS.join("")+genreS,
         detailBody:"",
+        primary: hasP ? `<span class="num pct" style="color:color-mix(in srgb, var(--accent) ${Math.round(28+Math.min(1,pct/40)*72)}%, var(--ink-faint))">${pctTxt}</span><span class="unit">%</span>`
+          : (dc?`<span class="num">${nf.format(dc)}</span><span class="unit">${L("人 体験版","demo")}</span>`
+             :`<span class="when">${known?esc(relTxt):L("未定","TBD")}</span>`),  // L0主指標＝跳ね予想%（高いほど濃く＝色スケール／color-mix非対応はCSSで一律accentにフォールバック）
+        kicker: (known?L("発売予定 ","Releases ")+esc(relTxt):esc(relTxt))+((g.factors&&g.factors.length)?" ・"+esc(factLabel(g.factors[0].name)):(hasP&&ratio&&ratio>=1.2?" ・"+L("ふつう×"+ratio.toFixed(1),"×"+ratio.toFixed(1)):"")),
         metric: hasP
           ? `<span class="num">${pctTxt}</span><span class="unit">%</span><div class="base">${L("跳ね予想","spike")}${ratio&&ratio>=1.2?" ・"+L("ふつう×"+ratio.toFixed(1),"×"+ratio.toFixed(1)):""}</div>`
           : (dc?`<span class="num">${nf.format(dc)}</span><span class="unit">${L("人 体験版","demo")}</span><div class="base">${known?esc(relTxt):L("発売日 未定","TBD")}</div>`
@@ -788,12 +904,15 @@ function viewItems(view){
   return [];
 }
 function render(view){
-  current=view; blurbEl.textContent=BLURB[view][lang]; syncHeroVis();
-  viewTitleEl.innerHTML=`<span class="vi">${VIEWTITLE[view][0]}</span>${VIEWTITLE[view][lang==="en"?2:1]}`;
-  noteEl.className="data-note "+NOTE[view].cls; noteTxt.textContent=NOTE[view].txt[lang];
-  if(view==="1"){ obsEl.innerHTML=L(`観測時刻 <b>${fmtJST(OBSERVED_AT)}</b>（JST）・公式API（同時接続）`,`Observed <b>${fmtJST(OBSERVED_AT)}</b> (JST) · official API (concurrent)`); }
+  current=view; blurbEl.textContent=BLURB[view][lang]; blurbEl.hidden=true; syncHeroVis();  // 説明は既定で畳む（見出しの ？ で展開＝掘れる）
+  viewTitleEl.innerHTML=`<span class="vi">${VIEWTITLE[view][0]}</span>${VIEWTITLE[view][lang==="en"?2:1]}`
+    +`<button class="ttlq" id="ttlHelp" type="button" aria-label="${esc(L("この見方の説明","About this view"))}" aria-expanded="false">？</button>`;
+  noteEl.className="data-note "+NOTE[view].cls; noteTxt.textContent=NOTE[view].txt[lang]; noteTxt.hidden=true;  // 注記も既定で畳む
+  document.getElementById("noteLbl").textContent=L("データについて","About the data");
+  const nt=document.getElementById("noteToggle"); if(nt) nt.setAttribute("aria-expanded","false");
+  if(view==="1"){ obsEl.innerHTML=L(`観測時刻 <b>${fmtJST(OBSERVED_AT)}</b>（JST）・公式API（いま遊んでいる人数）`,`Observed <b>${fmtJST(OBSERVED_AT)}</b> (JST) · official API (players in-game now)`); }
   else { obsEl.textContent=""; }
-  renderScorecard();   // 羽根予想(view3)の答え合わせパネル（他ビューでは自動で隠す）
+  renderScorecard();   // 跳ね予想(view3)の答え合わせパネル（他ビューでは自動で隠す）
   // 全ビュー共通：お気に入り絞り込み → shown件まで → 行（各行に「詳しく」）→ もっと見る（残りがあれば）
   const all=viewItems(view).filter(o=>!favOnly||favs.has(o.key)).filter(o=> (view!=="1"&&view!=="2"&&view!=="L") || genreMatch(o.detail)).filter(o=> !query || String(o.title).toLowerCase().includes(query)); document.getElementById("filters").style.display=(view==="1"||view==="2"||view==="L")?"":"none";
   if(view==="1"||view==="2"||view==="L"){  // 並び替えを view01/02/L で有効化（①の指摘）。rank＝各ビュー既定順を維持。
@@ -806,12 +925,13 @@ function render(view){
   const data=all.slice(0,shown);
   detailMap={}; data.forEach((o,i)=>{ detailMap[i]=Object.assign({i,view},o); });
   const emptyMsg=(query)?L(`「${esc(query)}」に一致する作品は、いまの一覧にありません。`,`No titles in this list match "${esc(query)}".`)
-    :(view==="3")?L("発売前の作品を監視中です。いまは該当がありません（発売前ゲームの取り込み後、羽根予想つきでここへ並びます）。","Watching pre-release games. Nothing to show yet — they appear here with spike predictions once the pre-release list is imported.")
+    :(view==="3")?L("発売前の作品を監視中です。いまは該当がありません（発売前ゲームの取り込み後、跳ね予想つきでここへ並びます）。","Watching pre-release games. Nothing to show yet — they appear here with spike predictions once the pre-release list is imported.")
     :(view==="1"&&activeGenres.size)?L("選んだジャンル（すべてに一致）に合う作品がありません。タグを外すと戻ります。","No titles match all selected genres. Remove a tag to go back.")
     :(favOnly?L("お気に入りはまだありません。各行の ☆ で追加できます。","No favorites yet. Add with the ☆ on each row."):L("表示できる作品がありません。","No titles to show."));
   listEl.innerHTML = data.map((o,i)=>rowHtml(Object.assign({i},o))).join("")
     || `<li class="row" style="grid-template-columns:1fr"><div class="sub" style="padding:18px 0">${emptyMsg}</div></li>`;
-  moreWrap.innerHTML = all.length>shown
+  moreHas = all.length>shown;
+  moreWrap.innerHTML = moreHas
     ? `<button class="morebtn" id="moreBtn" type="button">${L("もっと見る（+20）","Show more (+20)")}<span class="morecount">${data.length} / ${all.length}</span></button>`
     : "";
 }
@@ -822,10 +942,18 @@ document.querySelectorAll('nav.views button').forEach(b=>b.addEventListener("cli
 moreWrap.addEventListener("click",e=>{ if(e.target.closest("#moreBtn")){ shown+=20; render(current); } });
 // 行クリック：☆はお気に入り切替、それ以外（行のどこでも）は詳細ページを開く
 listEl.addEventListener("click",e=>{
+  const sh=e.target.closest("[data-share]");
+  if(sh){ shareGame(sh.dataset.share, sh.dataset.title); return; }
   const f=e.target.closest("[data-fav]");
   if(f){ const k=f.dataset.fav; favs.has(k)?favs.delete(k):favs.add(k); saveFavs(); render(current); return; }
   const row=e.target.closest("[data-detail]");
   if(row){ openDetail(row.dataset.detail); }
+});
+// キーボード操作：行(role=button)に Enter/Space でも詳細を開く。行内のボタン/リンク上での操作は各要素に任せる。
+listEl.addEventListener("keydown",e=>{
+  if(e.key!=="Enter"&&e.key!==" "&&e.key!=="Spacebar") return;
+  const row=e.target.closest(".row2[data-detail]");
+  if(row && e.target===row){ e.preventDefault(); openDetail(row.dataset.detail); }
 });
 // お気に入りセグメント（すべて⇄★・タブ近くに常時表示）
 const favAllEl=document.getElementById("favAll"), favStarEl=document.getElementById("favStar");
@@ -987,11 +1115,15 @@ function showDetail(o){
   const infoSec=o.detailBody?`<div class="dvsection"><div class="dvlabel">${L("情報","Info")}</div><div class="drillbody">${o.detailBody}</div></div>`
     :((o.view==="2"||o.view==="hop")?"":`<div class="dvsection"><div class="dvlabel">${L("情報","Info")}</div><div class="dvmuted">${L("詳細情報は準備中（appdetails 収集後に表示）。","Details pending (shown after appdetails collection).")}</div></div>`);
   const conns=buildConnections(o);
+  // L1「見立て」：一覧(L0)の行から外したチップ（平常比・確度・きっかけ・予想・タグ）をここに整列（掘れば全部見える）。
+  const assess=(o.tagsP||o.tagsS)?`<div class="dvsection"><div class="dvlabel">${L("この作品の見立て","At a glance")}</div><div class="assess">${o.tagsP?`<div class="assessrow">${o.tagsP}</div>`:""}${o.tagsS?`<div class="assessrow assesstags">${o.tagsS}</div>`:""}</div></div>`:"";
+  const dshare=o.appid?`<button class="go ghost" type="button" data-share="${o.appid}" data-title="${esc(o.title)}">${L("共有","Share")}</button>`:"";
   dvBody.innerHTML=trailHtml()
     +`<div class="dvhead">${cover}<div><h2 class="dvtitle">${esc(o.title)}</h2><div class="dvmetric">${o.metric||""}</div></div></div>`
+    +assess
     +(why?`<div class="dvsection"><div class="dvlabel">${L("なぜ拾ったか","Why picked")}</div>${why}</div>`:"")
     +histSec+infoSec+conns
-    +(steam?`<div class="dvactions">${steam}</div>`:"");
+    +((steam||dshare)?`<div class="dvactions">${steam}${dshare}</div>`:"");
   mainViewEl.hidden=true; detailEl.hidden=false; try{window.scrollTo({top:0,behavior:"instant"});}catch(e){window.scrollTo(0,0);}
 }
 function renderDetail(){ const o=trail[trail.length-1]; if(o) showDetail(o); }
@@ -1007,6 +1139,7 @@ function openDetailByAppid(appid){
 function jumpTrail(i){ if(i<0||i>=trail.length) return; trail=trail.slice(0,i+1); renderDetail(); }
 // 詳細内クリック：つながり（data-hop）で潜る／パンくず（data-crumb）で戻る。
 dvBody.addEventListener("click",e=>{
+  const sh=e.target.closest("[data-share]"); if(sh){ shareGame(sh.dataset.share, sh.dataset.title); return; }
   const hop=e.target.closest("[data-hop]"); if(hop){ openDetailByAppid(hop.dataset.hop); return; }
   const cr=e.target.closest("[data-crumb]"); if(cr){ jumpTrail(Number(cr.dataset.crumb)); return; }
 });
@@ -1021,7 +1154,71 @@ syncImgBtn();
 imgBtn.addEventListener("click",()=>{ imgOn=!imgOn; try{localStorage.setItem(IMG_KEY, imgOn?"1":"0");}catch(e){} syncImgBtn(); buildHero(); render(current); });
 // 言語トグル（日本語 / English）。端末内に記憶。静的DOMは applyI18n、動的は再描画で切替。
 const langBtn=document.getElementById("langBtn");
-langBtn.addEventListener("click",()=>{ lang=lang==="en"?"ja":"en"; try{localStorage.setItem(LANG_KEY,lang);}catch(e){} applyI18n(); syncImgBtn(); syncThemeBtn(); buildGenreChips(); buildHero(); render(current); });
+langBtn.addEventListener("click",()=>{ lang=lang==="en"?"ja":"en"; try{localStorage.setItem(LANG_KEY,lang);}catch(e){} applyI18n(); syncImgBtn(); syncThemeBtn(); syncFontBtn(); buildIntro(); buildGenreChips(); buildHero(); render(current); });
+
+// ---- 共有（E1）：Web Share API（対応時）→ 非対応はリンクをコピー。作品ページ(公式ストア)を共有する。----
+function toast(msg){
+  let el=document.getElementById("toast");
+  if(!el){ el=document.createElement("div"); el.id="toast"; el.className="toast"; document.body.appendChild(el); }
+  el.textContent=msg; el.classList.add("show");
+  clearTimeout(toast._t); toast._t=setTimeout(()=>el.classList.remove("show"),2200);
+}
+function shareGame(appid, title){
+  if(!appid) return;
+  const url="https://store.steampowered.com/app/"+appid+"/";
+  const nm=title||"Steam";
+  if(navigator.share){ navigator.share({title:nm, text:L(nm+" — トレパで見つけました",nm+" — found on Trend Pulse"), url:url}).catch(()=>{}); return; }
+  const txt=nm+" "+url;
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(()=>toast(L("リンクをコピーしました","Link copied")),()=>window.open(url,"_blank","noopener"));
+  } else { window.open(url,"_blank","noopener"); }
+}
+
+// ---- はじめての方へ（B1）：4つのタブを平易に説明。初回だけ自動表示・×で閉じたら記憶・「？使い方」で再表示。----
+const INTRO_KEY="radar_intro_dismissed_v1";
+const introEl=document.getElementById("intro");
+let introExpanded=false;
+function introRows(){
+  return [
+    ["これから来そう","Upcoming",       "発売前に、これから跳ねそうな新作。","Pre-release titles likely to take off."],
+    ["今の人数","Now playing",          "いま遊んでいる人が多い順。","Ranked by players in-game right now."],
+    ["いつもより伸び","Rising",          "ふだんより急に人が増えている作品。","Titles with a sudden jump vs their usual."],
+    ["新着で伸び","New & rising",        "最近出て、伸びている作品。","Recently released and climbing."],
+  ];
+}
+function buildIntro(){
+  if(!introEl) return;
+  const barLbl=L("はじめての方へ — 4つの見方","New here? — the four views");
+  let html=`<div class="introbar">`
+    +`<button class="introtoggle" id="introToggle" type="button" aria-expanded="${introExpanded}">`
+    +`<span class="qmark" aria-hidden="true">？</span><span class="introbarlbl">${esc(barLbl)}</span>`
+    +`<span class="introchev" aria-hidden="true">${introExpanded?"▾":"›"}</span></button>`
+    +`<button class="introclose" id="introClose" type="button" aria-label="${esc(L("閉じる","Close"))}">×</button>`
+    +`</div>`;
+  if(introExpanded){
+    const lead=L("気になるゲームだけ、静かに追えるサイトです。","A quiet way to follow just the games you care about.");
+    const items=introRows().map(r=>`<li><span class="itag">${esc(L(r[0],r[1]))}</span><span class="idesc">${esc(L(r[2],r[3]))}</span></li>`).join("");
+    html+=`<p class="introlead">${esc(lead)}</p><ul class="introlist">${items}</ul>`;
+  }
+  introEl.innerHTML=html;
+  const t=document.getElementById("introToggle");
+  if(t) t.addEventListener("click",()=>{ introExpanded=!introExpanded; buildIntro(); });
+  const c=document.getElementById("introClose");
+  if(c) c.addEventListener("click",()=>{ introEl.hidden=true; try{localStorage.setItem(INTRO_KEY,"1");}catch(e){} });
+}
+let introDismissed=false; try{ introDismissed=localStorage.getItem(INTRO_KEY)==="1"; }catch(e){}
+buildIntro(); introEl.hidden=introDismissed;
+document.getElementById("helpBtn").addEventListener("click",()=>{ introExpanded=true; buildIntro(); introEl.hidden=false; try{ introEl.scrollIntoView({behavior:"smooth",block:"nearest"}); }catch(e){} });
+
+// ---- 文字の大きさ（D1）：標準/大/特大。px指定のUIでも確実に効くよう body の zoom で拡大。端末内に記憶。----
+const FONT_KEY="radar_fontscale_v1";
+const FONT_STEPS=[["標準","A",1],["大","A+",1.15],["特大","A++",1.32]];
+let fontIdx=0; try{ const s=parseInt(localStorage.getItem(FONT_KEY)||"0",10); if(s>=0&&s<FONT_STEPS.length) fontIdx=s; }catch(e){}
+const fontBtn=document.getElementById("fontBtn");
+function applyFont(){ document.body.style.zoom=String(FONT_STEPS[fontIdx][2]); }
+function syncFontBtn(){ fontBtn.textContent=L("文字 "+FONT_STEPS[fontIdx][0], "Text "+FONT_STEPS[fontIdx][1]); fontBtn.setAttribute("aria-label", L("文字の大きさ："+FONT_STEPS[fontIdx][0], "Text size: "+FONT_STEPS[fontIdx][1])); }
+fontBtn.addEventListener("click",()=>{ fontIdx=(fontIdx+1)%FONT_STEPS.length; try{localStorage.setItem(FONT_KEY,String(fontIdx));}catch(e){} applyFont(); syncFontBtn(); });
+applyFont(); syncFontBtn();
 // 作品名でさがす（全ビュー横断・部分一致）。入力のたびに先頭20件から描き直す。
 const qEl=document.getElementById("q");
 if(qEl) qEl.addEventListener("input",()=>{ query=qEl.value.trim().toLowerCase(); shown=20; render(current); });
@@ -1056,13 +1253,14 @@ async function loadNow(){
     const d=await res.json();
     if(d && Array.isArray(d.rows) && d.rows.length){
       REAL_V1=d.rows; OBSERVED_AT=d.observed_at||OBSERVED_AT;
-      NOTE[1].txt={ja:"実データ：Steam公式APIの観測値（同時接続）。各appidの最新値・上位"+d.rows.length+"件（定期更新）。",en:"Real data: official Steam API (concurrent). Latest per appid · top "+d.rows.length+" (updated regularly)."};
+      NOTE[1].txt={ja:"実データ：Steam公式APIの観測値（いま遊んでいる人数）。各作品の最新値・上位"+d.rows.length+"件（定期更新）。",en:"Real data: official Steam API (players in-game now). Latest per title · top "+d.rows.length+" (updated regularly)."};
       buildGenreChips(); rebuildCatalog();
     }
   }catch(e){
     NOTE[1].txt={ja:"実データ（埋め込みスナップショット）：最新を取得できず前回値を表示中。Steam公式APIの観測値・上位20件。",en:"Real data (embedded snapshot): couldn't fetch latest, showing previous. Official Steam API · top 20."};
   }
-  if(current==="1") render("1");   // view01 を最新JSONで描き直す
+  // view01 を最新JSONで描き直す。view02 の折れ線は now_ccu の履歴を借りるため、こちらも更新する。
+  if(current==="1"||current==="2") render(current);
 }
 // ジャンル絞り込み（属性層の先行配線）：detail.genres から自動生成・日本語ラベル・AND（選んだ全てに一致）。export/DB非依存・可逆。
 const GENRE_JA={"Action":"アクション","Adventure":"アドベンチャー","RPG":"RPG","Simulation":"シミュレーション","Strategy":"ストラテジー","Indie":"インディー","Casual":"カジュアル","Sports":"スポーツ","Racing":"レース","Free To Play":"基本無料","Massively Multiplayer":"多人数オンライン","Early Access":"早期アクセス","Violent":"暴力表現","Gore":"ゴア表現","Nudity":"ヌード","Sexual Content":"性的内容","Horror":"ホラー","Puzzle":"パズル","Platformer":"プラットフォーマー","Shooter":"シューター","Fighting":"格闘","Music":"音楽","Education":"教育","Utilities":"ユーティリティ","Design & Illustration":"デザイン・イラスト","Animation & Modeling":"アニメ・モデリング","Web Publishing":"Web制作","Game Development":"ゲーム開発","Audio Production":"音楽制作","Video Production":"動画制作","Photo Editing":"写真編集","Software Training":"ソフト学習"};
@@ -1117,6 +1315,7 @@ async function loadRising(){
       REAL_V2=d.items.map(it=>{ const de=it.detection||{};
         return { a:it.appid, n:it.name, now:de.current_ccu, base:de.baseline||0,
           r:de.ratio||(de.baseline?de.current_ccu/de.baseline:1), cf:it.confidence||"mid",
+          hist:(Array.isArray(it.history)&&it.history.length>=2)?it.history:null,  // 折れ線グラフ用の観測履歴
           c:(it.signals||[]).map(function(s){return {t:s.type,v:s.value};}), g:it.genres||[] }; });
       NOTE[2]={cls:"",txt:{ja:"実データ：平常比の伸び（検証中）。生の人数順より上位ほど伸びやすい傾向（初期検証・約1.8倍）。",en:"Real data: rise vs usual (in validation). Higher ranks tend to rise more than a raw player-count order (early test ≈1.8×)."}};
     }
@@ -1141,7 +1340,7 @@ if(PP_URL){ const pp=document.getElementById("ppLink"); pp.href=PP_URL; pp.textC
 
 loadFavs();    // 端末内（localStorage）からお気に入りを復元
 rebuildCatalog(); // つながり用カタログを埋め込みデータで先に構築（fetch 前でも深掘りできる）
-render("1");   // まずフォールバックで即描画（白画面を出さない）
+render("3");   // 目玉「これから来そう」を既定ビューに。REAL_UP 未読込のうちは空状態→loadUpcoming で充填
 buildHero();   // 3秒ヒーロー（フォールバックの top1 で即出し・loadRising 後に更新）
 applyI18n(); syncThemeBtn();   // i18n：静的DOMを現在の言語で反映＋開発者オプトアウト行を構築
 loadNow();     // 次に最新JSONで上書き
@@ -1149,9 +1348,11 @@ loadRising();  // 02「いつもより伸び」を最新 view02_rising で上書
 loadFree();    // 無料配布レンズ（あれば表示・無ければ隠す）
 // B1'/B2：全ゲーム対象エクスポート（あれば view L/3 を差し替え・無ければ現状フォールバック）
 async function loadNewRising(){ try{ const r=await fetch("./data/new_rising.json?cb="+Date.now(),{cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); if(d&&Array.isArray(d.rows)&&d.rows.length){ REAL_L=d.rows; rebuildCatalog(); const ld=((d.params&&d.params.launch_days)||14); NOTE.L={cls:"",txt:{ja:"実データ：発売から日が浅く自己比で伸びている作品（全ゲーム対象・release_date "+ld+"日）。早期・低確信は明示。",en:"Real data: recently released titles rising vs their own usual (all games · release_date "+ld+"d). Early/low-confidence is marked."}}; if(current==="L"){buildGenreChips();render("L");} } }catch(e){} }
-async function loadUpcoming(){ try{ const r=await fetch("./data/upcoming.json?cb="+Date.now(),{cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); if(d&&Array.isArray(d.rows)&&d.rows.length){ REAL_UP=d.rows; rebuildCatalog(); UP_MODEL=d.model||null; let jt,et; if(UP_MODEL){ const np=UP_MODEL.n_pairs||0; const lift=(UP_MODEL.validation_oos&&UP_MODEL.validation_oos.top_decile_lift)||null; const val=UP_MODEL.readiness==="validated"; jt="実データ：羽根予想＝発売直後の跳ね確率。自社実績 "+nf.format(np)+"件で較正"+(lift?("・上位ほど跳ねやすさ ×"+lift):"")+"（"+(val?"検証済み":"検証中")+"）。予測は外れることがあります。"; et="Real data: spike prediction = probability of a launch spike. Calibrated on "+nf.format(np)+" of our own cases"+(lift?(" · top picks spike ×"+lift):"")+" ("+(val?"validated":"in validation")+"). Predictions can be wrong."; } else { const nh=d.rows.filter(x=>x&&(x.demo_ccu||x.has_news)).length; jt="実データ：発売前リスト。期待度は実測シグナル（体験版CCU・告知）から（"+nh+"件にシグナルあり）。予測モデルの生成待ち。"; et="Real data: pre-release list from measured signals (demo CCU, news; "+nh+" with a signal). Awaiting the prediction model."; } NOTE[3]={cls:"",txt:{ja:jt,en:et}}; if(current==="3"){render("3");} } }catch(e){} }
-// ③ 羽根予想の答え合わせ（的中率スコアカード）：as-of・リーク無しの成績を view3 に添える
-let scOpen=true;
+async function loadUpcoming(){ try{ const r=await fetch("./data/upcoming.json?cb="+Date.now(),{cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); if(d&&Array.isArray(d.rows)&&d.rows.length){ REAL_UP=d.rows; rebuildCatalog(); UP_MODEL=d.model||null; let jt,et; if(UP_MODEL){ const np=UP_MODEL.n_pairs||0; const lift=(UP_MODEL.validation_oos&&UP_MODEL.validation_oos.top_decile_lift)||null; const val=UP_MODEL.readiness==="validated"; jt="実データ：跳ね予想＝発売直後の跳ね確率。自社実績 "+nf.format(np)+"件で較正"+(lift?("・上位ほど跳ねやすさ ×"+lift):"")+"（"+(val?"検証済み":"検証中")+"）。予測は外れることがあります。"; et="Real data: spike prediction = probability of a launch spike. Calibrated on "+nf.format(np)+" of our own cases"+(lift?(" · top picks spike ×"+lift):"")+" ("+(val?"validated":"in validation")+"). Predictions can be wrong."; } else { const nh=d.rows.filter(x=>x&&(x.demo_ccu||x.has_news)).length; jt="実データ：発売前リスト。期待度は実測シグナル（体験版CCU・告知）から（"+nh+"件にシグナルあり）。予測モデルの生成待ち。"; et="Real data: pre-release list from measured signals (demo CCU, news; "+nh+" with a signal). Awaiting the prediction model."; } NOTE[3]={cls:"",txt:{ja:jt,en:et}}; if(current==="3"){render("3");} } }catch(e){} }
+// ③ 跳ね予想の答え合わせ（的中率スコアカード）：as-of・リーク無しの成績を view3 に添える
+// 初期は折りたたみ（summary だけ表示）。開閉状態は端末内に記憶する（データ好きは常に開いておける）。
+const SC_KEY="radar_scorecard_open_v1";
+let scOpen=false; try{ if(localStorage.getItem(SC_KEY)==="1") scOpen=true; }catch(e){}
 function scPct(x){ return (x==null)?"—":((x*100>=10?Math.round(x*100):(x*100).toFixed(1))+"%"); }
 function renderScorecard(){
   const sec=document.getElementById("scoreSec"); if(!sec) return;
@@ -1197,8 +1398,8 @@ function renderScorecard(){
   const foot=`<div class="sc-sum" style="margin:12px 0 0;font-size:11px">${L(
     "跳ね＝発売直後"+(P.outcome_days||14)+"日で最大同時接続 "+nf.format(P.hit_threshold||1000)+"人以上。as-of＝予測は発売前の情報だけ・結果は発売後だけ（あと出し無し）。予測は外れることがあります。",
     "Spike = ≥"+nf.format(P.hit_threshold||1000)+" peak concurrent within "+(P.outcome_days||14)+"d of launch. As-of: signals pre-release, outcomes post-release. Predictions can be wrong.")}</div>`;
-  if(!sec.dataset.wired){ sec.addEventListener("toggle",()=>{ scOpen=sec.open; }); sec.dataset.wired="1"; }
-  sec.innerHTML=`<summary><span class="sc-ttl">${L("答え合わせ：羽根予想の成績","Track record: spike prediction")}</span>${badge}</summary>`
+  if(!sec.dataset.wired){ sec.addEventListener("toggle",()=>{ scOpen=sec.open; try{localStorage.setItem(SC_KEY, scOpen?"1":"0");}catch(e){} }); sec.dataset.wired="1"; }
+  sec.innerHTML=`<summary><span class="sc-ttl">${L("答え合わせ：跳ね予想の成績","Track record: spike prediction")}</span>${badge}</summary>`
     +`<div class="sc-body">${sum}${calTab}${exList}${foot}</div>`;
   sec.open=scOpen; sec.hidden=false;
 }

@@ -10,6 +10,13 @@ STEAM_API_KEY = os.environ["STEAM_API_KEY"]
 DATABASE_URL = os.environ["DATABASE_URL"]
 API = "https://api.steampowered.com/IStoreService/GetAppList/v1/"
 
+# 名簿に「ソフトウェア」を含めるか（既定 false ＝ ゲームのみ・従来挙動）。
+# 方針（明文化）：Steam 上「ソフトウェア」区分のアプリ（例：Wallpaper Engine=431960）は、
+# 公式 most-played / SteamDB のチャート上位に載ることがあるが、当サイトは「ゲームのランキング」
+# なので既定では観測対象から除外する。ゆえに now_ccu にそれらが出ないのは仕様（欠落ではない）。
+# 将来ソフトも観測したくなったら INCLUDE_SOFTWARE=true にするだけで名簿に取り込める（可逆・env可変）。
+INCLUDE_SOFTWARE = (os.environ.get("INCLUDE_SOFTWARE") or "false").strip().lower() in ("1", "true", "yes")
+
 
 def fetch_all_games():
     games = {}
@@ -19,7 +26,7 @@ def fetch_all_games():
             "key": STEAM_API_KEY,
             "include_games": "true",
             "include_dlc": "false",
-            "include_software": "false",
+            "include_software": "true" if INCLUDE_SOFTWARE else "false",
             "include_videos": "false",
             "include_hardware": "false",
             "max_results": "50000",
@@ -44,7 +51,7 @@ def fetch_all_games():
 
 def main():
     games = fetch_all_games()
-    print(f"Steamから取得したゲーム数: {len(games)}")
+    print(f"Steamから取得したゲーム数: {len(games)}（INCLUDE_SOFTWARE={INCLUDE_SOFTWARE}）")
     rows = [(appid, name, "active") for appid, name in games.items()]
     conn = psycopg2.connect(DATABASE_URL)
     try:

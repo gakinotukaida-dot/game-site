@@ -41,6 +41,12 @@ N0          = float(os.environ.get("N0")        or "10")
 MIN_CURRENT = int(os.environ.get("MIN_CURRENT") or "100")
 MIN_POINTS  = int(os.environ.get("MIN_POINTS")  or "5")
 TOP_N       = int(os.environ.get("TOP_N")       or "30")
+# 折れ線グラフ（サイト「いつもより伸び」タブ）用の観測履歴。now_ccu と同じ 6h バケットの max でダウンサンプル。
+# view02 の主役は「絶対数は上位外だが自己比で急伸」する作品で、そのほとんどは now_ccu(top100) に載らないため、
+# ここで各候補の履歴を持たせないとサイト側で線が引けない（now_ccu からは借りられない）。すべて読み取りのみ・env可変。
+HIST_WINDOW_DAYS = int(os.environ.get("HIST_WINDOW_DAYS") or str(BASE_DAYS))  # 履歴窓（既定＝base_days=14）
+HIST_BUCKET_SEC  = int(os.environ.get("HIST_BUCKET_SEC")  or "21600")         # ダウンサンプル幅（既定6h）
+HIST_MAX_POINTS  = int(os.environ.get("HIST_MAX_POINTS")  or "80")            # 1件あたり最大点数（payload抑制）
 GENRE_MAX   = int(os.environ.get("GENRE_MAX")   or "6")   # 「どんなゲームか」タグ（games.genres 由来）
 CATEGORY_MAX = int(os.environ.get("CATEGORY_MAX") or "6") # 補助タグ（games.categories 由来）
 OUT_PATH    = os.environ.get("OUT_PATH") or "data/view02_rising.json"  # 出力JSON（独立・上書き・可逆）
@@ -361,6 +367,39 @@ def b1_signal(current, tw):
     return None, None, 0.0
 
 
+# 折れ線グラフ用の観測履歴（6hバケットの max・now_ccu と同形式 [[ts,ccu],...]）。読み取りのみ。
+HISTORY_QUERY = """
+WITH hist AS (
+  SELECT appid,
+         (floor(extract(epoch FROM recorded_at) / %(bucket)s) * %(bucket)s)::bigint AS ts,
+         max(player_count) AS c
+  FROM player_counts
+  WHERE appid = ANY(%(appids)s)
+    AND recorded_at >= now() - make_interval(days => %(window_days)s)
+  GROUP BY appid, ts
+)
+SELECT appid, json_agg(json_build_array(ts, c) ORDER BY ts) AS history
+FROM hist GROUP BY appid;
+"""
+
+
+def fetch_history(cur, ids):
+    """候補 appid 群の観測履歴を 6h バケットの max でまとめて取得する（読み取りのみ）。
+    返り値: {appid: [[ts(int), ccu(int)], ...]}。窓内が2点未満（＝線にならない）は入れない
+    ＝サイト側は履歴が無い作品を従来の「伸びバー」にフォールバックできる（欠測でも崩れない）。"""
+    if not ids:
+        return {}
+    cur.execute(HISTORY_QUERY, {"appids": list(ids),
+                                "window_days": HIST_WINDOW_DAYS, "bucket": HIST_BUCKET_SEC})
+    out = {}
+    for appid, history in cur.fetchall():
+        arr = history if isinstance(history, list) else (json.loads(history) if history else [])
+        pts = [[int(p[0]), int(p[1])] for p in arr][-HIST_MAX_POINTS:]
+        if len(pts) >= 2:
+            out[int(appid)] = pts
+    return out
+
+
 def main():
     print("=" * 88)
     print("view02 v2（A＋B1・読み取り専用・Twitch保存なし）")
@@ -379,6 +418,7 @@ def main():
                 return
             ids = [r["appid"] for r in cand]
             sale, news, free, revd, rev_surge_ids, jpnews = cause_sets(cur, ids)
+            hist_by = fetch_history(cur, ids)   # 折れ線グラフ用の観測履歴（候補分をまとめて取得）
     finally:
         conn.close()
 
@@ -499,6 +539,8 @@ def main():
             "confidence": r["conf_code"],
             "score": {"eff": round(r["eff"], 2), "base": round(r["base"], 2),
                       "boost": round(r["boost"], 2), "boost_capped": bool(r["boost_capped"])},
+            # 折れ線グラフ用の観測履歴（[[ts,ccu],...]・6hバケット・now_ccuと同形式）。無い作品は付けない。
+            "history": hist_by.get(int(r["appid"]), []),
         })
     try:
         out_dir = os.path.dirname(OUT_PATH)
