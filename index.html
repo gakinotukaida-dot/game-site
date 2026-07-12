@@ -678,6 +678,13 @@ function wireOptout(){ if(typeof CONTACT_URL==="string" && CONTACT_URL){ const o
 const listEl=document.getElementById("list"),blurbEl=document.getElementById("blurb"),obsEl=document.getElementById("obs");
 const noteEl=document.getElementById("dataNote"),noteTxt=document.getElementById("dataNoteText");
 const moreWrap=document.getElementById("moreWrap");
+// 無限スクロール：一覧末尾が近づいたら自動で+20（rootMargin で手前から先読み）。moreHas は render が更新。
+// 「もっと見る」ボタンは手動フォールバックとして残す（キーボード／IO非対応でも進める）。
+let moreHas=false;
+if("IntersectionObserver" in window){
+  const io=new IntersectionObserver(es=>{ if(moreHas && es.some(e=>e.isIntersecting)){ shown+=20; render(current); } }, {rootMargin:"400px 0px"});
+  io.observe(moreWrap);
+}
 const freeSec=document.getElementById("freeSec"),freeBody=document.getElementById("freeBody");
 let favOnly=false; const favs=new Set(); let current="3"; let shown=20; let activeGenres=new Set(); let sortMode="rank"; let REAL_L=null; let REAL_UP=null; let UP_MODEL=null; let SCORE=null; let query=""; let imgOn=true;
 // 跳ね予想の押し上げ要因ラベル（export の factors[].name → 表示名）
@@ -884,9 +891,9 @@ function viewItems(view){
         tagsP:`<span class="chip ic">${ICON.cal}${known?(L("発売予定 ","Releases ")+esc(relTxt)):esc(relTxt)}</span>`+predChip+cfChip+factChips,
         tagsS:rawS.join("")+genreS,
         detailBody:"",
-        primary: hasP ? `<span class="num pct">${pctTxt}</span><span class="unit">%</span>`
+        primary: hasP ? `<span class="num pct" style="color:color-mix(in srgb, var(--accent) ${Math.round(28+Math.min(1,pct/40)*72)}%, var(--ink-faint))">${pctTxt}</span><span class="unit">%</span>`
           : (dc?`<span class="num">${nf.format(dc)}</span><span class="unit">${L("人 体験版","demo")}</span>`
-             :`<span class="when">${known?esc(relTxt):L("未定","TBD")}</span>`),  // L0主指標＝跳ね予想%（強調色）
+             :`<span class="when">${known?esc(relTxt):L("未定","TBD")}</span>`),  // L0主指標＝跳ね予想%（高いほど濃く＝色スケール／color-mix非対応はCSSで一律accentにフォールバック）
         kicker: (known?L("発売予定 ","Releases ")+esc(relTxt):esc(relTxt))+((g.factors&&g.factors.length)?" ・"+esc(factLabel(g.factors[0].name)):(hasP&&ratio&&ratio>=1.2?" ・"+L("ふつう×"+ratio.toFixed(1),"×"+ratio.toFixed(1)):"")),
         metric: hasP
           ? `<span class="num">${pctTxt}</span><span class="unit">%</span><div class="base">${L("跳ね予想","spike")}${ratio&&ratio>=1.2?" ・"+L("ふつう×"+ratio.toFixed(1),"×"+ratio.toFixed(1)):""}</div>`
@@ -923,7 +930,8 @@ function render(view){
     :(favOnly?L("お気に入りはまだありません。各行の ☆ で追加できます。","No favorites yet. Add with the ☆ on each row."):L("表示できる作品がありません。","No titles to show."));
   listEl.innerHTML = data.map((o,i)=>rowHtml(Object.assign({i},o))).join("")
     || `<li class="row" style="grid-template-columns:1fr"><div class="sub" style="padding:18px 0">${emptyMsg}</div></li>`;
-  moreWrap.innerHTML = all.length>shown
+  moreHas = all.length>shown;
+  moreWrap.innerHTML = moreHas
     ? `<button class="morebtn" id="moreBtn" type="button">${L("もっと見る（+20）","Show more (+20)")}<span class="morecount">${data.length} / ${all.length}</span></button>`
     : "";
 }
