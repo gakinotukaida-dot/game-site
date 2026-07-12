@@ -118,14 +118,19 @@
   .row2{display:grid;grid-template-columns:auto auto 1fr;align-items:center;gap:0 11px;padding:11px 2px;
     border-bottom:1px solid var(--line);cursor:pointer;opacity:0;transform:translateY(6px);
     animation:rise .5s cubic-bezier(.2,.7,.2,1) forwards}
+  .row2.hascover{grid-template-columns:auto auto auto 1fr}  /* サムネ有効時だけ4列（発見性↑）。無効時は従来の3列（密度↑） */
   .r2rank{font-family:var(--serif);font-size:13px;color:var(--ink-faint);font-variant-numeric:tabular-nums;
     min-width:20px;text-align:right}
+  /* 行サムネ（小）：発見性↑⇄密度↓のトレードオフ。読み込み前/失敗時は薄いプレースホルダで面を保つ（崩れない） */
+  .r2cover{width:54px;height:25px;flex:none;border-radius:4px;overflow:hidden;border:1px solid var(--line);
+    background:linear-gradient(135deg,var(--chip),var(--bg-2))}
+  .r2cover img{width:100%;height:100%;object-fit:cover;display:block}
   .r2body{min-width:0}
   .r2top{display:flex;align-items:baseline;gap:9px;min-width:0}
   .r2top .title{flex:1;min-width:0}
   .r2primary{flex:none;text-align:right}
   .r2primary .num{font-size:19px;font-weight:700}      /* 主指標＝行の焦点（大きく・太く） */
-  .r2primary .num.pct{color:var(--accent)}             /* 跳ね予想%は強調色で視線を誘導 */
+  .r2primary .num.pct,.r2primary .num.mult{color:var(--accent)}  /* 跳ね%・×平常比＝強調色（color-mix非対応時のフォールバック） */
   .r2primary .unit{color:var(--ink-soft)}
   .rowchev{flex:none;color:var(--ink-faint);font-size:15px;line-height:1}
   .row2:hover{background:var(--bg-2)}
@@ -207,6 +212,7 @@
     li.row{grid-template-columns:20px 1fr auto;gap:9px;padding:11px 0}
     .row2{gap:0 9px;padding:11px 0}
     .r2rank{min-width:16px;font-size:12px}
+    .r2cover{width:46px;height:21px}
     .r2top .title{font-size:14.5px}
     .r2top{gap:7px}
     .cover{width:60px;height:28px}
@@ -582,6 +588,8 @@ function isRevival(hist, st, cur){
 }
 // 倍率の主役度：伸びが大きいほど強調（優先順位を色で示す）
 function ratioClass(r){ return r>=3 ? "r3" : (r>=1.8 ? "r2" : "r1"); }
+// ×平常比の連続カラースケール（跳ね予想%と同じ考え方に統一）。r=1で淡く・r>=5で最も濃く。color-mix非対応はCSSで一律accentにフォールバック。
+function multColor(r){ const t=Math.max(0,Math.min(1,(((r||1)-1)/4))); return `color-mix(in srgb, var(--accent) ${Math.round(28+t*72)}%, var(--ink-faint))`; }
 // 確度メーター：high=●●●／mid=●●○／low=●○○。ラベルは title に（静か＝根幹9）。
 function confMeter(cf){ const lv= cf==='high'?3 : cf==='low'?1 : 2; const lab= cf==='high'?L('高','High') : cf==='low'?L('低','Low') : L('中','Mid'); let s=""; for(let i=0;i<3;i++) s+=`<span class="${i<lv?'on':'d'}">●</span>`; return `<div class="conf conf-${cf||'mid'}" title="${L('確度','Confidence')} ${lab}（${L('伸びの推定の確からしさ','how reliable the rise estimate is')}）"><span class="dots">${s}</span><span class="conflab">${L('確度 ','Conf ')}${lab}</span></div>`; }
 // 平常比チップ（全ビュー共通）：現在が平常（過去14日の中央値）の何倍か。1.3倍以上は「いつもより上」を強調。呼称は全タブ「いつもより ×N」で統一（タブ間で表記を揃える）。
@@ -681,8 +689,11 @@ const moreWrap=document.getElementById("moreWrap");
 // 無限スクロール：一覧末尾が近づいたら自動で+20（rootMargin で手前から先読み）。moreHas は render が更新。
 // 「もっと見る」ボタンは手動フォールバックとして残す（キーボード／IO非対応でも進める）。
 let moreHas=false;
+// 無限スクロールの先読み距離（大きいほど早めに次の20件を読む＝スクロールが引っかかりにくい／小さいほど描画を節約）。
+// 大きすぎるとセンチネルが読み込み後も可視域に留まり再発火しにくい（20件の高さ≒1000pxが目安・これ未満に）。調整用に定数化。
+const PREFETCH_MARGIN="400px 0px";
 if("IntersectionObserver" in window){
-  const io=new IntersectionObserver(es=>{ if(moreHas && es.some(e=>e.isIntersecting)){ shown+=20; render(current); } }, {rootMargin:"400px 0px"});
+  const io=new IntersectionObserver(es=>{ if(moreHas && es.some(e=>e.isIntersecting)){ shown+=20; render(current); } }, {rootMargin:PREFETCH_MARGIN});
   io.observe(moreWrap);
 }
 const freeSec=document.getElementById("freeSec"),freeBody=document.getElementById("freeBody");
@@ -767,9 +778,13 @@ function detailBodyReal(d){
 function rowHtml(o){
   const rank=(typeof o.i==="number")?(o.i+1):"";
   const kick=o.kicker?`<div class="r2kick">${o.kicker}</div>`:"";
-  return `<li class="row2 ${favs.has(o.key)?'faved':''}" data-detail="${o.i}" role="button" tabindex="0" aria-label="${esc(o.title)}（${L("詳しく","details")}）" style="animation-delay:${o.i*30}ms">
+  // 行サムネ（小・発見性↑）：imgOn かつ appid のときだけ。読み込み失敗は img を隠してプレースホルダを残す（面を保つ＝崩れない）。
+  const showCover=imgOn&&o.appid;
+  const cover=showCover?`<div class="r2cover"><img src="https://cdn.cloudflare.steamstatic.com/steam/apps/${o.appid}/header.jpg" alt="" loading="lazy" onerror="this.style.visibility='hidden'"></div>`:"";
+  return `<li class="row2 ${showCover?'hascover ':''}${favs.has(o.key)?'faved':''}" data-detail="${o.i}" role="button" tabindex="0" aria-label="${esc(o.title)}（${L("詳しく","details")}）" style="animation-delay:${o.i*30}ms">
       <div class="r2rank">${rank}</div>
       ${favBtn(o.key)}
+      ${cover}
       <div class="r2body"><div class="r2top">${titleCell(o.title)}<span class="metric r2primary">${o.primary||o.metric||""}</span><span class="rowchev" aria-hidden="true">›</span></div>${kick}</div>
     </li>`; }
 
@@ -826,7 +841,7 @@ function viewItems(view){
         r:g.r, ratio:g.r, now:g.now, base:g.base, cf:g.cf, causes:cs,
         tagsP:causes, tagsS:genres, detailBody:"",
         surge:surge,
-        primary:`<span class="num mult ${ratioClass(g.r)}">×${g.r.toFixed(1)}</span>`,  // L0主指標＝平常比
+        primary:`<span class="num mult" style="color:${multColor(g.r)}">×${g.r.toFixed(1)}</span>`,  // L0主指標＝平常比（連続カラー・跳ね%と統一）
         kicker: cs.length ? L("きっかけ：","Trigger: ")+esc(causeLabel(cs[0].t)) : L("原因不明","Cause unknown"),
         metric:`<span class="num mult ${ratioClass(g.r)}">×${g.r.toFixed(1)}</span>${confMeter(g.cf)}${baseLine(g.base)}` };
     });
@@ -846,7 +861,7 @@ function viewItems(view){
         tagsP:(rev?`<span class="chip c-revival ic">${ICON.revival}${L("復活","Revived")}</span>`:"")+(days!=null?`<span class="chip c-new ic">${ICON.launch}${L("発売 "+days+"日目","Day "+days)}</span>`:"")+(ratio!=null?usualChip(ratio):""),
         tagsS:l1Secondary(g.detail), detailBody:detailBodyReal(g.detail),
         surge:sparkline(g.detail&&g.detail.history, bl),
-        primary: ratio!=null ? `<span class="num mult ${ratioClass(ratio)}">×${ratio.toFixed(1)}</span>` : `<span class="num">${nf.format(g.ccu)}</span><span class="unit">${L("人","players")}</span>`,  // L0主指標＝平常比（無ければ人数）
+        primary: ratio!=null ? `<span class="num mult" style="color:${multColor(ratio)}">×${ratio.toFixed(1)}</span>` : `<span class="num">${nf.format(g.ccu)}</span><span class="unit">${L("人","players")}</span>`,  // L0主指標＝平常比（連続カラー・無ければ人数）
         kicker:(rev?L("復活・","Revived · "):"")+(days!=null?L("発売 "+days+"日目","Day "+days)+" ・":"")+L(nf.format(g.ccu)+"人",nf.format(g.ccu)+" players"),
         metric:`<span class="num">${nf.format(g.ccu)}</span><span class="unit">${L("人","players")}</span>${baseLine(bl)}` };
     }).sort((a,b)=> b.ratio-a.ratio);
