@@ -1127,23 +1127,42 @@ function showDetail(o){
   mainViewEl.hidden=true; detailEl.hidden=false; try{window.scrollTo({top:0,behavior:"instant"});}catch(e){window.scrollTo(0,0);}
 }
 function renderDetail(){ const o=trail[trail.length-1]; if(o) showDetail(o); }
-// 一覧の行から開く＝新しい深掘りの起点（trail をリセット）。
-function openDetail(idx){ const o=detailMap[idx]; if(!o) return; trail=[o]; renderDetail(); }
-// つながりから別作品へホップ（サイト内・trail に積む）。同じ作品への即ループは無視。
+// ブラウザ／端末の「戻る」キーを詳細ページに効かせる（History API 連携）。
+// trail の深さ＝詳細で積んだ履歴エントリ数。戻るキーで一段ずつ（最後は一覧へ）戻れる。
+function pushDetailState(){ try{ history.pushState({dv:trail.length},""); }catch(e){} }
+// 履歴の状態（深さ）に画面を合わせる。0＝一覧、N＝trail を N 段に切って再描画。
+function applyDetailDepth(depth){
+  if(depth<=0){ trail=[]; detailEl.hidden=true; mainViewEl.hidden=false; return; }
+  if(trail.length>depth) trail=trail.slice(0,depth);
+  renderDetail();
+}
+window.addEventListener("popstate",e=>{
+  const depth=(e.state && typeof e.state.dv==="number")?e.state.dv:0;
+  applyDetailDepth(depth);
+});
+// 初期表示は一覧。現在の履歴エントリを「一覧」として正規化（リロード時の取り違え防止）。
+try{ history.replaceState(null,""); }catch(e){}
+// 一覧の行から開く＝新しい深掘りの起点（trail をリセット・履歴に1段積む）。
+function openDetail(idx){ const o=detailMap[idx]; if(!o) return; trail=[o]; pushDetailState(); renderDetail(); }
+// つながりから別作品へホップ（サイト内・trail に積む＝履歴も1段積む）。同じ作品への即ループは無視。
 function openDetailByAppid(appid){
   const rec=catalogRecord(appid); if(!rec) return;
   const cur=trail[trail.length-1];
   if(cur && String(cur.appid)===String(appid)) return;
-  trail.push(rec); renderDetail();
+  trail.push(rec); pushDetailState(); renderDetail();
 }
-function jumpTrail(i){ if(i<0||i>=trail.length) return; trail=trail.slice(0,i+1); renderDetail(); }
+// パンくずで戻る＝その地点まで履歴を巻き戻す（戻るキーと整合・描画は popstate 側）。
+function jumpTrail(i){ if(i<0||i>=trail.length) return; const steps=trail.length-(i+1); if(steps>0) history.go(-steps); }
 // 詳細内クリック：つながり（data-hop）で潜る／パンくず（data-crumb）で戻る。
 dvBody.addEventListener("click",e=>{
   const sh=e.target.closest("[data-share]"); if(sh){ shareGame(sh.dataset.share, sh.dataset.title); return; }
   const hop=e.target.closest("[data-hop]"); if(hop){ openDetailByAppid(hop.dataset.hop); return; }
   const cr=e.target.closest("[data-crumb]"); if(cr){ jumpTrail(Number(cr.dataset.crumb)); return; }
 });
-backBtn.addEventListener("click",()=>{ detailEl.hidden=true; mainViewEl.hidden=false; trail=[]; });
+// 「一覧へ戻る」＝詳細で積んだ履歴を全部巻き戻す（戻るキーと同じ経路で一覧へ）。
+backBtn.addEventListener("click",()=>{ if(trail.length>0){ history.go(-trail.length); } else { detailEl.hidden=true; mainViewEl.hidden=false; } });
+// Esc キーでも一段戻る（PCのキーボード操作・詳細表示中のみ）。
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && !detailEl.hidden){ history.back(); } });
 const themeBtn=document.getElementById("themeBtn");
 function syncThemeBtn(){ themeBtn.textContent=document.body.classList.contains("light")?L("背景を暗く","Dark background"):L("背景を明るく","Light background"); }
 themeBtn.addEventListener("click",()=>{ document.body.classList.toggle("light"); syncThemeBtn(); });
