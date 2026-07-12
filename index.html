@@ -120,7 +120,8 @@
     animation:rise .5s cubic-bezier(.2,.7,.2,1) forwards}
   .r2rank{font-family:var(--serif);font-size:13px;color:var(--ink-faint);font-variant-numeric:tabular-nums;
     min-width:20px;text-align:right}
-  .r2body{min-width:0}
+  .r2body{min-width:0;display:flex;align-items:center;gap:10px}
+  .r2main{flex:1;min-width:0}
   .r2top{display:flex;align-items:baseline;gap:9px;min-width:0}
   .r2top .title{flex:1;min-width:0}
   .r2primary{flex:none;text-align:right}
@@ -336,15 +337,16 @@
   .rowsteam:hover{color:var(--accent);border-color:var(--accent)}
   .titlerow{display:flex;align-items:center;gap:2px;min-width:0}
   .titlerow .title{min-width:0}
-  /* 主指標（人数/倍率）とミニ折れ線を右側で縦に近接配置＝数字とグラフを一体で見せる */
-  .r2metric{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:3px}
-  .sparkrow{display:flex;justify-content:flex-end;align-items:center}
+  /* 2行目：詳細タグ（左・詰めて表示）＋ミニ折れ線（右・数字の真下に整列）で隙間を埋める */
+  .r2sub{display:flex;align-items:center;gap:12px;margin-top:5px;min-width:0}
+  .r2tags{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:5px 6px;max-height:46px;overflow:hidden}
+  .sparkrow{flex:none;display:flex;justify-content:flex-end;align-items:center}
   .sparksvg{width:132px;max-width:40vw;height:27px;flex:none}
   .sparkline{fill:none;stroke:var(--accent);stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
   .sparkbase{stroke:var(--ink-faint);stroke-width:1;stroke-dasharray:3 3;vector-effect:non-scaling-stroke}
   .sparkdot{fill:var(--accent)}
   .sparklbl{font-size:10px;color:var(--ink-faint);white-space:nowrap}
-  .surgebar{display:flex;align-items:center;gap:9px;width:132px;max-width:40vw}
+  .surgebar{flex:none;display:flex;align-items:center;gap:9px;width:132px;max-width:40vw}
   .surgetrack{position:relative;height:5px;border-radius:3px;background:var(--chip);flex:1;overflow:hidden}
   .surgefill{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,var(--accent-weak),var(--accent))}
   .surgex{font-size:11px;color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
@@ -765,14 +767,15 @@ function detailBodyReal(d){
   return rows;
 }
 // v10：行内アコーディオンは廃止。詳細は openDetail() の詳細ページへ一本化（#3）。
-// L0（一覧）＝2行/件：順位・タイトル・主指標＋「きっかけ」だけ。チップ/タグ/折れ線/Steam/共有は L1（詳細の「見立て」）へ送る。
+// L0（一覧）＝順位・タイトル・主指標＋2行目に「詳細タグ（見立て＋ジャンル）」と折れ線。隙間を詰めて情報を敷き詰める。
 function rowHtml(o){
   const rank=(typeof o.i==="number")?(o.i+1):"";
-  const kick=o.kicker?`<div class="r2kick">${o.kicker}</div>`:"";
+  const tags=(o.tagsP||"")+(o.tagsS||"");          // 見立て（平常比・きっかけ等）＋ジャンル/詳細タグ
+  const sub=(tags||o.surge)?`<div class="r2sub"><span class="r2tags">${tags}</span>${o.surge||""}</div>`:"";
   return `<li class="row2 ${favs.has(o.key)?'faved':''}" data-detail="${o.i}" role="button" tabindex="0" aria-label="${esc(o.title)}（${L("詳しく","details")}）" style="animation-delay:${o.i*30}ms">
       <div class="r2rank">${rank}</div>
       ${favBtn(o.key)}
-      <div class="r2body"><div class="r2top">${titleCell(o.title)}<span class="r2metric"><span class="metric r2primary">${o.primary||o.metric||""}</span>${o.surge||""}</span><span class="rowchev" aria-hidden="true">›</span></div>${kick}</div>
+      <div class="r2body"><div class="r2main"><div class="r2top">${titleCell(o.title)}<span class="metric r2primary">${o.primary||o.metric||""}</span></div>${sub}</div><span class="rowchev" aria-hidden="true">›</span></div>
     </li>`; }
 
 // ダミー件数を増やして「もっと見る」を体験できるようにする（mk(k) で k 番目の仮データを作る）。
