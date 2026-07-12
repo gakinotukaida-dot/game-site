@@ -336,14 +336,16 @@
   .rowsteam:hover{color:var(--accent);border-color:var(--accent)}
   .titlerow{display:flex;align-items:center;gap:2px;min-width:0}
   .titlerow .title{min-width:0}
-  .sparkrow{grid-column:2 / -1;margin-top:8px;display:flex;align-items:center;gap:10px}
-  .sparksvg{width:100%;max-width:280px;height:34px;flex:none}
+  /* 主指標（人数/倍率）とミニ折れ線を右側で縦に近接配置＝数字とグラフを一体で見せる */
+  .r2metric{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+  .sparkrow{display:flex;justify-content:flex-end;align-items:center}
+  .sparksvg{width:132px;max-width:40vw;height:27px;flex:none}
   .sparkline{fill:none;stroke:var(--accent);stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
   .sparkbase{stroke:var(--ink-faint);stroke-width:1;stroke-dasharray:3 3;vector-effect:non-scaling-stroke}
   .sparkdot{fill:var(--accent)}
   .sparklbl{font-size:10px;color:var(--ink-faint);white-space:nowrap}
-  .surgebar{grid-column:2 / -1;margin-top:8px;display:flex;align-items:center;gap:9px}
-  .surgetrack{position:relative;height:5px;border-radius:3px;background:var(--chip);flex:1;overflow:hidden;max-width:340px}
+  .surgebar{display:flex;align-items:center;gap:9px;width:132px;max-width:40vw}
+  .surgetrack{position:relative;height:5px;border-radius:3px;background:var(--chip);flex:1;overflow:hidden}
   .surgefill{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,var(--accent-weak),var(--accent))}
   .surgex{font-size:11px;color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
   .confchip{font-size:10px;color:var(--ink-faint);border:1px solid var(--line);border-radius:999px;padding:1px 7px}
@@ -770,7 +772,7 @@ function rowHtml(o){
   return `<li class="row2 ${favs.has(o.key)?'faved':''}" data-detail="${o.i}" role="button" tabindex="0" aria-label="${esc(o.title)}（${L("詳しく","details")}）" style="animation-delay:${o.i*30}ms">
       <div class="r2rank">${rank}</div>
       ${favBtn(o.key)}
-      <div class="r2body"><div class="r2top">${titleCell(o.title)}<span class="metric r2primary">${o.primary||o.metric||""}</span><span class="rowchev" aria-hidden="true">›</span></div>${kick}</div>
+      <div class="r2body"><div class="r2top">${titleCell(o.title)}<span class="r2metric"><span class="metric r2primary">${o.primary||o.metric||""}</span>${o.surge||""}</span><span class="rowchev" aria-hidden="true">›</span></div>${kick}</div>
     </li>`; }
 
 // ダミー件数を増やして「もっと見る」を体験できるようにする（mk(k) で k 番目の仮データを作る）。
