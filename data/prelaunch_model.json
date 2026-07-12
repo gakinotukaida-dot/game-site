@@ -2,7 +2,7 @@
   "view": "prelaunch_model",
   "schema": "prelaunch_model_v1",
   "note": "羽根予想モデル（自社実績で較正したスコアカード）。跳ね確率は log-odds 合算＝解釈可能・材料が薄いほど基準確率に寄る。強さ指標 top_decile_lift は 70/30 ホールドアウトの out-of-sample。readiness=collecting の間は控えめ運用。",
-  "generated_at": "2026-07-12T06:46:34.214863+00:00",
+  "generated_at": "2026-07-12T17:18:02.515539+00:00",
   "params": {
     "lookback_days": 180,
     "outcome_days": 14,
@@ -47,7 +47,9 @@
       "none": 0.0
     },
     "web_views": {
-      "none": 0.0
+      "none": 0.00362,
+      "mid": -0.23051,
+      "low": -0.41771
     },
     "web_reach": {
       "none": 0.0
@@ -69,8 +71,8 @@
     },
     "genre": {
       "warm": -0.46511,
-      "hot": 0.81264,
       "cold": -1.13967,
+      "hot": 0.81264,
       "na": -1.31426
     }
   },
@@ -95,25 +97,15 @@
       "hits": 24,
       "rate": 0.03017
     },
-    "RPG": {
-      "n": 357,
-      "hits": 26,
-      "rate": 0.07201
+    "Strategy": {
+      "n": 414,
+      "hits": 11,
+      "rate": 0.02674
     },
     "Simulation": {
       "n": 517,
       "hits": 24,
       "rate": 0.04626
-    },
-    "Early Access": {
-      "n": 256,
-      "hits": 13,
-      "rate": 0.05032
-    },
-    "Strategy": {
-      "n": 414,
-      "hits": 11,
-      "rate": 0.02674
     },
     "Sports": {
       "n": 68,
@@ -125,6 +117,16 @@
       "hits": 8,
       "rate": 0.02828
     },
+    "Early Access": {
+      "n": 256,
+      "hits": 13,
+      "rate": 0.05032
+    },
+    "RPG": {
+      "n": 357,
+      "hits": 26,
+      "rate": 0.07201
+    },
     "Massively Multiplayer": {
       "n": 55,
       "hits": 6,
@@ -134,11 +136,6 @@
       "n": 29,
       "hits": 0,
       "rate": 0.0077
-    },
-    "Utilities": {
-      "n": 2,
-      "hits": 0,
-      "rate": 0.0285
     },
     "Animation & Modeling": {
       "n": 1,
@@ -155,6 +152,11 @@
       "hits": 0,
       "rate": 0.03167
     },
+    "Utilities": {
+      "n": 2,
+      "hits": 0,
+      "rate": 0.0285
+    },
     "Education": {
       "n": 1,
       "hits": 0,
@@ -166,8 +168,8 @@
     "eval_base": 0.04555,
     "top_decile_rate": 0.1875,
     "top_decile_lift": 4.12,
-    "mean_prob_hit": 0.06209,
-    "mean_prob_miss": 0.01122
+    "mean_prob_hit": 0.06233,
+    "mean_prob_miss": 0.01127
   },
   "feature_report": {
     "demo_ccu": {
@@ -229,11 +231,23 @@
       }
     },
     "web_views": {
+      "low": {
+        "n": 4,
+        "hits": 0,
+        "rate": 0.0,
+        "woe": -0.41771
+      },
+      "mid": {
+        "n": 2,
+        "hits": 0,
+        "rate": 0.0,
+        "woe": -0.23051
+      },
       "none": {
-        "n": 1712,
+        "n": 1706,
         "hits": 61,
-        "rate": 0.0356,
-        "woe": 0.0
+        "rate": 0.0358,
+        "woe": 0.00362
       }
     },
     "web_reach": {
