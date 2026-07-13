@@ -3,124 +3,36 @@
   "schema": "upcoming_v3",
   "source": "games(coming_soon/release_date) + 実測シグナル(体験版/Twitch/告知/開発元実績/ジャンル) + prelaunch_model",
   "note": "発売前の羽根予想。spike_prob=跳ね確率＝自社実績で較正したモデルの出力（参考・外れうる）。モデルが無い場合は expect のみ（実測シグナルの有無）。発売日が今日以前の作品は除外（coming_soon フラグが古い“居座り”も落とす）。",
-  "generated_at": "2026-07-12T17:39:43.493894+00:00",
+  "generated_at": "2026-07-13T07:51:59.219147+00:00",
   "model": {
     "schema": "prelaunch_model_v1",
     "readiness": "validated",
-    "base_rate": 0.035631,
-    "n_pairs": 1712,
+    "base_rate": 0.035301,
+    "n_pairs": 1728,
     "hit_threshold": 1000,
     "validation_oos": {
-      "eval_n": 483,
-      "eval_base": 0.04555,
+      "eval_n": 488,
+      "eval_base": 0.04508,
       "top_decile_rate": 0.1875,
-      "top_decile_lift": 4.12,
-      "mean_prob_hit": 0.06233,
-      "mean_prob_miss": 0.01127
+      "top_decile_lift": 4.16,
+      "mean_prob_hit": 0.06245,
+      "mean_prob_miss": 0.01124
     },
-    "generated_at": "2026-07-12T17:18:02.515539+00:00"
+    "generated_at": "2026-07-13T07:38:01.411742+00:00"
   },
   "params": {
     "limit": 200,
     "genre_max": 7
   },
-  "count": 200,
+  "count": 173,
   "rows": [
-    {
-      "appid": 2697940,
-      "name": "Ascend to ZERO",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.7616,
-      "expect": "high",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_reviews",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "hot"
-        }
-      ],
-      "active_signals": 4,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 7,
-      "has_news": true,
-      "dev_best_peak": 61,
-      "dev_best_reviews": 2844,
-      "web_news": null,
-      "web_views": 0,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Action",
-        "RPG",
-        "Strategy"
-      ]
-    },
-    {
-      "appid": 4306890,
-      "name": "GRANBLUE FANTASY: Relink - Endless Ragnarok アップグレードキット（Special Edition）",
-      "release": "Coming soon",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.5778,
-      "expect": "high",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_reviews",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "hot"
-        }
-      ],
-      "active_signals": 3,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 89790,
-      "dev_best_reviews": 52889,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Action",
-        "Adventure",
-        "RPG"
-      ]
-    },
     {
       "appid": 3453910,
       "name": "Happy's Humble BURGATORY",
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.5673,
+      "spike_prob": 0.579,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -147,7 +59,7 @@
       "news_count": 4,
       "has_news": true,
       "dev_best_peak": 1553,
-      "dev_best_reviews": 2708,
+      "dev_best_reviews": 2714,
       "web_news": null,
       "web_views": null,
       "web_reach": null,
@@ -159,12 +71,56 @@
       ]
     },
     {
+      "appid": 4306890,
+      "name": "GRANBLUE FANTASY: Relink - Endless Ragnarok アップグレードキット（Special Edition）",
+      "release": "Coming soon",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.5677,
+      "expect": "high",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "dev_best_peak",
+          "dir": "up",
+          "bucket": "high"
+        },
+        {
+          "name": "dev_best_reviews",
+          "dir": "up",
+          "bucket": "high"
+        },
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "hot"
+        }
+      ],
+      "active_signals": 3,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": 89790,
+      "dev_best_reviews": 53056,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Action",
+        "Adventure",
+        "RPG"
+      ]
+    },
+    {
       "appid": 3372060,
       "name": "Hell Maiden",
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.55,
+      "spike_prob": 0.538,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -191,7 +147,7 @@
       "news_count": 2,
       "has_news": true,
       "dev_best_peak": 58,
-      "dev_best_reviews": 2456,
+      "dev_best_reviews": 2459,
       "web_news": null,
       "web_views": null,
       "web_reach": null,
@@ -210,7 +166,7 @@
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.4698,
+      "spike_prob": 0.4615,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -255,7 +211,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.3528,
+      "spike_prob": 0.3605,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -298,7 +254,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.3031,
+      "spike_prob": 0.2962,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -325,7 +281,7 @@
       "news_count": 6,
       "has_news": true,
       "dev_best_peak": 15,
-      "dev_best_reviews": 3466,
+      "dev_best_reviews": 3470,
       "web_news": null,
       "web_views": null,
       "web_reach": null,
@@ -342,7 +298,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.1626,
+      "spike_prob": 0.1617,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -386,7 +342,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.1568,
+      "spike_prob": 0.1555,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -431,7 +387,7 @@
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.1433,
+      "spike_prob": 0.1383,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -458,7 +414,7 @@
       "news_count": 1,
       "has_news": true,
       "dev_best_peak": 116,
-      "dev_best_reviews": 8408,
+      "dev_best_reviews": 8410,
       "web_news": null,
       "web_views": 0,
       "web_reach": null,
@@ -470,12 +426,55 @@
       ]
     },
     {
+      "appid": 2521170,
+      "name": "Looking For Fael",
+      "release": "16 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.1383,
+      "expect": "high",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "dev_best_reviews",
+          "dir": "up",
+          "bucket": "high"
+        },
+        {
+          "name": "dev_best_peak",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "low"
+        }
+      ],
+      "active_signals": 5,
+      "demo_ccu": 4,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 2,
+      "has_news": true,
+      "dev_best_peak": 6,
+      "dev_best_reviews": 3154,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Adventure",
+        "Indie"
+      ]
+    },
+    {
       "appid": 4504050,
       "name": "7月15日雨夜：前传",
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.1167,
+      "spike_prob": 0.1169,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -518,7 +517,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.1167,
+      "spike_prob": 0.1169,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -545,7 +544,7 @@
       "news_count": 3,
       "has_news": true,
       "dev_best_peak": 4,
-      "dev_best_reviews": 2,
+      "dev_best_reviews": 3,
       "web_news": null,
       "web_views": null,
       "web_reach": null,
@@ -563,7 +562,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.1167,
+      "spike_prob": 0.1169,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -590,7 +589,7 @@
       "news_count": 5,
       "has_news": true,
       "dev_best_peak": 36,
-      "dev_best_reviews": 33,
+      "dev_best_reviews": 35,
       "web_news": null,
       "web_views": null,
       "web_reach": null,
@@ -608,7 +607,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.1167,
+      "spike_prob": 0.1169,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -653,7 +652,7 @@
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0942,
+      "spike_prob": 0.0937,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -680,7 +679,7 @@
       "news_count": 1,
       "has_news": true,
       "dev_best_peak": 8,
-      "dev_best_reviews": 118,
+      "dev_best_reviews": 119,
       "web_news": null,
       "web_views": 0,
       "web_reach": null,
@@ -692,19 +691,19 @@
       ]
     },
     {
-      "appid": 4786430,
-      "name": "Ascend to ZERO - SUPPORTER PACK",
-      "release": "13 Jul, 2026",
+      "appid": 4341810,
+      "name": "LarsGadiel",
+      "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0935,
+      "spike_prob": 0.0937,
       "expect": "mid",
       "conf": "high",
       "factors": [
         {
-          "name": "dev_best_reviews",
+          "name": "genre",
           "dir": "up",
-          "bucket": "high"
+          "bucket": "hot"
         },
         {
           "name": "dev_best_peak",
@@ -712,25 +711,28 @@
           "bucket": "low"
         },
         {
-          "name": "is_free",
+          "name": "news_count",
           "dir": "up",
-          "bucket": "paid"
+          "bucket": "low"
         }
       ],
-      "active_signals": 3,
+      "active_signals": 4,
       "demo_ccu": null,
       "twitch_peak": null,
       "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 61,
-      "dev_best_reviews": 2844,
+      "news_count": 2,
+      "has_news": true,
+      "dev_best_peak": 1,
+      "dev_best_reviews": 246,
       "web_news": null,
       "web_views": null,
       "web_reach": null,
       "is_free": false,
       "genres": [
-        "Action"
+        "Action",
+        "Adventure",
+        "Indie",
+        "RPG"
       ]
     },
     {
@@ -739,7 +741,7 @@
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0935,
+      "spike_prob": 0.0902,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -766,7 +768,7 @@
       "news_count": 0,
       "has_news": false,
       "dev_best_peak": 102,
-      "dev_best_reviews": 8862,
+      "dev_best_reviews": 8865,
       "web_news": null,
       "web_views": null,
       "web_reach": null,
@@ -781,7 +783,7 @@
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0935,
+      "spike_prob": 0.0902,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -808,7 +810,7 @@
       "news_count": 0,
       "has_news": false,
       "dev_best_peak": 911,
-      "dev_best_reviews": 13385,
+      "dev_best_reviews": 13399,
       "web_news": null,
       "web_views": null,
       "web_reach": null,
@@ -826,7 +828,7 @@
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0701,
+      "spike_prob": 0.0707,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -869,7 +871,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0701,
+      "spike_prob": 0.0707,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -913,7 +915,7 @@
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0701,
+      "spike_prob": 0.0707,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -940,7 +942,7 @@
       "news_count": 5,
       "has_news": true,
       "dev_best_peak": 2,
-      "dev_best_reviews": 439,
+      "dev_best_reviews": 441,
       "web_news": null,
       "web_views": 0,
       "web_reach": null,
@@ -956,7 +958,7 @@
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0701,
+      "spike_prob": 0.0707,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -996,54 +998,12 @@
       ]
     },
     {
-      "appid": 3765010,
-      "name": "Forensics: Crime Scene Detective",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0697,
-      "expect": "mid",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 5,
-      "demo_ccu": 428,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 10,
-      "has_news": true,
-      "dev_best_peak": 5,
-      "dev_best_reviews": 182,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Simulation"
-      ]
-    },
-    {
       "appid": 4541610,
       "name": "Ascension: The Infinite Descent",
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0695,
+      "spike_prob": 0.0685,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -1088,7 +1048,7 @@
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0695,
+      "spike_prob": 0.0685,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -1134,7 +1094,7 @@
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0667,
+      "spike_prob": 0.0656,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -1179,7 +1139,7 @@
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0667,
+      "spike_prob": 0.0656,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -1225,7 +1185,7 @@
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0667,
+      "spike_prob": 0.0656,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -1265,146 +1225,12 @@
       ]
     },
     {
-      "appid": 4642990,
-      "name": "Dawnhold",
-      "release": "13 Jul, 2026",
+      "appid": 4508120,
+      "name": "Hex Judge",
+      "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0667,
-      "expect": "mid",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "hot"
-        },
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 1,
-      "has_news": true,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Action",
-        "Indie",
-        "RPG",
-        "Strategy"
-      ]
-    },
-    {
-      "appid": 4624560,
-      "name": "Chest Buster",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0513,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 4,
-      "demo_ccu": 9,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 6,
-      "has_news": true,
-      "dev_best_peak": 9,
-      "dev_best_reviews": 0,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Casual",
-        "Indie",
-        "Simulation",
-        "Strategy"
-      ]
-    },
-    {
-      "appid": 4202850,
-      "name": "Ferrano: Beyond Redline",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0513,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 4,
-      "demo_ccu": 3,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 5,
-      "has_news": true,
-      "dev_best_peak": 3,
-      "dev_best_reviews": 0,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Casual",
-        "Indie",
-        "Racing"
-      ]
-    },
-    {
-      "appid": 4628800,
-      "name": "GeoFlag",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0513,
+      "spike_prob": 0.0514,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1428,7 +1254,7 @@
       "demo_ccu": 1,
       "twitch_peak": null,
       "streamers": 0,
-      "news_count": 7,
+      "news_count": 8,
       "has_news": true,
       "dev_best_peak": 1,
       "dev_best_reviews": 0,
@@ -1437,8 +1263,7 @@
       "web_reach": null,
       "is_free": false,
       "genres": [
-        "Casual",
-        "Indie"
+        "Adventure"
       ]
     },
     {
@@ -1447,7 +1272,7 @@
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0513,
+      "spike_prob": 0.0514,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1490,7 +1315,7 @@
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0513,
+      "spike_prob": 0.0514,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1534,7 +1359,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0513,
+      "spike_prob": 0.0514,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1573,12 +1398,57 @@
       ]
     },
     {
+      "appid": 4387440,
+      "name": "Late Night Fears",
+      "release": "17 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0514,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "high"
+        },
+        {
+          "name": "dev_best_peak",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 4,
+      "demo_ccu": 2,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 6,
+      "has_news": true,
+      "dev_best_peak": 2,
+      "dev_best_reviews": 0,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Adventure",
+        "Casual",
+        "Indie",
+        "Simulation"
+      ]
+    },
+    {
       "appid": 4484320,
       "name": "Brainrotting",
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0493,
+      "spike_prob": 0.0492,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1617,7 +1487,7 @@
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0493,
+      "spike_prob": 0.0492,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1652,52 +1522,12 @@
       ]
     },
     {
-      "appid": 3088400,
-      "name": "Deadly Trick",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0493,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 10,
-      "has_news": true,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": 0,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Action",
-        "Casual",
-        "Indie",
-        "Simulation"
-      ]
-    },
-    {
       "appid": 4177670,
       "name": "Dragon Dragon Fire Fire Deluxe",
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0493,
+      "spike_prob": 0.0492,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1730,51 +1560,12 @@
       ]
     },
     {
-      "appid": 2388580,
-      "name": "Forest of Deceit",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0493,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 4,
-      "has_news": true,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Casual",
-        "Indie",
-        "Strategy"
-      ]
-    },
-    {
       "appid": 3712080,
       "name": "Funnel Runners",
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0493,
+      "spike_prob": 0.0492,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1809,51 +1600,12 @@
       ]
     },
     {
-      "appid": 3463400,
-      "name": "Game Store Chronicle",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0493,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 3,
-      "has_news": true,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Casual",
-        "Indie",
-        "Simulation"
-      ]
-    },
-    {
       "appid": 4768190,
       "name": "Iron Offensive: Helmet Cam Extraction Shooter",
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0493,
+      "spike_prob": 0.0492,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1888,12 +1640,50 @@
       ]
     },
     {
-      "appid": 2860240,
-      "name": "City Bus Simulator 2026",
-      "release": "13 Jul, 2026",
+      "appid": 2723250,
+      "name": "MALEDICTOR",
+      "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0483,
+      "spike_prob": 0.0492,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "high"
+        },
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 4,
+      "has_news": true,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": 0,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Action",
+        "Early Access"
+      ]
+    },
+    {
+      "appid": 4424450,
+      "name": "BROKEN SOUL : Boss Rush",
+      "release": "17 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0481,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1914,21 +1704,22 @@
         }
       ],
       "active_signals": 5,
-      "demo_ccu": 9,
+      "demo_ccu": 1,
       "twitch_peak": null,
       "streamers": 0,
-      "news_count": 1,
+      "news_count": 2,
       "has_news": true,
-      "dev_best_peak": 9,
-      "dev_best_reviews": 35,
+      "dev_best_peak": 1,
+      "dev_best_reviews": 5,
       "web_news": null,
-      "web_views": 0,
+      "web_views": null,
       "web_reach": null,
       "is_free": false,
       "genres": [
+        "Action",
+        "Casual",
         "Indie",
-        "RPG",
-        "Simulation"
+        "RPG"
       ]
     },
     {
@@ -1937,7 +1728,7 @@
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.048,
+      "spike_prob": 0.0462,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1964,7 +1755,7 @@
       "news_count": 0,
       "has_news": false,
       "dev_best_peak": 5,
-      "dev_best_reviews": 1692,
+      "dev_best_reviews": 1695,
       "web_news": null,
       "web_views": null,
       "web_reach": null,
@@ -1975,52 +1766,12 @@
       ]
     },
     {
-      "appid": 4834020,
-      "name": "Ascend to ZERO Soundtrack",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0423,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_reviews",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 61,
-      "dev_best_reviews": 2844,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": []
-    },
-    {
       "appid": 3423990,
       "name": "Frozen Ship",
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0406,
+      "spike_prob": 0.0404,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2065,7 +1816,7 @@
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0368,
+      "spike_prob": 0.037,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2086,13 +1837,13 @@
         }
       ],
       "active_signals": 5,
-      "demo_ccu": 98,
+      "demo_ccu": 112,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 6,
       "has_news": true,
-      "dev_best_peak": 98,
-      "dev_best_reviews": 255,
+      "dev_best_peak": 112,
+      "dev_best_reviews": 265,
       "web_news": null,
       "web_views": null,
       "web_reach": null,
@@ -2102,56 +1853,12 @@
       ]
     },
     {
-      "appid": 4600920,
-      "name": "CoreBreaker: Desktop Swarm",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0355,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 5,
-      "demo_ccu": 1,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 6,
-      "has_news": true,
-      "dev_best_peak": 1,
-      "dev_best_reviews": 7,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Casual",
-        "Indie",
-        "Simulation"
-      ]
-    },
-    {
       "appid": 4526770,
       "name": "Declutterer",
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0355,
+      "spike_prob": 0.0358,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2172,12 +1879,12 @@
         }
       ],
       "active_signals": 5,
-      "demo_ccu": 3,
+      "demo_ccu": 4,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 10,
       "has_news": true,
-      "dev_best_peak": 3,
+      "dev_best_peak": 4,
       "dev_best_reviews": 3,
       "web_news": null,
       "web_views": null,
@@ -2193,7 +1900,7 @@
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0355,
+      "spike_prob": 0.0358,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2237,7 +1944,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0355,
+      "spike_prob": 0.0358,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2277,56 +1984,12 @@
       ]
     },
     {
-      "appid": 4101150,
-      "name": "Hold the Core",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0355,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 5,
-      "demo_ccu": 1,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 4,
-      "has_news": true,
-      "dev_best_peak": 1,
-      "dev_best_reviews": 1,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Action",
-        "Indie",
-        "Strategy"
-      ]
-    },
-    {
       "appid": 4272270,
       "name": "It's Chopping Time!",
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0355,
+      "spike_prob": 0.0358,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2366,55 +2029,12 @@
       ]
     },
     {
-      "appid": 3633760,
-      "name": "KAZ",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0355,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 5,
-      "demo_ccu": 18,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 8,
-      "has_news": true,
-      "dev_best_peak": 18,
-      "dev_best_reviews": 165,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Action",
-        "Indie"
-      ]
-    },
-    {
       "appid": 4615010,
       "name": "Kibble Cats",
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0355,
+      "spike_prob": 0.0358,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2457,7 +2077,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0355,
+      "spike_prob": 0.0358,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2496,22 +2116,22 @@
       ]
     },
     {
-      "appid": 4424450,
-      "name": "BROKEN SOUL : Boss Rush",
-      "release": "17 Jul, 2026",
+      "appid": 4404580,
+      "name": "MOBU",
+      "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0338,
+      "spike_prob": 0.0358,
       "expect": "low",
       "conf": "high",
       "factors": [
         {
-          "name": "genre",
+          "name": "news_count",
           "dir": "up",
-          "bucket": "hot"
+          "bucket": "high"
         },
         {
-          "name": "news_count",
+          "name": "dev_best_peak",
           "dir": "up",
           "bucket": "low"
         },
@@ -2521,23 +2141,21 @@
           "bucket": "paid"
         }
       ],
-      "active_signals": 3,
+      "active_signals": 5,
       "demo_ccu": 1,
       "twitch_peak": null,
       "streamers": 0,
-      "news_count": 2,
+      "news_count": 10,
       "has_news": true,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
+      "dev_best_peak": 1,
+      "dev_best_reviews": 13,
       "web_news": null,
       "web_views": null,
       "web_reach": null,
       "is_free": false,
       "genres": [
         "Action",
-        "Casual",
-        "Indie",
-        "RPG"
+        "Indie"
       ]
     },
     {
@@ -2546,7 +2164,7 @@
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0304,
+      "spike_prob": 0.0302,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2588,7 +2206,7 @@
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0281,
+      "spike_prob": 0.0282,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2631,7 +2249,7 @@
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0281,
+      "spike_prob": 0.0282,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2670,24 +2288,19 @@
       ]
     },
     {
-      "appid": 4582080,
-      "name": "Goal Idle",
-      "release": "13 Jul, 2026",
+      "appid": 4406610,
+      "name": "Link Empire",
+      "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.028,
+      "spike_prob": 0.0256,
       "expect": "low",
       "conf": "high",
       "factors": [
         {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
           "name": "news_count",
           "dir": "up",
-          "bucket": "low"
+          "bucket": "high"
         },
         {
           "name": "is_free",
@@ -2695,22 +2308,20 @@
           "bucket": "paid"
         }
       ],
-      "active_signals": 5,
-      "demo_ccu": 115,
+      "active_signals": 2,
+      "demo_ccu": null,
       "twitch_peak": null,
       "streamers": 0,
-      "news_count": 1,
+      "news_count": 3,
       "has_news": true,
-      "dev_best_peak": 115,
-      "dev_best_reviews": 28,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
       "web_news": null,
       "web_views": null,
       "web_reach": null,
       "is_free": false,
       "genres": [
-        "Casual",
-        "Indie",
-        "Early Access"
+        "Strategy"
       ]
     },
     {
@@ -2719,7 +2330,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0247,
+      "spike_prob": 0.0246,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2735,7 +2346,7 @@
         }
       ],
       "active_signals": 3,
-      "demo_ccu": 21,
+      "demo_ccu": 26,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 3,
@@ -2752,49 +2363,12 @@
       ]
     },
     {
-      "appid": 4508120,
-      "name": "Hex Judge",
-      "release": "16 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0247,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 3,
-      "demo_ccu": 1,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 8,
-      "has_news": true,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Adventure"
-      ]
-    },
-    {
       "appid": 4715200,
       "name": "EverDark",
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.022,
+      "spike_prob": 0.0217,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2838,7 +2412,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.022,
+      "spike_prob": 0.0217,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2882,7 +2456,7 @@
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.022,
+      "spike_prob": 0.0217,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2926,7 +2500,7 @@
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.022,
+      "spike_prob": 0.0217,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2973,7 +2547,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0211,
+      "spike_prob": 0.0207,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3015,7 +2589,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0211,
+      "spike_prob": 0.0207,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3055,7 +2629,7 @@
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0211,
+      "spike_prob": 0.0207,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3097,7 +2671,7 @@
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0211,
+      "spike_prob": 0.0207,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3137,7 +2711,7 @@
       "release": "3 Aug, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0211,
+      "spike_prob": 0.0207,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3175,7 +2749,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0211,
+      "spike_prob": 0.0207,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3217,7 +2791,7 @@
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0211,
+      "spike_prob": 0.0207,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3257,7 +2831,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0211,
+      "spike_prob": 0.0207,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3294,7 +2868,7 @@
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0211,
+      "spike_prob": 0.0207,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3332,7 +2906,7 @@
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0211,
+      "spike_prob": 0.0207,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3366,53 +2940,12 @@
       ]
     },
     {
-      "appid": 4278750,
-      "name": "It wasn’t meow",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0211,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "hot"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Casual",
-        "Indie",
-        "RPG",
-        "Simulation",
-        "Strategy"
-      ]
-    },
-    {
       "appid": 4776920,
       "name": "Knaights",
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0211,
+      "spike_prob": 0.0207,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3446,24 +2979,19 @@
       ]
     },
     {
-      "appid": 3937090,
-      "name": "BugFixer",
-      "release": "13 Jul, 2026",
+      "appid": 1411640,
+      "name": "Litterbox League",
+      "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0204,
+      "spike_prob": 0.0207,
       "expect": "low",
-      "conf": "high",
+      "conf": "mid",
       "factors": [
         {
-          "name": "dev_best_peak",
+          "name": "genre",
           "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "low"
+          "bucket": "hot"
         },
         {
           "name": "is_free",
@@ -3471,22 +2999,23 @@
           "bucket": "paid"
         }
       ],
-      "active_signals": 4,
-      "demo_ccu": 6,
+      "active_signals": 1,
+      "demo_ccu": null,
       "twitch_peak": null,
       "streamers": 0,
-      "news_count": 1,
-      "has_news": true,
-      "dev_best_peak": 6,
-      "dev_best_reviews": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
       "web_news": null,
       "web_views": null,
       "web_reach": null,
       "is_free": false,
       "genres": [
         "Action",
-        "Adventure",
-        "Indie"
+        "Casual",
+        "Indie",
+        "Sports"
       ]
     },
     {
@@ -3495,7 +3024,7 @@
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0204,
+      "spike_prob": 0.0202,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3538,7 +3067,7 @@
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0204,
+      "spike_prob": 0.0202,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3581,7 +3110,7 @@
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0204,
+      "spike_prob": 0.0202,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3625,7 +3154,95 @@
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0204,
+      "spike_prob": 0.0202,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "dev_best_peak",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 4,
+      "demo_ccu": 2,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 2,
+      "has_news": true,
+      "dev_best_peak": 2,
+      "dev_best_reviews": 0,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Casual",
+        "Indie",
+        "Strategy"
+      ]
+    },
+    {
+      "appid": 3985060,
+      "name": "FLASH AND DIE",
+      "release": "15 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0202,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "dev_best_peak",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 4,
+      "demo_ccu": 4,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 1,
+      "has_news": true,
+      "dev_best_peak": 4,
+      "dev_best_reviews": 0,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Adventure",
+        "Indie",
+        "Simulation"
+      ]
+    },
+    {
+      "appid": 4408180,
+      "name": "Guess The Sound",
+      "release": "16 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0202,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3664,56 +3281,12 @@
       ]
     },
     {
-      "appid": 3985060,
-      "name": "FLASH AND DIE",
-      "release": "15 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0204,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 4,
-      "demo_ccu": 3,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 1,
-      "has_news": true,
-      "dev_best_peak": 3,
-      "dev_best_reviews": 0,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Adventure",
-        "Indie",
-        "Simulation"
-      ]
-    },
-    {
       "appid": 4651470,
       "name": "Hypatia",
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0204,
+      "spike_prob": 0.0202,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3754,55 +3327,12 @@
       ]
     },
     {
-      "appid": 2219390,
-      "name": "Imperial Ambitions",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0204,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 4,
-      "demo_ccu": 45,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 1,
-      "has_news": true,
-      "dev_best_peak": 45,
-      "dev_best_reviews": 0,
-      "web_news": null,
-      "web_views": 0,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Simulation",
-        "Strategy"
-      ]
-    },
-    {
       "appid": 4831170,
       "name": "Jammed",
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0204,
+      "spike_prob": 0.0202,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3823,12 +3353,12 @@
         }
       ],
       "active_signals": 4,
-      "demo_ccu": 3,
+      "demo_ccu": 4,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 1,
       "has_news": true,
-      "dev_best_peak": 3,
+      "dev_best_peak": 4,
       "dev_best_reviews": 0,
       "web_news": null,
       "web_views": null,
@@ -3842,12 +3372,98 @@
       ]
     },
     {
+      "appid": 3628800,
+      "name": "Leap Of Faith",
+      "release": "17 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0202,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "dev_best_peak",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 4,
+      "demo_ccu": 1,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 2,
+      "has_news": true,
+      "dev_best_peak": 1,
+      "dev_best_reviews": 0,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Casual",
+        "Indie"
+      ]
+    },
+    {
+      "appid": 3530240,
+      "name": "Love is a Demon",
+      "release": "17 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0202,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "dev_best_peak",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 4,
+      "demo_ccu": 1,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 2,
+      "has_news": true,
+      "dev_best_peak": 1,
+      "dev_best_reviews": 0,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Adventure",
+        "Casual"
+      ]
+    },
+    {
       "appid": 4858110,
       "name": "Dracula 2",
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0197,
+      "spike_prob": 0.0196,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3886,7 +3502,7 @@
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0195,
+      "spike_prob": 0.0193,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3924,7 +3540,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0195,
+      "spike_prob": 0.0193,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3964,7 +3580,7 @@
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0195,
+      "spike_prob": 0.0193,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -4004,7 +3620,7 @@
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0195,
+      "spike_prob": 0.0193,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -4044,7 +3660,7 @@
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0195,
+      "spike_prob": 0.0193,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -4078,12 +3694,51 @@
       ]
     },
     {
+      "appid": 4205970,
+      "name": "Little Rock Shop",
+      "release": "14 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0193,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 1,
+      "has_news": true,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Casual",
+        "Indie",
+        "Early Access"
+      ]
+    },
+    {
       "appid": 4306270,
       "name": "BeeTD",
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0184,
+      "spike_prob": 0.0185,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -4118,96 +3773,6 @@
       "genres": [
         "Indie",
         "Strategy"
-      ]
-    },
-    {
-      "appid": 4412720,
-      "name": "Aether Keepers",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0151,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "hot"
-        },
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 4,
-      "demo_ccu": 1,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 3,
-      "dev_best_reviews": 5,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Casual",
-        "Indie",
-        "RPG",
-        "Simulation",
-        "Strategy"
-      ]
-    },
-    {
-      "appid": 4562070,
-      "name": "Deepcore",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0151,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "hot"
-        },
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 4,
-      "demo_ccu": 1,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 4,
-      "dev_best_reviews": 1,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Action",
-        "Casual",
-        "RPG"
       ]
     },
     {
@@ -4389,49 +3954,6 @@
       ]
     },
     {
-      "appid": 4412710,
-      "name": "Gummy Invaders",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.014,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 5,
-      "demo_ccu": 3,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 1,
-      "has_news": true,
-      "dev_best_peak": 3,
-      "dev_best_reviews": 5,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Casual",
-        "Simulation"
-      ]
-    },
-    {
       "appid": 3983870,
       "name": "HAMISH",
       "release": "15 Jul, 2026",
@@ -4476,51 +3998,6 @@
       ]
     },
     {
-      "appid": 3683050,
-      "name": "Hexalith",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.014,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 5,
-      "demo_ccu": 1,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 1,
-      "has_news": true,
-      "dev_best_peak": 1,
-      "dev_best_reviews": 6,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Casual",
-        "Indie",
-        "Simulation",
-        "Strategy"
-      ]
-    },
-    {
       "appid": 2467950,
       "name": "Kill the Man in the House",
       "release": "16 Jul, 2026",
@@ -4553,7 +4030,7 @@
       "news_count": 1,
       "has_news": true,
       "dev_best_peak": 1,
-      "dev_best_reviews": 12,
+      "dev_best_reviews": 13,
       "web_news": null,
       "web_views": null,
       "web_reach": null,
@@ -4565,12 +4042,185 @@
       ]
     },
     {
+      "appid": 4438470,
+      "name": "Knock It Over, Again?",
+      "release": "17 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.014,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "dev_best_peak",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 5,
+      "demo_ccu": 1,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 1,
+      "has_news": true,
+      "dev_best_peak": 1,
+      "dev_best_reviews": 2,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Casual",
+        "Indie"
+      ]
+    },
+    {
+      "appid": 4607810,
+      "name": "Lizard Simulator",
+      "release": "17 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.014,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "dev_best_peak",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 5,
+      "demo_ccu": 1,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 1,
+      "has_news": true,
+      "dev_best_peak": 1,
+      "dev_best_reviews": 1,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Simulation",
+        "Early Access"
+      ]
+    },
+    {
+      "appid": 3414920,
+      "name": "Lobsterpunk",
+      "release": "17 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.014,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "dev_best_peak",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 5,
+      "demo_ccu": 1,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 1,
+      "has_news": true,
+      "dev_best_peak": 1,
+      "dev_best_reviews": 15,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Adventure",
+        "Casual",
+        "Indie"
+      ]
+    },
+    {
+      "appid": 4443160,
+      "name": "Lux Anima",
+      "release": "14 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.014,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "dev_best_peak",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 5,
+      "demo_ccu": 3,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 2,
+      "has_news": true,
+      "dev_best_peak": 3,
+      "dev_best_reviews": 11,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Casual",
+        "Indie"
+      ]
+    },
+    {
       "appid": 4780890,
       "name": "A Case of Missing Identity [DEMO]",
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0137,
+      "spike_prob": 0.0134,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -4599,24 +4249,19 @@
       ]
     },
     {
-      "appid": 4893270,
-      "name": "Blackwater Exchange - City Trouble",
-      "release": "13 Jul, 2026",
+      "appid": 4709090,
+      "name": "Life:Reboot Demo",
+      "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0127,
+      "spike_prob": 0.0134,
       "expect": "low",
       "conf": "high",
       "factors": [
         {
-          "name": "dev_best_peak",
+          "name": "genre",
           "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
+          "bucket": "hot"
         }
       ],
       "active_signals": 2,
@@ -4625,94 +4270,16 @@
       "streamers": 0,
       "news_count": 0,
       "has_news": false,
-      "dev_best_peak": 1,
-      "dev_best_reviews": 0,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
       "web_news": null,
       "web_views": null,
       "web_reach": null,
-      "is_free": false,
+      "is_free": true,
       "genres": [
         "Indie",
-        "Simulation",
-        "Strategy"
-      ]
-    },
-    {
-      "appid": 4893920,
-      "name": "Blackwater Exchange - Starter Ledger",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0127,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 1,
-      "dev_best_reviews": 0,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Indie",
-        "Simulation",
-        "Strategy"
-      ]
-    },
-    {
-      "appid": 4800070,
-      "name": "Figryne Cast Studio Engine - Cinematic LUT Pack",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0127,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 2,
-      "dev_best_reviews": 0,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Animation & Modeling",
-        "Audio Production",
-        "Video Production"
+        "RPG",
+        "Simulation"
       ]
     },
     {
@@ -4721,7 +4288,7 @@
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0126,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -4751,54 +4318,12 @@
       ]
     },
     {
-      "appid": 4229250,
-      "name": "Kisen: Seeker of Aenjan City",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0105,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 4,
-      "demo_ccu": 1,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 2,
-      "has_news": true,
-      "dev_best_peak": 1,
-      "dev_best_reviews": 0,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Indie"
-      ]
-    },
-    {
       "appid": 3661430,
       "name": "Feather Land",
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0096,
+      "spike_prob": 0.0095,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -4829,162 +4354,6 @@
         "Casual",
         "Indie",
         "Simulation"
-      ]
-    },
-    {
-      "appid": 3843410,
-      "name": "Flux Empyrean",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0096,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 3,
-      "demo_ccu": 4,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 2,
-      "has_news": true,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Adventure",
-        "Indie",
-        "Simulation"
-      ]
-    },
-    {
-      "appid": 4408180,
-      "name": "Guess The Sound",
-      "release": "16 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0096,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 3,
-      "demo_ccu": 1,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 2,
-      "has_news": true,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Casual",
-        "Indie",
-        "Strategy"
-      ]
-    },
-    {
-      "appid": 4895990,
-      "name": "Argonauts Agency: The World on His Shoulders",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0087,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 3,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 2,
-      "dev_best_reviews": 4,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Adventure",
-        "Casual",
-        "Simulation",
-        "Strategy"
-      ]
-    },
-    {
-      "appid": 4895370,
-      "name": "BAFF C",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0087,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 3,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 30,
-      "dev_best_reviews": 955,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Casual",
-        "Indie"
       ]
     },
     {
@@ -5257,9 +4626,9 @@
       ]
     },
     {
-      "appid": 4429120,
-      "name": "Ambitious Road",
-      "release": "13 Jul, 2026",
+      "appid": 4125200,
+      "name": "Brewgether",
+      "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
       "spike_prob": 0.0062,
@@ -5290,88 +4659,49 @@
       "web_reach": null,
       "is_free": false,
       "genres": [
-        "Simulation",
-        "Strategy"
-      ]
-    },
-    {
-      "appid": 4852680,
-      "name": "Blackwater Exchange",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0062,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 3,
-      "demo_ccu": 1,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 1,
-      "dev_best_reviews": 0,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Indie",
-        "Simulation",
-        "Strategy"
-      ]
-    },
-    {
-      "appid": 4125200,
-      "name": "Brewgether",
-      "release": "16 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0062,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 3,
-      "demo_ccu": 1,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 1,
-      "dev_best_reviews": 0,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
         "Action",
         "Indie",
         "Simulation",
         "Strategy",
         "Early Access"
+      ]
+    },
+    {
+      "appid": 4273380,
+      "name": "Chesscent",
+      "release": "14 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0062,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "dev_best_peak",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 3,
+      "demo_ccu": 1,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": 1,
+      "dev_best_reviews": 0,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Casual",
+        "Strategy"
       ]
     },
     {
@@ -5410,6 +4740,44 @@
       "genres": [
         "Casual",
         "Simulation",
+        "Strategy"
+      ]
+    },
+    {
+      "appid": 4329800,
+      "name": "DICEASTER",
+      "release": "16 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0062,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "dev_best_peak",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 3,
+      "demo_ccu": 1,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": 1,
+      "dev_best_reviews": 0,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Action",
         "Strategy"
       ]
     },
@@ -5453,45 +4821,6 @@
       ]
     },
     {
-      "appid": 4750580,
-      "name": "Figryne Cast Studio Engine",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0062,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 3,
-      "demo_ccu": 2,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 2,
-      "dev_best_reviews": 0,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Animation & Modeling",
-        "Audio Production",
-        "Video Production"
-      ]
-    },
-    {
       "appid": 4420080,
       "name": "Ghost Algorithm",
       "release": "16 Jul, 2026",
@@ -5528,44 +4857,6 @@
         "Indie",
         "Simulation",
         "Strategy"
-      ]
-    },
-    {
-      "appid": 4502210,
-      "name": "Goblin Attack",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0062,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 3,
-      "demo_ccu": 3,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 3,
-      "dev_best_reviews": 0,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Casual",
-        "Indie"
       ]
     },
     {
@@ -5611,7 +4902,7 @@
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -5644,7 +4935,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -5678,7 +4969,7 @@
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -5712,7 +5003,7 @@
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -5744,7 +5035,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -5777,7 +5068,7 @@
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -5810,7 +5101,7 @@
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -5838,47 +5129,12 @@
       ]
     },
     {
-      "appid": 4452460,
-      "name": "Calling in the Shadows",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.006,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Action",
-        "Adventure",
-        "Indie",
-        "Early Access"
-      ]
-    },
-    {
       "appid": 4821610,
       "name": "CerbCade",
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -5912,7 +5168,7 @@
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -5946,7 +5202,7 @@
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -5976,45 +5232,12 @@
       ]
     },
     {
-      "appid": 4329800,
-      "name": "DICEASTER",
-      "release": "16 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.006,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Action",
-        "Strategy"
-      ]
-    },
-    {
       "appid": 3065180,
       "name": "Dolls: The Hunt",
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -6050,7 +5273,7 @@
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -6084,7 +5307,7 @@
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -6118,7 +5341,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -6150,7 +5373,7 @@
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -6182,7 +5405,7 @@
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -6216,7 +5439,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -6239,40 +5462,6 @@
       "web_reach": null,
       "is_free": false,
       "genres": [
-        "Simulation"
-      ]
-    },
-    {
-      "appid": 4488570,
-      "name": "Fresh Food Merge",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.006,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Action",
-        "Casual",
         "Simulation"
       ]
     },
@@ -6282,7 +5471,7 @@
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -6315,7 +5504,7 @@
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -6349,7 +5538,7 @@
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -6381,7 +5570,7 @@
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -6413,7 +5602,7 @@
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -6446,7 +5635,7 @@
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -6479,7 +5668,7 @@
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -6513,7 +5702,7 @@
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -6549,7 +5738,7 @@
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -6584,7 +5773,7 @@
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -6618,7 +5807,7 @@
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.006,
+      "spike_prob": 0.0059,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -6645,47 +5834,12 @@
       ]
     },
     {
-      "appid": 4877380,
-      "name": "Blackwater Exchange Soundtrack",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0055,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 1,
-      "dev_best_reviews": 0,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": []
-    },
-    {
       "appid": 4120310,
       "name": "70年代風ロボットアニメ ゲッP-X",
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0042,
+      "spike_prob": 0.0043,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -6717,12 +5871,12 @@
       ]
     },
     {
-      "appid": 3107030,
-      "name": "Alchemickal",
-      "release": "13 Jul, 2026",
+      "appid": 4057320,
+      "name": "Between These Two",
+      "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0042,
+      "spike_prob": 0.0043,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -6744,13 +5898,13 @@
       "news_count": 0,
       "has_news": false,
       "dev_best_peak": 1,
-      "dev_best_reviews": 9,
+      "dev_best_reviews": 14,
       "web_news": null,
-      "web_views": 0,
+      "web_views": null,
       "web_reach": null,
       "is_free": false,
       "genres": [
-        "Action",
+        "Adventure",
         "Indie"
       ]
     },
@@ -6760,7 +5914,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0042,
+      "spike_prob": 0.0043,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -6776,13 +5930,13 @@
         }
       ],
       "active_signals": 4,
-      "demo_ccu": 33,
+      "demo_ccu": 35,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 0,
       "has_news": false,
-      "dev_best_peak": 33,
-      "dev_best_reviews": 20,
+      "dev_best_peak": 35,
+      "dev_best_reviews": 21,
       "web_news": null,
       "web_views": null,
       "web_reach": null,
@@ -6794,51 +5948,12 @@
       ]
     },
     {
-      "appid": 4034890,
-      "name": "Dropt",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0042,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 4,
-      "demo_ccu": 1,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 18,
-      "dev_best_reviews": 707,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Casual",
-        "Indie",
-        "Strategy"
-      ]
-    },
-    {
       "appid": 3740000,
       "name": "Escape the Beach",
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0042,
+      "spike_prob": 0.0043,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -6872,49 +5987,12 @@
       ]
     },
     {
-      "appid": 4682660,
-      "name": "Femme Fatality",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0042,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 4,
-      "demo_ccu": 5,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 5,
-      "dev_best_reviews": 92,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Simulation"
-      ]
-    },
-    {
       "appid": 4834160,
       "name": "Find Cats 7 Art & Alchemy",
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0042,
+      "spike_prob": 0.0043,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -6930,12 +6008,12 @@
         }
       ],
       "active_signals": 4,
-      "demo_ccu": 1,
+      "demo_ccu": 2,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 0,
       "has_news": false,
-      "dev_best_peak": 1,
+      "dev_best_peak": 2,
       "dev_best_reviews": 41,
       "web_news": null,
       "web_views": null,
@@ -6952,7 +6030,7 @@
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0042,
+      "spike_prob": 0.0043,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -6986,50 +6064,12 @@
       ]
     },
     {
-      "appid": 4568980,
-      "name": "Fu-Fu-Chan -way up!-",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0042,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 4,
-      "demo_ccu": 1,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 1,
-      "dev_best_reviews": 19,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Action",
-        "Indie"
-      ]
-    },
-    {
       "appid": 4066190,
       "name": "Jiaozi & Shopkeeper",
       "release": "16 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0042,
+      "spike_prob": 0.0043,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -7116,90 +6156,6 @@
       ]
     },
     {
-      "appid": 4926540,
-      "name": "Democracy Manifest Alpha Demo",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0038,
-      "expect": "low",
-      "conf": "high",
-      "factors": [],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": true,
-      "genres": [
-        "Action",
-        "Casual",
-        "Indie",
-        "Strategy"
-      ]
-    },
-    {
-      "appid": 4937220,
-      "name": "GLANCED Demo",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0038,
-      "expect": "low",
-      "conf": "high",
-      "factors": [],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": true,
-      "genres": [
-        "Action",
-        "Early Access"
-      ]
-    },
-    {
-      "appid": 4881740,
-      "name": "HollowCity:EscapeFromSeoul Demo",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0038,
-      "expect": "low",
-      "conf": "high",
-      "factors": [],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": true,
-      "genres": [
-        "Action",
-        "Adventure",
-        "Indie"
-      ]
-    },
-    {
       "appid": 4901850,
       "name": "I Missed the Apocalypse",
       "release": "16 Jul, 2026",
@@ -7229,12 +6185,99 @@
       ]
     },
     {
+      "appid": 4805390,
+      "name": "Knights vs Aliens",
+      "release": "16 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0038,
+      "expect": "low",
+      "conf": "high",
+      "factors": [],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": true,
+      "genres": [
+        "Action",
+        "Casual",
+        "Indie",
+        "Strategy",
+        "Free To Play"
+      ]
+    },
+    {
+      "appid": 4909260,
+      "name": "Line Go Up",
+      "release": "17 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0038,
+      "expect": "low",
+      "conf": "high",
+      "factors": [],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": true,
+      "genres": [
+        "Casual",
+        "Indie",
+        "Strategy",
+        "Free To Play"
+      ]
+    },
+    {
+      "appid": 4853570,
+      "name": "LunaGenesis Demo",
+      "release": "16 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0038,
+      "expect": "low",
+      "conf": "high",
+      "factors": [],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": true,
+      "genres": [
+        "Action",
+        "Adventure",
+        "Indie"
+      ]
+    },
+    {
       "appid": 4865670,
       "name": "Escape the Beach Soundtrack",
       "release": "17 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0037,
+      "spike_prob": 0.0036,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -7262,44 +6305,6 @@
       "web_reach": null,
       "is_free": false,
       "genres": []
-    },
-    {
-      "appid": 4097640,
-      "name": "Areteion",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0032,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 3,
-      "demo_ccu": 3,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 3,
-      "dev_best_reviews": 0,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Indie",
-        "Strategy"
-      ]
     },
     {
       "appid": 4819200,
@@ -7399,41 +6404,8 @@
       ]
     },
     {
-      "appid": 4057320,
-      "name": "Between These Two",
-      "release": "17 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0029,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": 1,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Adventure",
-        "Indie"
-      ]
-    },
-    {
-      "appid": 4273380,
-      "name": "Chesscent",
+      "appid": 4436740,
+      "name": "Level Up, Tiny King!",
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
@@ -7460,8 +6432,9 @@
       "web_reach": null,
       "is_free": false,
       "genres": [
-        "Casual",
-        "Strategy"
+        "Action",
+        "Indie",
+        "Early Access"
       ]
     },
     {
@@ -7470,7 +6443,7 @@
       "release": "14 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0026,
+      "spike_prob": 0.0024,
       "expect": "low",
       "conf": "low",
       "factors": [
@@ -7500,7 +6473,7 @@
       "release": "15 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0026,
+      "spike_prob": 0.0024,
       "expect": "low",
       "conf": "low",
       "factors": [
@@ -7638,124 +6611,6 @@
       ]
     },
     {
-      "appid": 4566880,
-      "name": "Endless Roll",
-      "release": "13 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0022,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 4,
-      "demo_ccu": 1,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 1,
-      "dev_best_reviews": 16,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Indie"
-      ]
-    },
-    {
-      "appid": 4769770,
-      "name": "ChronoRewind: The Great Ritual",
-      "release": "14 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.002,
-      "expect": "low",
-      "conf": "high",
-      "factors": [],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": true,
-      "genres": [
-        "Indie",
-        "Strategy",
-        "Free To Play"
-      ]
-    },
-    {
-      "appid": 4798860,
-      "name": "Circuit Keep Demo",
-      "release": "17 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.002,
-      "expect": "low",
-      "conf": "high",
-      "factors": [],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": true,
-      "genres": [
-        "Strategy"
-      ]
-    },
-    {
-      "appid": 4853820,
-      "name": "Crownrats Demo",
-      "release": "15 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.002,
-      "expect": "low",
-      "conf": "high",
-      "factors": [],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": true,
-      "genres": [
-        "Indie",
-        "Strategy"
-      ]
-    },
-    {
       "appid": 4334110,
       "name": "Heartstop Tour",
       "release": "14 Jul, 2026",
@@ -7786,6 +6641,87 @@
       "genres": [
         "Indie",
         "Free To Play"
+      ]
+    },
+    {
+      "appid": 4769770,
+      "name": "ChronoRewind: The Great Ritual",
+      "release": "14 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0019,
+      "expect": "low",
+      "conf": "high",
+      "factors": [],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": true,
+      "genres": [
+        "Indie",
+        "Strategy",
+        "Free To Play"
+      ]
+    },
+    {
+      "appid": 4798860,
+      "name": "Circuit Keep Demo",
+      "release": "17 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0019,
+      "expect": "low",
+      "conf": "high",
+      "factors": [],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": true,
+      "genres": [
+        "Strategy"
+      ]
+    },
+    {
+      "appid": 4853820,
+      "name": "Crownrats Demo",
+      "release": "15 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0019,
+      "expect": "low",
+      "conf": "high",
+      "factors": [],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": true,
+      "genres": [
+        "Indie",
+        "Strategy"
       ]
     },
     {
