@@ -2,6 +2,10 @@
 # 置き場所: .github/workflows/diagnose_timing_align.yml
 # 役割: 本番点灯（TIMING_ALIGN=1）前の分布確認。主因を時刻確認できた率／種別ごとの整合・非整合・中立／
 #       lead日数（t_rise−onset）の分布を見て、CAUSE_LOOKBACK_DAYS 等のしきい値を確定する（休眠導入の定石）。
+# 運用（決定済み 2026-07-16・docs/investigation_design.md「Phase2 A の運用」参照）:
+#   マージ後に本ワークフローを数回（別日に分けて）手動実行し、lead サンプルを10件程度貯めてから
+#   しきい値を確定 → 本番 view02_rank_v2.yml に TIMING_ALIGN:"1" を追加して点灯。
+#   1回で得られる時刻付きサンプルは news/launch の 2〜3 件（実測）＝ 4〜5 回が目安。
 # 守る線: DBは読み取り専用（SELECTのみ）。OUT_PATH=/tmp のためリポジトリに一切書かない＝本番 view02_rising.json 無影響。
 #         コミットなし・ログのみ。手動実行のみ（workflow_dispatch）。
 name: diagnose timing align (read-only)
