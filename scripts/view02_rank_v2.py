@@ -90,9 +90,13 @@ B1_ATTENTION = float(os.environ.get("B1_ATTENTION") or "0.05")  # 配信注目
 BOOST_WEB    = float(os.environ.get("BOOST_WEB")    or "0.05")  # Web/ニュースで話題（GDELT・上限内）
 BOOST_CAP    = float(os.environ.get("BOOST_CAP")    or "0.30")  # 合計ブーストの上限
 # Web話題（GDELT・オンザフライ・保存なし。Twitchと同型＝計算時取得→使い捨て）
-WEB_CAND_N   = int(os.environ.get("WEB_CAND_N")   or "20")   # GDELTを照会する候補数（base順上位・遅いので絞る）
+WEB_CAND_N   = int(os.environ.get("WEB_CAND_N")   or "20")   # GDELTを照会する“基本枠”（優先順で前から。遅いので絞る）
 WEB_NEWS_MIN = int(os.environ.get("WEB_NEWS_MIN") or "3")    # この記事数以上で「Web/ニュースで話題」を点灯
 GDELT_DELAY  = float(os.environ.get("GDELT_DELAY") or "1.0") # GDELT照会の間隔（429回避）
+# 「調査中」（他シグナル未検出＝このままだと原因不明）を優先してWeb調査に回す設定。
+#   ON なら基本枠を超えても“調査中”は全件照会する＝きっかけをちゃんと掘りにいく（安全上限までは自動で拡張）。
+WEB_UNKNOWN_ALL = (os.environ.get("WEB_UNKNOWN_ALL") or "1").strip().lower() not in ("0", "false", "no", "off")
+WEB_MAX_QUERIES = int(os.environ.get("WEB_MAX_QUERIES") or str(CAND_N))  # GDELT照会“総数”の安全上限（暴走防止）
 # B1 しきい値（暫定）
 B1_FEW_CH    = int(os.environ.get("B1_FEW_CH")    or "10")   # 「少数配信」の上限
 B1_CONC_REF  = float(os.environ.get("B1_CONC_REF") or "300") # 視聴/配信 の基準（集中度）
@@ -331,12 +335,15 @@ def twitch_fetch(names):
     return out
 
 
-def web_fetch(names):
+def web_fetch(names, limit=None):
     """ゲーム名 → GDELT 直近1週間の世界多言語ニュース記事数（オンザフライ・保存なし・きっかけ用）。
-    上位 WEB_CAND_N 件だけ照会（GDELTは遅いので絞る＝Twitchと同じ“計算時取得→使い捨て”）。
+    names は「優先順」で渡す（呼び出し側が“調査中”を先頭に並べる）。先頭 limit 件だけ照会
+    （GDELTは遅いので絞る＝Twitchと同じ“計算時取得→使い捨て”）。limit 省略時は WEB_CAND_N。
     失敗/遅延はそのゲームだけ skip（点灯しないだけ・全体は壊れない）。鍵不要（公式GDELT API）。"""
     out = {}
-    for n in names[:WEB_CAND_N]:
+    if limit is None:
+        limit = WEB_CAND_N
+    for n in names[:limit]:
         q = norm_name(n)
         if not q or len(q) < 3:
             continue  # 短すぎる名前は誤マッチ源＝照会しない
@@ -423,7 +430,37 @@ def main():
         conn.close()
 
     tw = twitch_fetch([r["name"] for r in cand])   # DB接続外でTwitch取得（保存なし）
-    web = web_fetch([r["name"] for r in cand])      # DB接続外でWeb話題(GDELT)取得（保存なし）
+
+    # ── 「調査中」を優先してWeb調査(GDELT)に回す ───────────────────────────────
+    # sale/news/launch/free/review/jp_news/Twitch のどれでもきっかけが立たなかった候補（＝このままだと
+    # 「原因不明＝調査中」になる作品）を先頭へ並べ、限られたGDELT照会枠を“調査中の解明”へ優先投入する。
+    # 従来は base(倍率)順の上位 WEB_CAND_N 件だけを照会していたため、既にセール等で判明済みの上位に枠を使い、
+    # 倍率が下位で他シグナルの無い＝まさに調査中の作品はWeb調査を一切受けられなかった。ここでそれを是正する。
+    def _has_trigger_pre_web(r):
+        """Web調査より前の段階（DB系＋Twitch）で、きっかけが1つでも立っているか。"""
+        sp = sale.get(r["appid"])
+        if sp and sp.get("pct", 0) > 0:
+            return True
+        if (r["appid"] in news or r["is_launch"] or r["appid"] in free
+                or r["appid"] in rev_surge_ids or r["appid"] in jpnews):
+            return True
+        return bool(b1_signal(r["current_ccu"], tw.get(r["name"]))[0])
+
+    unresolved = [r for r in cand if not _has_trigger_pre_web(r)]   # ＝いまのままだと「調査中」
+    resolved   = [r for r in cand if _has_trigger_pre_web(r)]
+    web_order  = [r["name"] for r in unresolved] + [r["name"] for r in resolved]  # 調査中を先頭に
+    web_limit  = WEB_CAND_N
+    if WEB_UNKNOWN_ALL:
+        web_limit = max(web_limit, len(unresolved))    # 調査中は枠を超えても全件（＝ちゃんと調査する）
+    web_limit  = min(web_limit, WEB_MAX_QUERIES, len(web_order))    # ただし安全上限は超えない
+    print(f"Web調査(GDELT): 調査中 {len(unresolved)} 件を優先し計 {web_limit} 件を照会"
+          f"（基本枠WEB_CAND_N={WEB_CAND_N} / 安全上限WEB_MAX_QUERIES={WEB_MAX_QUERIES}"
+          f" / 調査中全件={'ON' if WEB_UNKNOWN_ALL else 'OFF'}）。")
+    web = web_fetch(web_order, limit=web_limit)     # DB接続外でWeb話題(GDELT)取得（保存なし）
+
+    # Web調査で「調査中」のうち何件のきっかけが立ったか（＝この機能が実際に効いた件数）を可視化。
+    n_web_hit = sum(1 for r in unresolved if web.get(r["name"], 0) >= WEB_NEWS_MIN)
+    print(f"Web調査により 調査中 {n_web_hit}/{len(unresolved)} 件できっかけを検出（記事{WEB_NEWS_MIN}本以上で点灯）。")
 
     rows = []
     for r in cand:

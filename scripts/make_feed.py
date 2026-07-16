@@ -16,7 +16,7 @@ MAX_ITEMS = int(os.environ.get("FEED_MAX_ITEMS", "25"))
 
 CAUSE_JA = {"sale": "セール", "news": "更新/告知", "launch": "新作", "free_promo": "無料配布",
             "review_surge": "レビュー増", "b1_discovery": "配信で発掘", "b1_attention": "配信で注目",
-            "jp_news": "国内で話題"}
+            "jp_news": "国内で話題", "web_buzz": "Web/ニュースで話題"}
 CONF_JA  = {"high": "確度 高", "mid": "確度 中", "low": "確度 低"}
 
 
@@ -35,6 +35,8 @@ def causes_text(signals):
             lab += f" {v['discount_percent']}%OFF"
         elif t == "review_surge" and v.get("delta") is not None:
             lab += f" +{v['delta']}"
+        elif t == "web_buzz" and v.get("articles") is not None:
+            lab += f"（記事{v['articles']}）"
         out.append(lab)
     return "・".join(out) if out else "きっかけは調査中"
 
