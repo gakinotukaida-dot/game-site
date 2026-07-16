@@ -97,6 +97,9 @@ GDELT_DELAY  = float(os.environ.get("GDELT_DELAY") or "1.0") # GDELT照会の間
 #   ON なら基本枠を超えても“調査中”は全件照会する＝きっかけをちゃんと掘りにいく（安全上限までは自動で拡張）。
 WEB_UNKNOWN_ALL = (os.environ.get("WEB_UNKNOWN_ALL") or "1").strip().lower() not in ("0", "false", "no", "off")
 WEB_MAX_QUERIES = int(os.environ.get("WEB_MAX_QUERIES") or str(CAND_N))  # GDELT照会“総数”の安全上限（暴走防止）
+# 透明性（B）：各作品の「調査メタ」を公開JSONに出すか。何を調べ・各ソースが陰性/陽性か・なぜ不明かを
+#   集計のみで記録する（Twitch数値は公開しない＝真偽のみ／記事数は既に公開済み）。OFFで従来JSONに戻る（可逆）。
+INV_META = (os.environ.get("INV_META") or "1").strip().lower() not in ("0", "false", "no", "off")
 # B1 しきい値（暫定）
 B1_FEW_CH    = int(os.environ.get("B1_FEW_CH")    or "10")   # 「少数配信」の上限
 B1_CONC_REF  = float(os.environ.get("B1_CONC_REF") or "300") # 視聴/配信 の基準（集中度）
@@ -462,6 +465,10 @@ def main():
     n_web_hit = sum(1 for r in unresolved if web.get(r["name"], 0) >= WEB_NEWS_MIN)
     print(f"Web調査により 調査中 {n_web_hit}/{len(unresolved)} 件できっかけを検出（記事{WEB_NEWS_MIN}本以上で点灯）。")
 
+    # 透明性（B）用：Web(GDELT)を実際に“照会対象にした”名前集合と、Twitchが使えたか（鍵有無）。
+    web_queried_names = set(web_order[:web_limit])
+    twitch_avail = bool(CLIENT_ID and CLIENT_SECRET)
+
     rows = []
     for r in cand:
         sr = shrunk(r["raw_ratio"], r["n_points"])
@@ -499,6 +506,27 @@ def main():
             signals.append({"type": b1type, "layer": "trigger", "value": None}); boost += b1boost
         if b1label:
             label_parts.append(b1label)  # 印字（診断用）にはラベルを残す＝公開はしない
+        # ── 透明性（B）：この作品で何を調べ、各ソースが陰性/陽性か・なぜ不明かを集計のみで残す ──
+        #   Twitchは真偽のみ（数値は公開しない＝②）。記事数(articles)は既に公開済みなので載せてよい。
+        wq = r["name"] in web_queried_names          # Web(GDELT)を実際に照会対象にしたか
+        inv_results = {
+            "sale":    {"queried": True, "hit": bool(sp and sp["pct"] > 0)},
+            "news":    {"queried": True, "hit": r["appid"] in news},
+            "launch":  {"queried": True, "hit": bool(r["is_launch"])},
+            "free":    {"queried": True, "hit": r["appid"] in free},
+            "review":  {"queried": True, "hit": r["appid"] in rev_surge_ids},
+            "jp_news": {"queried": True, "hit": r["appid"] in jpnews},
+            "twitch":  {"queried": twitch_avail, "hit": bool(b1type)},
+            "web":     {"queried": wq, "hit": wc >= WEB_NEWS_MIN, "articles": int(wc)},
+        }
+        if signals:
+            unknown_reason = None
+        elif not wq:
+            unknown_reason = "web_skipped_budget"          # 主要手段(GDELT)を予算で未照会＝カバレッジ欠落
+        else:
+            unknown_reason = "investigated_all_negative"   # 調べ尽くして陰性＝正直な調査中
+        investigation = {"queried": [k for k, v in inv_results.items() if v["queried"]],
+                         "results": inv_results, "unknown_reason": unknown_reason}
         boost_capped = boost >= BOOST_CAP
         boost = clamp(boost, 0, BOOST_CAP)
         eff = bs * (1 + boost)
@@ -516,7 +544,8 @@ def main():
             label = " + ".join(label_parts) if label_parts else "（シグナルあり）"
         r.update({"shrunk": sr, "base": bs, "eff": eff, "label": label, "conf": conf,
                   "conf_code": conf_code, "signals": signals, "boost": boost,
-                  "boost_capped": boost_capped, "tw": tw.get(r["name"]), "web": web.get(r["name"])})
+                  "boost_capped": boost_capped, "tw": tw.get(r["name"]), "web": web.get(r["name"]),
+                  "investigation": investigation})
         rows.append(r)
 
     rows.sort(key=lambda x: x["eff"], reverse=True)
@@ -536,7 +565,13 @@ def main():
         print(f"  {nm} {str(r['current_ccu']).rjust(6)} {str(r['recent_value']).rjust(6)} "
               f"{base.rjust(6)} {ratio.rjust(5)} {z.rjust(4)} {'Y' if r['is_riser'] else '-'}    "
               f"{'Y' if r['is_launch'] else '-'}    {tws.rjust(10)}  {r['label']} / {r['conf']}")
-    print(f"\n原因不明: {n_unknown}/{len(rows)}。重みは上限付き暫定（案2で学習予定）。Twitchは集計のみ・保存なし。")
+    reason_ct = {"investigated_all_negative": 0, "web_skipped_budget": 0}
+    for r in rows:
+        rr = (r.get("investigation") or {}).get("unknown_reason")
+        if rr in reason_ct:
+            reason_ct[rr] += 1
+    print(f"\n原因不明: {n_unknown}/{len(rows)}（調べ尽くし陰性 {reason_ct['investigated_all_negative']} "
+          f"/ 予算で未照会 {reason_ct['web_skipped_budget']}）。重みは上限付き暫定（案2で学習予定）。")
     print("=" * 88)
 
     # ---------- 出力JSON（data/view02_rising.json・独立・上書き・可逆） ----------
@@ -554,7 +589,7 @@ def main():
         "items": [],
     }
     for i, r in enumerate(rows, 1):
-        out["items"].append({
+        item = {
             "rank": i,
             "appid": int(r["appid"]),
             "name": r["name"],
@@ -578,7 +613,10 @@ def main():
                       "boost": round(r["boost"], 2), "boost_capped": bool(r["boost_capped"])},
             # 折れ線グラフ用の観測履歴（[[ts,ccu],...]・6hバケット・now_ccuと同形式）。無い作品は付けない。
             "history": hist_by.get(int(r["appid"]), []),
-        })
+        }
+        if INV_META:  # 透明性（B）：調査メタ（何を調べ・陰性/陽性・なぜ不明か）。集計のみ・Twitch数値なし。
+            item["investigation"] = r["investigation"]
+        out["items"].append(item)
     try:
         out_dir = os.path.dirname(OUT_PATH)
         if out_dir:

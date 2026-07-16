@@ -1,7 +1,9 @@
 # 「調査中（原因不明）」の調査アルゴリズム — 設計・決定記録
 
 対象: `scripts/view02_rank_v2.py`（本番ランキング）→ `data/view02_rising.json` → `scripts/make_feed.py`（RSS）
-状態: **方針確定**（Phase1 から着手）。本書は経緯・判定・決定・懸念消し込みを残す決定記録であり、Phase1 の実装仕様も兼ねる。
+状態: **方針確定・Phase1 実装済み**。本書は経緯・判定・決定・懸念消し込みを残す決定記録であり、Phase1 の実装仕様も兼ねる。
+Phase1（B 透明性 + D プロセス指標）は本PRで実装：`view02_rank_v2.py` に `investigation` ブロック（env `INV_META`）、
+`scripts/diagnose_cause_accuracy.py` ＋ `.github/workflows/cause_scorecard.yml`（`data/cause_scorecard.json` を出力）。
 
 ---
 
@@ -87,7 +89,7 @@
 
 ```
 PR#39（済）= カバレッジ。維持（テスト済・可逆）
- └─ Phase1: B（透明性・修正版）+ D（プロセス指標）
+ └─ Phase1【実装済み】: B（透明性・修正版）+ D（プロセス指標）
  └─ Phase2: A（精度層・ソフト・env既定OFF）+ D-リフト（履歴が貯まってから）
  └─ C: 休眠（B/Dで真の未知が支配的、かつ非循環の新ソースが出た場合のみ再検討）
 ```
