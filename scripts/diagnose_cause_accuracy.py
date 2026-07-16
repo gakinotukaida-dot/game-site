@@ -39,8 +39,8 @@ def main():
     n = len(items)
 
     known = unknown = 0
-    reasons = {}                 # 調査中の内訳（investigated_all_negative / web_skipped_budget / unlabeled）
-    web_queried = web_hit = web_solo = 0
+    reasons = {}                 # 調査中の内訳（investigated_all_negative / web_skipped_budget / web_query_failed / unlabeled）
+    web_queried = web_hit = web_solo = web_err = 0
     signal_hits = {}             # きっかけソース別の点灯件数（1作品に複数可）
     conf = {}
     has_inv = False
@@ -68,6 +68,8 @@ def main():
             web_queried += 1
         if web.get("hit"):
             web_hit += 1
+        if web.get("error"):
+            web_err += 1
         if types == ["web_buzz"]:     # 他ソース陰性で Web 単独が解明した＝PR#39 の直接効果
             web_solo += 1
 
@@ -94,6 +96,7 @@ def main():
             "queried": web_queried,
             "hit": web_hit,
             "resolved_solo": web_solo,   # Web単独で「調査中」→解明にした件数
+            "query_failed": web_err,     # 照会失敗（レート制限等・陰性と区別＝調査の網羅性の欠け）
             "hit_rate": round(web_hit / web_queried, 4) if web_queried else None,
         },
         "signal_hits": dict(sorted(signal_hits.items(), key=lambda kv: kv[1], reverse=True)),
@@ -110,7 +113,7 @@ def main():
     if reasons:
         parts = " / ".join(f"{k}={v}" for k, v in scorecard["coverage"]["unknown_reasons"].items())
         print(f"  調査中の内訳: {parts}")
-    print(f"  Web調査: 照会 {web_queried} ・ 点灯 {web_hit} ・ Web単独解明 {web_solo}"
+    print(f"  Web調査: 照会 {web_queried} ・ 点灯 {web_hit} ・ Web単独解明 {web_solo} ・ 照会失敗 {web_err}"
           + (f" ・ 点灯率 {scorecard['web_investigation']['hit_rate']:.1%}" if web_queried else ""))
     if signal_hits:
         top = " / ".join(f"{k}:{v}" for k, v in list(scorecard["signal_hits"].items())[:8])

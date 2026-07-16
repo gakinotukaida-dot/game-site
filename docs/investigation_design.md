@@ -120,9 +120,14 @@ A は既定 OFF。`TIMING_ALIGN=1` で有効化する前に、Phase1 の `cause_
   "unknown_reason": null
   //  "investigated_all_negative" = 全ソース調べて陰性（＝正直な調査中）
   //  "web_skipped_budget"        = GDELT予算切れで未照会（カバレッジ欠落・PR#39後は稀）
+  //  "web_query_failed"          = GDELT照会が失敗（レート制限等・再試行済み）＝「調べ尽くした」とは言えない
   //  "twitch_key_absent"         = 鍵なしでB1未実施
 }
 ```
+
+CI実測（2026-07-16 初回・TIMING_ALIGN=1 診断実行）で GDELT が 30 件中 21 件 HTTPError（レート制限）と判明。
+対策として web_fetch に GDELT_RETRY_WAIT（既定10s）での1回再試行を追加し、失敗作品は `web.error=true` +
+`unknown_reason="web_query_failed"` で「陰性」と区別する（失敗を『調べ尽くした』と偽らない＝Bの核）。
 
 - `unknown_reason` は **調査中 item のみ**に意味を持たせる（既知 item は `null`）。
 - 追記ログ用の新ファイルは作らない（B-3）。永続化は F7 の git 履歴に委ねる。
