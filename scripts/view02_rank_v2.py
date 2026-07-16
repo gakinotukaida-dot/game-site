@@ -90,9 +90,27 @@ B1_ATTENTION = float(os.environ.get("B1_ATTENTION") or "0.05")  # 配信注目
 BOOST_WEB    = float(os.environ.get("BOOST_WEB")    or "0.05")  # Web/ニュースで話題（GDELT・上限内）
 BOOST_CAP    = float(os.environ.get("BOOST_CAP")    or "0.30")  # 合計ブーストの上限
 # Web話題（GDELT・オンザフライ・保存なし。Twitchと同型＝計算時取得→使い捨て）
-WEB_CAND_N   = int(os.environ.get("WEB_CAND_N")   or "20")   # GDELTを照会する候補数（base順上位・遅いので絞る）
+WEB_CAND_N   = int(os.environ.get("WEB_CAND_N")   or "20")   # GDELTを照会する“基本枠”（優先順で前から。遅いので絞る）
 WEB_NEWS_MIN = int(os.environ.get("WEB_NEWS_MIN") or "3")    # この記事数以上で「Web/ニュースで話題」を点灯
 GDELT_DELAY  = float(os.environ.get("GDELT_DELAY") or "1.0") # GDELT照会の間隔（429回避）
+GDELT_RETRY_WAIT = float(os.environ.get("GDELT_RETRY_WAIT") or "10")  # 失敗時に1回だけ再試行するまでの待ち（レート制限の谷待ち）
+GDELT_CONSEC_NO_RETRY = int(os.environ.get("GDELT_CONSEC_NO_RETRY") or "3")  # 連続失敗がこの数でリトライを止める（無駄な10秒待ちの抑制）
+GDELT_CONSEC_ABORT    = int(os.environ.get("GDELT_CONSEC_ABORT")    or "8")  # 連続失敗がこの数で残り全件を打ち切る（全面障害時の暴走防止）
+# 「調査中」（他シグナル未検出＝このままだと原因不明）を優先してWeb調査に回す設定。
+#   ON なら基本枠を超えても“調査中”は全件照会する＝きっかけをちゃんと掘りにいく（安全上限までは自動で拡張）。
+WEB_UNKNOWN_ALL = (os.environ.get("WEB_UNKNOWN_ALL") or "1").strip().lower() not in ("0", "false", "no", "off")
+WEB_MAX_QUERIES = int(os.environ.get("WEB_MAX_QUERIES") or str(CAND_N))  # GDELT照会“総数”の安全上限（暴走防止）
+# 透明性（B）：各作品の「調査メタ」を公開JSONに出すか。何を調べ・各ソースが陰性/陽性か・なぜ不明かを
+#   集計のみで記録する（Twitch数値は公開しない＝真偽のみ／記事数は既に公開済み）。OFFで従来JSONに戻る（可逆）。
+INV_META = (os.environ.get("INV_META") or "1").strip().lower() not in ("0", "false", "no", "off")
+# タイミング整合（A・Phase2）：シグナルの発生時刻と“伸びの立ち上がり(t_rise)”の整合で主因/併発を分ける。
+#   ソフト（除外しない・signalsは消さない＝調査中を増やさない）。既定OFF。MVPは時刻の確かな news/launch のみ判定し、
+#   時刻不明のソースは aligned=null（中立＝フルboost）。非整合(併発)は boost を CAUSE_MISALIGN_MULT 倍に弱めるだけ。
+TIMING_ALIGN = (os.environ.get("TIMING_ALIGN") or "0").strip().lower() in ("1", "true", "yes", "on")  # 既定OFF
+RISE_ONSET_FRAC     = float(os.environ.get("RISE_ONSET_FRAC")     or "0.5")  # baseline→peak の何割超えを起点とみなすか
+CAUSE_LOOKBACK_DAYS = float(os.environ.get("CAUSE_LOOKBACK_DAYS") or "3")    # 原因が伸びの何日前まで先行を許すか
+CAUSE_LAG_DAYS      = float(os.environ.get("CAUSE_LAG_DAYS")      or "1")    # 伸びの後どれだけ遅れを許すか
+CAUSE_MISALIGN_MULT = float(os.environ.get("CAUSE_MISALIGN_MULT") or "0.4")  # 非整合(併発)シグナルのboost倍率
 # B1 しきい値（暫定）
 B1_FEW_CH    = int(os.environ.get("B1_FEW_CH")    or "10")   # 「少数配信」の上限
 B1_CONC_REF  = float(os.environ.get("B1_CONC_REF") or "300") # 視聴/配信 の基準（集中度）
@@ -190,6 +208,101 @@ def shrunk(raw, n):
     if raw is None or n is None:
         return None
     return 1 + (n / (n + N0)) * (raw - 1)
+
+
+# ---------- タイミング整合（A・Phase2） ----------
+def estimate_t_rise(history, baseline, frac):
+    """観測履歴 [[ts,ccu],...]（6hバケット）から“伸びの立ち上がり時刻”を推定（epoch秒 or None）。
+    しきい値 = baseline + (peak−baseline)×frac。最新から遡り、しきい値以上が続く“直近の連続超過区間の始点”を起点とする
+    （途中で落ちて再上昇した作品でも「いまの伸び」の起点を拾う）。伸びが測れない/履歴が無い場合は None。"""
+    if not history or baseline is None:
+        return None
+    ccus = [c for _, c in history]
+    peak = max(ccus) if ccus else 0
+    if peak <= baseline:
+        return None
+    thr = baseline + (peak - baseline) * frac
+    t_rise = None
+    for ts, c in reversed(history):   # 最新→過去
+        if c >= thr:
+            t_rise = ts               # 超過が続く間、起点を過去へ更新
+        elif t_rise is not None:
+            break                     # 直近の連続超過区間の始点で確定
+    return t_rise
+
+
+def signal_onset_ts(sig_type, r, news_map, now_epoch):
+    """シグナルの発生時刻（epoch秒）を返す。MVPは時刻の確かな news/launch のみ。他は None（＝中立扱い）。
+    news は days_ago（最新告知からの経過日）で近似、launch は release_date の 00:00 UTC。"""
+    if sig_type == "news":
+        da = news_map.get(r["appid"])
+        return None if da is None else (now_epoch - da * 86400)
+    if sig_type == "launch":
+        rd = r.get("release_date")
+        if not rd or not hasattr(rd, "year"):
+            return None
+        return datetime.datetime(rd.year, rd.month, rd.day, tzinfo=datetime.timezone.utc).timestamp()
+    return None
+
+
+def apply_timing_alignment(signals, sig_boosts, history, baseline, r, news_map, now_epoch):
+    """A（ソフト）：各シグナルに aligned/onset_ts を付け、伸びの立ち上がり(t_rise)と時刻整合するものを主因、
+    しないものを併発(layer=context)にして sig_boosts を CAUSE_MISALIGN_MULT 倍に弱める（in-place・除外しない）。
+    時刻不明のシグナルは aligned=None（中立＝据え置き）。戻り値＝主因の type（最も明確に先行した整合シグナル）or None。
+    signals と sig_boosts は 1:1 対応（呼び出し側が同順で append 済み）。"""
+    t_rise = estimate_t_rise(history, baseline, RISE_ONSET_FRAC)
+    primary_cause, best_lead = None, None
+    for idx, sig in enumerate(signals):
+        t_sig = None if t_rise is None else signal_onset_ts(sig["type"], r, news_map, now_epoch)
+        sig["onset_ts"] = None if t_sig is None else int(t_sig)
+        if t_sig is None:
+            sig["aligned"] = None                 # 時刻不明＝中立（フルboost・trigger据え置き）
+            continue
+        lead = t_rise - t_sig                      # 正＝原因が伸びに先行
+        aligned = (-CAUSE_LAG_DAYS * 86400) <= lead <= (CAUSE_LOOKBACK_DAYS * 86400)
+        sig["aligned"] = bool(aligned)
+        if aligned:
+            sig["layer"] = "trigger"
+            if best_lead is None or lead > best_lead:
+                best_lead, primary_cause = lead, sig["type"]   # 最も明確に先行した整合シグナル
+        else:
+            sig["layer"] = "context"               # 併発（同時に存在するが時刻が合わない）
+            sig_boosts[idx] *= CAUSE_MISALIGN_MULT
+    return primary_cause
+
+
+def alignment_report(rows, hist_by):
+    """TIMING_ALIGN 診断用の集計（印字する行のリストを返す・JSONには何も足さない＝ログのみ）。
+    しきい値（CAUSE_LOOKBACK_DAYS 等）確定のため、種別ごとの整合/非整合/中立と lead 日数分布を出す。
+    lead＝t_rise − onset（正＝原因が伸びに先行）。中立＝時刻不明（aligned=None）。"""
+    by, leads = {}, {}
+    n_trise = 0
+    for r in rows:
+        tr = estimate_t_rise(hist_by.get(int(r["appid"]), []), r["baseline"], RISE_ONSET_FRAC)
+        if tr is not None:
+            n_trise += 1
+        for s in r["signals"]:
+            if "aligned" not in s:
+                continue
+            cnt = by.setdefault(s["type"], [0, 0, 0])   # [整合, 非整合, 中立]
+            if s["aligned"] is True:
+                cnt[0] += 1
+            elif s["aligned"] is False:
+                cnt[1] += 1
+            else:
+                cnt[2] += 1
+            if s["aligned"] is not None and tr is not None and s.get("onset_ts") is not None:
+                leads.setdefault(s["type"], []).append((tr - s["onset_ts"]) / 86400.0)
+    lines = [f"  t_rise 推定可: {n_trise}/{len(rows)} 件（推定不能＝伸びが測れない/履歴なし→全シグナル中立）"]
+    for t, (a, m, z) in sorted(by.items(), key=lambda kv: -(kv[1][0] + kv[1][1])):
+        ld = sorted(leads.get(t, []))
+        if ld:
+            k = len(ld)
+            med = ld[k // 2] if k % 2 else (ld[k // 2 - 1] + ld[k // 2]) / 2   # 偶数個は中央2値の平均（上振れ防止）
+            lines.append(f"  {t}: 整合{a} / 非整合{m} / 中立{z}・lead日数 中央値{med:+.1f}（min{ld[0]:+.1f}/max{ld[-1]:+.1f}）")
+        else:
+            lines.append(f"  {t}: 整合{a} / 非整合{m} / 中立{z}")
+    return lines
 
 
 # ---------- cause（既存テーブル・防御クエリ） ----------
@@ -331,21 +444,46 @@ def twitch_fetch(names):
     return out
 
 
-def web_fetch(names):
+def web_fetch(names, limit=None):
     """ゲーム名 → GDELT 直近1週間の世界多言語ニュース記事数（オンザフライ・保存なし・きっかけ用）。
-    上位 WEB_CAND_N 件だけ照会（GDELTは遅いので絞る＝Twitchと同じ“計算時取得→使い捨て”）。
-    失敗/遅延はそのゲームだけ skip（点灯しないだけ・全体は壊れない）。鍵不要（公式GDELT API）。"""
-    out = {}
-    for n in names[:WEB_CAND_N]:
+    names は「優先順」で渡す（呼び出し側が“調査中”を先頭に並べる）。先頭 limit 件だけ照会
+    （GDELTは遅いので絞る＝Twitchと同じ“計算時取得→使い捨て”）。limit 省略時は WEB_CAND_N。
+    レート制限(HTTPError等)は GDELT_RETRY_WAIT 秒待って1回だけ再試行（実測21/30失敗の是正）。
+    照会できなかった作品（失敗・短名で照会不能）は failed に入れて返す＝「調べ尽くした」と
+    「Web調査ができなかった」を区別できる（B: 正直さ）。サーキットブレーカー：連続失敗が
+    GDELT_CONSEC_NO_RETRY 件でリトライ停止、GDELT_CONSEC_ABORT 件で残り全件を失敗扱いで打ち切り
+    （GDELT全面障害時に最悪50分超走り続けるのを防ぐ＝make_feed の :25 スロットを守る）。
+    戻り値: (成功分 {name: 記事数}, 照会できなかった集合 {name})。鍵不要（公式GDELT API）。"""
+    out, failed = {}, set()
+    if limit is None:
+        limit = WEB_CAND_N
+    consec_fail = 0
+    targets = names[:limit]
+    for i, n in enumerate(targets):
         q = norm_name(n)
         if not q or len(q) < 3:
-            continue  # 短すぎる名前は誤マッチ源＝照会しない
-        try:
-            out[n] = int(src_gdelt(q) or 0)
-        except Exception as e:
-            print(f"  ⚠ web(GDELT) skip '{(n or '')[:24]}': {type(e).__name__}")
+            failed.add(n)   # 照会不能（誤マッチ源の短名）＝「調べた」と偽らない
+            continue
+        if consec_fail >= GDELT_CONSEC_ABORT:
+            failed.update(targets[i:])   # 全面障害とみなし残りを打ち切り（正直に「未調査」扱い）
+            print(f"  ⚠ web(GDELT) 連続{consec_fail}失敗 → 残り{len(targets) - i}件を打ち切り（全面障害の疑い）")
+            break
+        ok = False
+        for attempt in (1, 2):
+            try:
+                out[n] = int(src_gdelt(q) or 0)
+                ok = True
+                break
+            except Exception as e:
+                if attempt == 1 and consec_fail < GDELT_CONSEC_NO_RETRY:
+                    time.sleep(GDELT_RETRY_WAIT)   # レート制限の谷を待って1回だけ粘る
+                else:
+                    failed.add(n)
+                    print(f"  ⚠ web(GDELT) skip '{(n or '')[:24]}': {type(e).__name__}")
+                    break
+        consec_fail = 0 if ok else consec_fail + 1
         time.sleep(GDELT_DELAY)
-    return out
+    return out, failed
 
 
 def b1_signal(current, tw):
@@ -423,45 +561,115 @@ def main():
         conn.close()
 
     tw = twitch_fetch([r["name"] for r in cand])   # DB接続外でTwitch取得（保存なし）
-    web = web_fetch([r["name"] for r in cand])      # DB接続外でWeb話題(GDELT)取得（保存なし）
+
+    # ── 「調査中」を優先してWeb調査(GDELT)に回す ───────────────────────────────
+    # sale/news/launch/free/review/jp_news/Twitch のどれでもきっかけが立たなかった候補（＝このままだと
+    # 「原因不明＝調査中」になる作品）を先頭へ並べ、限られたGDELT照会枠を“調査中の解明”へ優先投入する。
+    # 従来は base(倍率)順の上位 WEB_CAND_N 件だけを照会していたため、既にセール等で判明済みの上位に枠を使い、
+    # 倍率が下位で他シグナルの無い＝まさに調査中の作品はWeb調査を一切受けられなかった。ここでそれを是正する。
+    def _has_trigger_pre_web(r):
+        """Web調査より前の段階（DB系＋Twitch）で、きっかけが1つでも立っているか。"""
+        sp = sale.get(r["appid"])
+        if sp and sp.get("pct", 0) > 0:
+            return True
+        if (r["appid"] in news or r["is_launch"] or r["appid"] in free
+                or r["appid"] in rev_surge_ids or r["appid"] in jpnews):
+            return True
+        return bool(b1_signal(r["current_ccu"], tw.get(r["name"]))[0])
+
+    unresolved = [r for r in cand if not _has_trigger_pre_web(r)]   # ＝いまのままだと「調査中」
+    resolved   = [r for r in cand if _has_trigger_pre_web(r)]
+    web_order  = [r["name"] for r in unresolved] + [r["name"] for r in resolved]  # 調査中を先頭に
+    web_limit  = WEB_CAND_N
+    if WEB_UNKNOWN_ALL:
+        web_limit = max(web_limit, len(unresolved))    # 調査中は枠を超えても全件（＝ちゃんと調査する）
+    web_limit  = min(web_limit, WEB_MAX_QUERIES, len(web_order))    # ただし安全上限は超えない
+    print(f"Web調査(GDELT): 調査中 {len(unresolved)} 件を優先し計 {web_limit} 件を照会"
+          f"（基本枠WEB_CAND_N={WEB_CAND_N} / 安全上限WEB_MAX_QUERIES={WEB_MAX_QUERIES}"
+          f" / 調査中全件={'ON' if WEB_UNKNOWN_ALL else 'OFF'}）。")
+    web, web_failed = web_fetch(web_order, limit=web_limit)   # DB接続外でWeb話題(GDELT)取得（保存なし）
+
+    # Web調査で「調査中」のうち何件のきっかけが立ったか（＝この機能が実際に効いた件数）を可視化。
+    n_web_hit = sum(1 for r in unresolved if web.get(r["name"], 0) >= WEB_NEWS_MIN)
+    print(f"Web調査により 調査中 {n_web_hit}/{len(unresolved)} 件できっかけを検出（記事{WEB_NEWS_MIN}本以上で点灯）。"
+          + (f" 照会失敗 {len(web_failed)} 件（レート制限等・再試行済み）。" if web_failed else ""))
+
+    # 透明性（B）用：Twitchが使えたか（鍵有無）。Webの照会有無は web/web_failed（web_fetch の実績）から導出する
+    # ＝スライス由来の「照会したはず」ではなく「実際に照会した/できなかった」を使う（偽装防止）。
+    twitch_avail = bool(CLIENT_ID and CLIENT_SECRET)
+    now_epoch = datetime.datetime.now(datetime.timezone.utc).timestamp()   # A: シグナル時刻の基準（news=days_ago換算用）
 
     rows = []
     for r in cand:
         sr = shrunk(r["raw_ratio"], r["n_points"])
         bs = base_score(sr, r["robust_z"])
-        signals, label_parts, boost = [], [], 0.0
+        signals, label_parts, sig_boosts = [], [], []   # sig_boosts は signals と1:1（整合で再重み付けするため分離保持）
         sp = sale.get(r["appid"])
         if sp and sp["pct"] > 0:
             signals.append({"type": "sale", "layer": "trigger",
                             "value": {"discount_percent": int(sp["pct"]), "is_best": bool(sp["best"])}})
-            label_parts.append(f"セール{sp['pct']}%" + ("(観測内最大)" if sp["best"] else "")); boost += BOOST_SALE
+            label_parts.append(f"セール{sp['pct']}%" + ("(観測内最大)" if sp["best"] else "")); sig_boosts.append(BOOST_SALE)
         if r["appid"] in news:
             da = news.get(r["appid"])
             signals.append({"type": "news", "layer": "trigger",
                             "value": (None if da is None else {"days_ago": int(da)})})
-            label_parts.append(f"更新/告知({da}日前)" if da is not None else "更新/告知"); boost += BOOST_NEWS
+            label_parts.append(f"更新/告知({da}日前)" if da is not None else "更新/告知"); sig_boosts.append(BOOST_NEWS)
         if r["is_launch"]:
             signals.append({"type": "launch", "layer": "trigger", "value": None})
-            label_parts.append("新作"); boost += BOOST_LAUNCH
+            label_parts.append("新作"); sig_boosts.append(BOOST_LAUNCH)
         if r["appid"] in free:
             signals.append({"type": "free_promo", "layer": "trigger", "value": None})
-            label_parts.append("無料配布"); boost += BOOST_FREE
+            label_parts.append("無料配布"); sig_boosts.append(BOOST_FREE)
         dl = revd.get(r["appid"], 0)
         if r["appid"] in rev_surge_ids:
             signals.append({"type": "review_surge", "layer": "trigger", "value": {"delta": int(dl)}})
-            label_parts.append(f"レビュー急増(+{dl})"); boost += BOOST_REVIEW
+            label_parts.append(f"レビュー急増(+{dl})"); sig_boosts.append(BOOST_REVIEW)
         if r["appid"] in jpnews:  # C3: 国内話題（抽象・見出しなし）
             signals.append({"type": "jp_news", "layer": "trigger", "value": None})
-            label_parts.append("国内で話題"); boost += BOOST_JP
+            label_parts.append("国内で話題"); sig_boosts.append(BOOST_JP)
         wc = web.get(r["name"], 0)  # Web話題（GDELT・世界の多言語ニュース記事数・オンザフライ）
         if wc >= WEB_NEWS_MIN:
             signals.append({"type": "web_buzz", "layer": "trigger", "value": {"articles": int(wc)}})
-            label_parts.append(f"Web/ニュースで話題(記事{wc})"); boost += BOOST_WEB
+            label_parts.append(f"Web/ニュースで話題(記事{wc})"); sig_boosts.append(BOOST_WEB)
         b1type, b1label, b1boost = b1_signal(r["current_ccu"], tw.get(r["name"]))
         if b1type:  # 公開JSONは種別のみ・数値なし（②）。弱い「配信あり」はシグナルにしない。
-            signals.append({"type": b1type, "layer": "trigger", "value": None}); boost += b1boost
+            signals.append({"type": b1type, "layer": "trigger", "value": None}); sig_boosts.append(b1boost)
         if b1label:
             label_parts.append(b1label)  # 印字（診断用）にはラベルを残す＝公開はしない
+        # ── 透明性（B）：この作品で何を調べ、各ソースが陰性/陽性か・なぜ不明かを集計のみで残す ──
+        #   Twitchは真偽のみ（数値は公開しない＝②）。記事数(articles)は既に公開済みなので載せてよい。
+        #   hit は直前に構築した signals から導出（判定条件の複製を持たない＝signals と矛盾しえない）。
+        sig_types = {s["type"] for s in signals}
+        web_ok = r["name"] in web                    # Web(GDELT)を実際に照会し応答を得たか（web_fetch の実績）
+        web_err = r["name"] in web_failed            # 照会できなかった（失敗・照会不能）＝陰性と区別
+        inv_results = {
+            "sale":    {"queried": True, "hit": "sale" in sig_types},
+            "news":    {"queried": True, "hit": "news" in sig_types},
+            "launch":  {"queried": True, "hit": "launch" in sig_types},
+            "free":    {"queried": True, "hit": "free_promo" in sig_types},
+            "review":  {"queried": True, "hit": "review_surge" in sig_types},
+            "jp_news": {"queried": True, "hit": "jp_news" in sig_types},
+            "twitch":  {"queried": twitch_avail, "hit": bool(b1type)},
+            "web":     {"queried": web_ok, "hit": "web_buzz" in sig_types, "articles": int(wc), "error": web_err},
+        }
+        if signals:
+            unknown_reason = None
+        elif web_err:
+            unknown_reason = "web_query_failed"            # Web調査ができなかった＝「調べ尽くした」とは言えない
+        elif not web_ok:
+            unknown_reason = "web_skipped_budget"          # 主要手段(GDELT)を予算で未照会＝カバレッジ欠落
+        elif not twitch_avail:
+            unknown_reason = "twitch_key_absent"           # Twitch鍵なしでB1未実施＝完全な「調べ尽くし」ではない
+        else:
+            unknown_reason = "investigated_all_negative"   # 調べ尽くして陰性＝正直な調査中
+        investigation = {"queried": [k for k, v in inv_results.items() if v["queried"]],
+                         "results": inv_results, "unknown_reason": unknown_reason}
+        # ── タイミング整合（A）：主因(aligned)/併発(context) を分け、非整合の boost を弱める（除外はしない） ──
+        primary_cause = None
+        if TIMING_ALIGN:
+            primary_cause = apply_timing_alignment(
+                signals, sig_boosts, hist_by.get(int(r["appid"]), []), r["baseline"], r, news, now_epoch)
+        boost = sum(sig_boosts)
         boost_capped = boost >= BOOST_CAP
         boost = clamp(boost, 0, BOOST_CAP)
         eff = bs * (1 + boost)
@@ -479,7 +687,8 @@ def main():
             label = " + ".join(label_parts) if label_parts else "（シグナルあり）"
         r.update({"shrunk": sr, "base": bs, "eff": eff, "label": label, "conf": conf,
                   "conf_code": conf_code, "signals": signals, "boost": boost,
-                  "boost_capped": boost_capped, "tw": tw.get(r["name"]), "web": web.get(r["name"])})
+                  "boost_capped": boost_capped, "tw": tw.get(r["name"]), "web": web.get(r["name"]),
+                  "investigation": investigation, "primary_cause": primary_cause})
         rows.append(r)
 
     rows.sort(key=lambda x: x["eff"], reverse=True)
@@ -499,7 +708,22 @@ def main():
         print(f"  {nm} {str(r['current_ccu']).rjust(6)} {str(r['recent_value']).rjust(6)} "
               f"{base.rjust(6)} {ratio.rjust(5)} {z.rjust(4)} {'Y' if r['is_riser'] else '-'}    "
               f"{'Y' if r['is_launch'] else '-'}    {tws.rjust(10)}  {r['label']} / {r['conf']}")
-    print(f"\n原因不明: {n_unknown}/{len(rows)}。重みは上限付き暫定（案2で学習予定）。Twitchは集計のみ・保存なし。")
+    reason_ct = {}
+    for r in rows:
+        rr = (r.get("investigation") or {}).get("unknown_reason")
+        if rr:
+            reason_ct[rr] = reason_ct.get(rr, 0) + 1
+    reasons_txt = " / ".join(f"{k}={v}" for k, v in sorted(reason_ct.items(), key=lambda kv: -kv[1])) or "—"
+    print(f"\n原因不明: {n_unknown}/{len(rows)}（内訳: {reasons_txt}）。重みは上限付き暫定（案2で学習予定）。")
+    if TIMING_ALIGN:
+        n_known = sum(1 for r in rows if r["signals"])
+        n_primary = sum(1 for r in rows if r.get("primary_cause"))
+        print(f"タイミング整合(A): 主因を時刻確認できた {n_primary}/{n_known} 件"
+              f"（残りはシグナルありだが時刻未確認＝併発/中立・boost弱め）。既定OFF・env TIMING_ALIGN。")
+        print(f"  窓: LOOKBACK={CAUSE_LOOKBACK_DAYS}日 / LAG={CAUSE_LAG_DAYS}日 / onset frac={RISE_ONSET_FRAC}"
+              f" / 非整合boost×{CAUSE_MISALIGN_MULT}")
+        for line in alignment_report(rows, hist_by):
+            print(line)
     print("=" * 88)
 
     # ---------- 出力JSON（data/view02_rising.json・独立・上書き・可逆） ----------
@@ -517,7 +741,7 @@ def main():
         "items": [],
     }
     for i, r in enumerate(rows, 1):
-        out["items"].append({
+        item = {
             "rank": i,
             "appid": int(r["appid"]),
             "name": r["name"],
@@ -541,7 +765,12 @@ def main():
                       "boost": round(r["boost"], 2), "boost_capped": bool(r["boost_capped"])},
             # 折れ線グラフ用の観測履歴（[[ts,ccu],...]・6hバケット・now_ccuと同形式）。無い作品は付けない。
             "history": hist_by.get(int(r["appid"]), []),
-        })
+        }
+        if INV_META:  # 透明性（B）：調査メタ（何を調べ・陰性/陽性・なぜ不明か）。集計のみ・Twitch数値なし。
+            item["investigation"] = r["investigation"]
+        if TIMING_ALIGN:  # A：時刻整合で確認できた主因（無ければ null＝シグナルはあるが時刻未確認）。
+            item["primary_cause"] = r["primary_cause"]
+        out["items"].append(item)
     try:
         out_dir = os.path.dirname(OUT_PATH)
         if out_dir:

@@ -1,0 +1,40 @@
+# 調査スコアカード（プロセス指標）を data/cause_scorecard.json に出す ── D・Phase1
+# 置き場所: .github/workflows/cause_scorecard.yml
+# 役割: 「調査中をちゃんと調査できているか」を可視化。unknown率／調査中の内訳（陰性 vs 予算未照会）／
+#       Web調査の効き／ソース別点灯。跳ね正解ではなく“調査プロセス”の健全性を測る。
+# 守る線: DB非依存・鍵不要（data/view02_rising.json を読むだけ）。書き込みは data/cause_scorecard.json
+#         1ファイルだけ・毎回上書き＝可逆。手動実行（view02_rising.json 更新後に回すと最新を反映）。
+name: cause scorecard (read-only)
+
+on:
+  workflow_dispatch: {}
+  # 必要になれば view02 rank v2（:18）の後に schedule を足す（例）:
+  # schedule:
+  #   - cron: "28 1,7,13,19 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  scorecard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Build cause scorecard（DB非依存・JSON書き出し）
+        # SCORECARD_SRC / SCORECARD_OUT で入出力を差し替え可（既定は data/view02_rising.json → data/cause_scorecard.json）
+        run: python scripts/diagnose_cause_accuracy.py
+      - name: Commit JSON（変更があるときだけ）
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/cause_scorecard.json
+          if git diff --cached --quiet; then echo "変更なし＝コミットしない"; exit 0; fi
+          git commit -m "data: update cause_scorecard.json"
+          for i in 1 2 3; do
+            if git push; then echo "push成功"; exit 0; fi
+            echo "push失敗 → 取り込み直して再試行 ($i/3)"; git pull --rebase
+          done
+          echo "3回失敗。同時pushの衝突が続いている可能性 → ログ共有を"; exit 1
