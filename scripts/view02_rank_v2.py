@@ -268,6 +268,39 @@ def apply_timing_alignment(signals, sig_boosts, history, baseline, r, news_map, 
     return primary_cause
 
 
+def alignment_report(rows, hist_by):
+    """TIMING_ALIGN 診断用の集計（印字する行のリストを返す・JSONには何も足さない＝ログのみ）。
+    しきい値（CAUSE_LOOKBACK_DAYS 等）確定のため、種別ごとの整合/非整合/中立と lead 日数分布を出す。
+    lead＝t_rise − onset（正＝原因が伸びに先行）。中立＝時刻不明（aligned=None）。"""
+    by, leads = {}, {}
+    n_trise = 0
+    for r in rows:
+        tr = estimate_t_rise(hist_by.get(int(r["appid"]), []), r["baseline"], RISE_ONSET_FRAC)
+        if tr is not None:
+            n_trise += 1
+        for s in r["signals"]:
+            if "aligned" not in s:
+                continue
+            cnt = by.setdefault(s["type"], [0, 0, 0])   # [整合, 非整合, 中立]
+            if s["aligned"] is True:
+                cnt[0] += 1
+            elif s["aligned"] is False:
+                cnt[1] += 1
+            else:
+                cnt[2] += 1
+            if s["aligned"] is not None and tr is not None and s.get("onset_ts") is not None:
+                leads.setdefault(s["type"], []).append((tr - s["onset_ts"]) / 86400.0)
+    lines = [f"  t_rise 推定可: {n_trise}/{len(rows)} 件（推定不能＝伸びが測れない/履歴なし→全シグナル中立）"]
+    for t, (a, m, z) in sorted(by.items(), key=lambda kv: -(kv[1][0] + kv[1][1])):
+        ld = sorted(leads.get(t, []))
+        if ld:
+            med = ld[len(ld) // 2]
+            lines.append(f"  {t}: 整合{a} / 非整合{m} / 中立{z}・lead日数 中央値{med:+.1f}（min{ld[0]:+.1f}/max{ld[-1]:+.1f}）")
+        else:
+            lines.append(f"  {t}: 整合{a} / 非整合{m} / 中立{z}")
+    return lines
+
+
 # ---------- cause（既存テーブル・防御クエリ） ----------
 def cause_sets(cur, ids):
     sale, news, free, revd, jpnews = {}, {}, set(), {}, set()
@@ -653,6 +686,10 @@ def main():
         n_primary = sum(1 for r in rows if r.get("primary_cause"))
         print(f"タイミング整合(A): 主因を時刻確認できた {n_primary}/{n_known} 件"
               f"（残りはシグナルありだが時刻未確認＝併発/中立・boost弱め）。既定OFF・env TIMING_ALIGN。")
+        print(f"  窓: LOOKBACK={CAUSE_LOOKBACK_DAYS}日 / LAG={CAUSE_LAG_DAYS}日 / onset frac={RISE_ONSET_FRAC}"
+              f" / 非整合boost×{CAUSE_MISALIGN_MULT}")
+        for line in alignment_report(rows, hist_by):
+            print(line)
     print("=" * 88)
 
     # ---------- 出力JSON（data/view02_rising.json・独立・上書き・可逆） ----------
