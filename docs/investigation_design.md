@@ -1,9 +1,11 @@
 # 「調査中（原因不明）」の調査アルゴリズム — 設計・決定記録
 
 対象: `scripts/view02_rank_v2.py`（本番ランキング）→ `data/view02_rising.json` → `scripts/make_feed.py`（RSS）
-状態: **方針確定・Phase1 実装済み**。本書は経緯・判定・決定・懸念消し込みを残す決定記録であり、Phase1 の実装仕様も兼ねる。
-Phase1（B 透明性 + D プロセス指標）は本PRで実装：`view02_rank_v2.py` に `investigation` ブロック（env `INV_META`）、
-`scripts/diagnose_cause_accuracy.py` ＋ `.github/workflows/cause_scorecard.yml`（`data/cause_scorecard.json` を出力）。
+状態: **方針確定・Phase1 実装済み・Phase2 A 実装済み（既定OFF）**。本書は経緯・判定・決定・懸念消し込みの決定記録であり、実装仕様も兼ねる。
+- Phase1（B 透明性 + D プロセス指標）：`view02_rank_v2.py` の `investigation` ブロック（env `INV_META`）、
+  `scripts/diagnose_cause_accuracy.py` ＋ `.github/workflows/cause_scorecard.yml`（`data/cause_scorecard.json`）。
+- Phase2 A（主因/併発のタイミング整合）：`view02_rank_v2.py` の `apply_timing_alignment()`（env `TIMING_ALIGN`・**既定OFF**）。
+  ソフト（除外しない・signals を消さない）。残るは D-リフト（履歴蓄積後）と C（休眠）。
 
 ---
 
@@ -90,9 +92,18 @@ Phase1（B 透明性 + D プロセス指標）は本PRで実装：`view02_rank_v
 ```
 PR#39（済）= カバレッジ。維持（テスト済・可逆）
  └─ Phase1【実装済み】: B（透明性・修正版）+ D（プロセス指標）
- └─ Phase2: A（精度層・ソフト・env既定OFF）+ D-リフト（履歴が貯まってから）
+ └─ Phase2:
+      A【実装済み・既定OFF】: 主因/併発のタイミング整合（ソフト・env TIMING_ALIGN）
+      D-リフト【未実装】: 既知 vs 調査中の前方持続差（履歴が貯まってから）
  └─ C: 休眠（B/Dで真の未知が支配的、かつ非循環の新ソースが出た場合のみ再検討）
 ```
+
+### Phase2 A の運用（有効化の順序）
+
+A は既定 OFF。`TIMING_ALIGN=1` で有効化する前に、Phase1 の `cause_scorecard`（または rank ログの
+「主因を時刻確認できた N/既知」）で **整合率の分布を確認 → しきい値（`CAUSE_LOOKBACK_DAYS` 等）を確定** してから
+点灯する（review_surge relative と同じ「休眠導入→分布確認→有効化」の定石）。有効化しても signals は消えず
+`known` も不変（＝調査中を増やさない）。非整合は併発として boost を弱めるだけで、順位への影響は上限付き。
 
 ### Phase1 仕様（実装対象）
 
