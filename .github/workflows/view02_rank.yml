@@ -1,38 +1,25 @@
-# タイミング整合(A)の診断実行 ── TIMING_ALIGN=1 で view02 v2 を回し、整合率・lead分布をログに出す
-# 置き場所: .github/workflows/diagnose_timing_align.yml
-# 役割: 本番点灯（TIMING_ALIGN=1）前の分布確認。主因を時刻確認できた率／種別ごとの整合・非整合・中立／
-#       lead日数（t_rise−onset）の分布を見て、CAUSE_LOOKBACK_DAYS 等のしきい値を確定する（休眠導入の定石）。
-# 守る線: DBは読み取り専用（SELECTのみ）。OUT_PATH=/tmp のためリポジトリに一切書かない＝本番 view02_rising.json 無影響。
-#         コミットなし・ログのみ。手動実行のみ（workflow_dispatch）。
-name: diagnose timing align (read-only)
+# view02 ランキング（A1＋推定きっかけ）を手動実行（読み取り専用・ログのみ・コミットなし）
+# 置き場所: .github/workflows/view02_rank.yml
+# 実行: Actions タブ →「view02 rank (read-only)」→ Run workflow → 実行ログに結果が出る
+name: view02 rank (read-only)
 
 on:
   workflow_dispatch: {}
 
-permissions:
-  contents: read   # チェックアウトのみ（書き込み不要＝コミットしない）
-
 jobs:
-  diagnose:
+  rank:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - run: pip install "psycopg2-binary>=2.9"
-      - name: Run view02 v2 with TIMING_ALIGN=1（ログのみ・コミットなし）
+      - name: Run view02 rank (read-only; prints to log)
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          # Twitch鍵が無ければ B1 は自動スキップ（本体と同じ）
-          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
-          TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
-          # 本番（view02_rank_v2.yml）と同じシグナル条件で回す＝分布が本番相当になる
-          REV_SURGE_MODE: "relative"
-          REV_BASELINE_DAYS: "14"
-          REV_REL_MULT: "3"
-          REV_ABS_FLOOR: "15"
-          # ここが診断の本体：整合を点灯し、出力はリポジトリ外へ（本番データ無影響）
-          TIMING_ALIGN: "1"
-          OUT_PATH: "/tmp/view02_rising_align.json"
-        run: python scripts/view02_rank_v2.py
+          # 必要なら暫定パラメータを上書き（例）:
+          # MIN_POINTS: "5"
+          # MIN_CURRENT: "100"
+          # TOP_N: "30"
+        run: python scripts/view02_rank.py
