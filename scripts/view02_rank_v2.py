@@ -94,6 +94,8 @@ WEB_CAND_N   = int(os.environ.get("WEB_CAND_N")   or "20")   # GDELTを照会す
 WEB_NEWS_MIN = int(os.environ.get("WEB_NEWS_MIN") or "3")    # この記事数以上で「Web/ニュースで話題」を点灯
 GDELT_DELAY  = float(os.environ.get("GDELT_DELAY") or "1.0") # GDELT照会の間隔（429回避）
 GDELT_RETRY_WAIT = float(os.environ.get("GDELT_RETRY_WAIT") or "10")  # 失敗時に1回だけ再試行するまでの待ち（レート制限の谷待ち）
+GDELT_CONSEC_NO_RETRY = int(os.environ.get("GDELT_CONSEC_NO_RETRY") or "3")  # 連続失敗がこの数でリトライを止める（無駄な10秒待ちの抑制）
+GDELT_CONSEC_ABORT    = int(os.environ.get("GDELT_CONSEC_ABORT")    or "8")  # 連続失敗がこの数で残り全件を打ち切る（全面障害時の暴走防止）
 # 「調査中」（他シグナル未検出＝このままだと原因不明）を優先してWeb調査に回す設定。
 #   ON なら基本枠を超えても“調査中”は全件照会する＝きっかけをちゃんと掘りにいく（安全上限までは自動で拡張）。
 WEB_UNKNOWN_ALL = (os.environ.get("WEB_UNKNOWN_ALL") or "1").strip().lower() not in ("0", "false", "no", "off")
@@ -295,7 +297,8 @@ def alignment_report(rows, hist_by):
     for t, (a, m, z) in sorted(by.items(), key=lambda kv: -(kv[1][0] + kv[1][1])):
         ld = sorted(leads.get(t, []))
         if ld:
-            med = ld[len(ld) // 2]
+            k = len(ld)
+            med = ld[k // 2] if k % 2 else (ld[k // 2 - 1] + ld[k // 2]) / 2   # 偶数個は中央2値の平均（上振れ防止）
             lines.append(f"  {t}: 整合{a} / 非整合{m} / 中立{z}・lead日数 中央値{med:+.1f}（min{ld[0]:+.1f}/max{ld[-1]:+.1f}）")
         else:
             lines.append(f"  {t}: 整合{a} / 非整合{m} / 中立{z}")
@@ -446,25 +449,39 @@ def web_fetch(names, limit=None):
     names は「優先順」で渡す（呼び出し側が“調査中”を先頭に並べる）。先頭 limit 件だけ照会
     （GDELTは遅いので絞る＝Twitchと同じ“計算時取得→使い捨て”）。limit 省略時は WEB_CAND_N。
     レート制限(HTTPError等)は GDELT_RETRY_WAIT 秒待って1回だけ再試行（実測21/30失敗の是正）。
-    それでも失敗した作品は failed に入れて返す＝「調べ尽くした」と「照会が失敗した」を区別できる（B: 正直さ）。
-    戻り値: (成功分 {name: 記事数}, 失敗集合 {name})。鍵不要（公式GDELT API）。"""
+    照会できなかった作品（失敗・短名で照会不能）は failed に入れて返す＝「調べ尽くした」と
+    「Web調査ができなかった」を区別できる（B: 正直さ）。サーキットブレーカー：連続失敗が
+    GDELT_CONSEC_NO_RETRY 件でリトライ停止、GDELT_CONSEC_ABORT 件で残り全件を失敗扱いで打ち切り
+    （GDELT全面障害時に最悪50分超走り続けるのを防ぐ＝make_feed の :25 スロットを守る）。
+    戻り値: (成功分 {name: 記事数}, 照会できなかった集合 {name})。鍵不要（公式GDELT API）。"""
     out, failed = {}, set()
     if limit is None:
         limit = WEB_CAND_N
-    for n in names[:limit]:
+    consec_fail = 0
+    targets = names[:limit]
+    for i, n in enumerate(targets):
         q = norm_name(n)
         if not q or len(q) < 3:
-            continue  # 短すぎる名前は誤マッチ源＝照会しない
+            failed.add(n)   # 照会不能（誤マッチ源の短名）＝「調べた」と偽らない
+            continue
+        if consec_fail >= GDELT_CONSEC_ABORT:
+            failed.update(targets[i:])   # 全面障害とみなし残りを打ち切り（正直に「未調査」扱い）
+            print(f"  ⚠ web(GDELT) 連続{consec_fail}失敗 → 残り{len(targets) - i}件を打ち切り（全面障害の疑い）")
+            break
+        ok = False
         for attempt in (1, 2):
             try:
                 out[n] = int(src_gdelt(q) or 0)
+                ok = True
                 break
             except Exception as e:
-                if attempt == 1:
+                if attempt == 1 and consec_fail < GDELT_CONSEC_NO_RETRY:
                     time.sleep(GDELT_RETRY_WAIT)   # レート制限の谷を待って1回だけ粘る
                 else:
                     failed.add(n)
-                    print(f"  ⚠ web(GDELT) skip '{(n or '')[:24]}': {type(e).__name__}（再試行も失敗）")
+                    print(f"  ⚠ web(GDELT) skip '{(n or '')[:24]}': {type(e).__name__}")
+                    break
+        consec_fail = 0 if ok else consec_fail + 1
         time.sleep(GDELT_DELAY)
     return out, failed
 
@@ -577,8 +594,8 @@ def main():
     print(f"Web調査により 調査中 {n_web_hit}/{len(unresolved)} 件できっかけを検出（記事{WEB_NEWS_MIN}本以上で点灯）。"
           + (f" 照会失敗 {len(web_failed)} 件（レート制限等・再試行済み）。" if web_failed else ""))
 
-    # 透明性（B）用：Web(GDELT)を実際に“照会対象にした”名前集合と、Twitchが使えたか（鍵有無）。
-    web_queried_names = set(web_order[:web_limit])
+    # 透明性（B）用：Twitchが使えたか（鍵有無）。Webの照会有無は web/web_failed（web_fetch の実績）から導出する
+    # ＝スライス由来の「照会したはず」ではなく「実際に照会した/できなかった」を使う（偽装防止）。
     twitch_avail = bool(CLIENT_ID and CLIENT_SECRET)
     now_epoch = datetime.datetime.now(datetime.timezone.utc).timestamp()   # A: シグナル時刻の基準（news=days_ago換算用）
 
@@ -621,24 +638,28 @@ def main():
             label_parts.append(b1label)  # 印字（診断用）にはラベルを残す＝公開はしない
         # ── 透明性（B）：この作品で何を調べ、各ソースが陰性/陽性か・なぜ不明かを集計のみで残す ──
         #   Twitchは真偽のみ（数値は公開しない＝②）。記事数(articles)は既に公開済みなので載せてよい。
-        wq = r["name"] in web_queried_names          # Web(GDELT)を実際に照会対象にしたか
+        #   hit は直前に構築した signals から導出（判定条件の複製を持たない＝signals と矛盾しえない）。
+        sig_types = {s["type"] for s in signals}
+        web_ok = r["name"] in web                    # Web(GDELT)を実際に照会し応答を得たか（web_fetch の実績）
+        web_err = r["name"] in web_failed            # 照会できなかった（失敗・照会不能）＝陰性と区別
         inv_results = {
-            "sale":    {"queried": True, "hit": bool(sp and sp["pct"] > 0)},
-            "news":    {"queried": True, "hit": r["appid"] in news},
-            "launch":  {"queried": True, "hit": bool(r["is_launch"])},
-            "free":    {"queried": True, "hit": r["appid"] in free},
-            "review":  {"queried": True, "hit": r["appid"] in rev_surge_ids},
-            "jp_news": {"queried": True, "hit": r["appid"] in jpnews},
+            "sale":    {"queried": True, "hit": "sale" in sig_types},
+            "news":    {"queried": True, "hit": "news" in sig_types},
+            "launch":  {"queried": True, "hit": "launch" in sig_types},
+            "free":    {"queried": True, "hit": "free_promo" in sig_types},
+            "review":  {"queried": True, "hit": "review_surge" in sig_types},
+            "jp_news": {"queried": True, "hit": "jp_news" in sig_types},
             "twitch":  {"queried": twitch_avail, "hit": bool(b1type)},
-            "web":     {"queried": wq, "hit": wc >= WEB_NEWS_MIN, "articles": int(wc),
-                        "error": r["name"] in web_failed},   # 照会が失敗した（≠陰性）。正直さのための区別。
+            "web":     {"queried": web_ok, "hit": "web_buzz" in sig_types, "articles": int(wc), "error": web_err},
         }
         if signals:
             unknown_reason = None
-        elif not wq:
+        elif web_err:
+            unknown_reason = "web_query_failed"            # Web調査ができなかった＝「調べ尽くした」とは言えない
+        elif not web_ok:
             unknown_reason = "web_skipped_budget"          # 主要手段(GDELT)を予算で未照会＝カバレッジ欠落
-        elif r["name"] in web_failed:
-            unknown_reason = "web_query_failed"            # 照会したが失敗＝「調べ尽くした」とは言えない（陰性と区別）
+        elif not twitch_avail:
+            unknown_reason = "twitch_key_absent"           # Twitch鍵なしでB1未実施＝完全な「調べ尽くし」ではない
         else:
             unknown_reason = "investigated_all_negative"   # 調べ尽くして陰性＝正直な調査中
         investigation = {"queried": [k for k, v in inv_results.items() if v["queried"]],
@@ -687,14 +708,13 @@ def main():
         print(f"  {nm} {str(r['current_ccu']).rjust(6)} {str(r['recent_value']).rjust(6)} "
               f"{base.rjust(6)} {ratio.rjust(5)} {z.rjust(4)} {'Y' if r['is_riser'] else '-'}    "
               f"{'Y' if r['is_launch'] else '-'}    {tws.rjust(10)}  {r['label']} / {r['conf']}")
-    reason_ct = {"investigated_all_negative": 0, "web_skipped_budget": 0, "web_query_failed": 0}
+    reason_ct = {}
     for r in rows:
         rr = (r.get("investigation") or {}).get("unknown_reason")
-        if rr in reason_ct:
-            reason_ct[rr] += 1
-    print(f"\n原因不明: {n_unknown}/{len(rows)}（調べ尽くし陰性 {reason_ct['investigated_all_negative']} "
-          f"/ 予算で未照会 {reason_ct['web_skipped_budget']} / 照会失敗 {reason_ct['web_query_failed']}）。"
-          f"重みは上限付き暫定（案2で学習予定）。")
+        if rr:
+            reason_ct[rr] = reason_ct.get(rr, 0) + 1
+    reasons_txt = " / ".join(f"{k}={v}" for k, v in sorted(reason_ct.items(), key=lambda kv: -kv[1])) or "—"
+    print(f"\n原因不明: {n_unknown}/{len(rows)}（内訳: {reasons_txt}）。重みは上限付き暫定（案2で学習予定）。")
     if TIMING_ALIGN:
         n_known = sum(1 for r in rows if r["signals"])
         n_primary = sum(1 for r in rows if r.get("primary_cause"))

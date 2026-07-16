@@ -32,8 +32,10 @@ def main():
     try:
         d = json.load(open(SRC, encoding="utf-8"))
     except Exception as e:
-        print(f"[cause-scorecard] {SRC} を読めません（スキップ）: {e}", file=sys.stderr)
-        return 0
+        # 診断ワークフローは「静かに古いスコアカードを維持」より「その場で落ちて原因を示す」が正しい
+        # （exit 0 だと後段の git add が pathspec エラーで紛らわしく落ちる／古いデータの黙認になる）。
+        print(f"[cause-scorecard] {SRC} を読めません: {e}", file=sys.stderr)
+        return 1
 
     items = d.get("items") or []
     n = len(items)
@@ -129,6 +131,7 @@ def main():
         print(f"出力: {OUT}")
     except Exception as e:
         print(f"  ⚠ JSON書き出し失敗: {type(e).__name__}: {e}", file=sys.stderr)
+        return 1   # 書けなかったのに green にしない（後段 git add の紛らわしい失敗も防ぐ）
     return 0
 
 
