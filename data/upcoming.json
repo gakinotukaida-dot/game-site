@@ -3,22 +3,22 @@
   "schema": "upcoming_v3",
   "source": "games(coming_soon/release_date) + 実測シグナル(体験版/Twitch/告知/開発元実績/ジャンル) + prelaunch_model",
   "note": "発売前の羽根予想。spike_prob=跳ね確率＝自社実績で較正したモデルの出力（参考・外れうる）。モデルが無い場合は expect のみ（実測シグナルの有無）。発売日が今日以前の作品は除外（coming_soon フラグが古い“居座り”も落とす）。",
-  "generated_at": "2026-07-17T07:01:12.201351+00:00",
+  "generated_at": "2026-07-17T17:43:20.326868+00:00",
   "model": {
     "schema": "prelaunch_model_v1",
     "readiness": "validated",
-    "base_rate": 0.038954,
-    "n_pairs": 1951,
+    "base_rate": 0.039266,
+    "n_pairs": 1961,
     "hit_threshold": 1000,
     "validation_oos": {
-      "eval_n": 558,
-      "eval_base": 0.0448,
-      "top_decile_rate": 0.21818,
-      "top_decile_lift": 4.87,
-      "mean_prob_hit": 0.15814,
-      "mean_prob_miss": 0.01949
+      "eval_n": 561,
+      "eval_base": 0.04456,
+      "top_decile_rate": 0.17857,
+      "top_decile_lift": 4.01,
+      "mean_prob_hit": 0.17127,
+      "mean_prob_miss": 0.02093
     },
-    "generated_at": "2026-07-17T06:27:52.282803+00:00"
+    "generated_at": "2026-07-17T17:31:44.604797+00:00"
   },
   "params": {
     "limit": 200,
@@ -27,12 +27,57 @@
   "count": 161,
   "rows": [
     {
+      "appid": 4134600,
+      "name": "EverRail",
+      "release": "20 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.9194,
+      "expect": "high",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "dev_best_reviews",
+          "dir": "up",
+          "bucket": "high"
+        },
+        {
+          "name": "demo_ccu",
+          "dir": "up",
+          "bucket": "mid"
+        },
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "high"
+        }
+      ],
+      "active_signals": 5,
+      "demo_ccu": 55,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 10,
+      "has_news": true,
+      "dev_best_peak": 635,
+      "dev_best_reviews": 22346,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Action",
+        "Adventure",
+        "Simulation",
+        "Early Access"
+      ]
+    },
+    {
       "appid": 3743340,
       "name": "Firefighting Simulator: Ignite - Motor Vehicle Accident Expansion",
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.7264,
+      "spike_prob": 0.7347,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -70,57 +115,12 @@
       ]
     },
     {
-      "appid": 4134600,
-      "name": "EverRail",
-      "release": "20 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.5249,
-      "expect": "high",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_reviews",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "hot"
-        }
-      ],
-      "active_signals": 5,
-      "demo_ccu": 48,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 10,
-      "has_news": true,
-      "dev_best_peak": 635,
-      "dev_best_reviews": 22346,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Action",
-        "Adventure",
-        "Simulation",
-        "Early Access"
-      ]
-    },
-    {
       "appid": 2445980,
       "name": "G-Rebels",
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.2484,
+      "spike_prob": 0.2531,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -164,7 +164,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.1666,
+      "spike_prob": 0.1734,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -207,7 +207,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.1044,
+      "spike_prob": 0.1054,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -251,7 +251,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.1044,
+      "spike_prob": 0.1054,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -296,7 +296,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.1044,
+      "spike_prob": 0.1054,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -341,7 +341,7 @@
       "release": "29 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.1044,
+      "spike_prob": 0.1054,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -386,7 +386,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0993,
+      "spike_prob": 0.099,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -407,12 +407,12 @@
         }
       ],
       "active_signals": 4,
-      "demo_ccu": 4,
+      "demo_ccu": 6,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 7,
       "has_news": true,
-      "dev_best_peak": 4,
+      "dev_best_peak": 6,
       "dev_best_reviews": 0,
       "web_news": null,
       "web_views": null,
@@ -432,7 +432,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0993,
+      "spike_prob": 0.099,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -476,7 +476,7 @@
       "release": "22 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0953,
+      "spike_prob": 0.0954,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -497,7 +497,7 @@
         }
       ],
       "active_signals": 5,
-      "demo_ccu": 41,
+      "demo_ccu": 44,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 2,
@@ -521,7 +521,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0883,
+      "spike_prob": 0.088,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -542,12 +542,12 @@
         }
       ],
       "active_signals": 5,
-      "demo_ccu": 21,
+      "demo_ccu": 36,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 8,
       "has_news": true,
-      "dev_best_peak": 21,
+      "dev_best_peak": 36,
       "dev_best_reviews": 330,
       "web_news": null,
       "web_views": null,
@@ -565,7 +565,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0883,
+      "spike_prob": 0.088,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -610,7 +610,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0883,
+      "spike_prob": 0.088,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -655,7 +655,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0883,
+      "spike_prob": 0.088,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -676,12 +676,12 @@
         }
       ],
       "active_signals": 5,
-      "demo_ccu": 1,
+      "demo_ccu": 2,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 6,
       "has_news": true,
-      "dev_best_peak": 1,
+      "dev_best_peak": 2,
       "dev_best_reviews": 10,
       "web_news": null,
       "web_views": null,
@@ -700,7 +700,7 @@
       "release": "22 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0883,
+      "spike_prob": 0.088,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -745,7 +745,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0883,
+      "spike_prob": 0.088,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -788,7 +788,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0883,
+      "spike_prob": 0.088,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -831,7 +831,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0883,
+      "spike_prob": 0.088,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -873,7 +873,7 @@
       "release": "July 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0637,
+      "spike_prob": 0.0649,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -899,7 +899,7 @@
       "streamers": 0,
       "news_count": 1,
       "has_news": true,
-      "dev_best_peak": 1,
+      "dev_best_peak": 2,
       "dev_best_reviews": 0,
       "web_news": null,
       "web_views": 0,
@@ -917,7 +917,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0564,
+      "spike_prob": 0.0575,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -961,7 +961,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0564,
+      "spike_prob": 0.0575,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1007,7 +1007,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0564,
+      "spike_prob": 0.0575,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1054,7 +1054,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0472,
+      "spike_prob": 0.047,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1098,7 +1098,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0358,
+      "spike_prob": 0.0354,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1131,144 +1131,12 @@
       ]
     },
     {
-      "appid": 4453300,
-      "name": "Cup and Counter: Coffee Shop Simulator",
-      "release": "20 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0339,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 4,
-      "demo_ccu": 19,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 10,
-      "has_news": true,
-      "dev_best_peak": 19,
-      "dev_best_reviews": 0,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Casual",
-        "Indie",
-        "Simulation"
-      ]
-    },
-    {
-      "appid": 4568910,
-      "name": "FragMiner",
-      "release": "21 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0339,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 4,
-      "demo_ccu": 3,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 5,
-      "has_news": true,
-      "dev_best_peak": 3,
-      "dev_best_reviews": 0,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Casual",
-        "Indie",
-        "Simulation",
-        "Strategy"
-      ]
-    },
-    {
-      "appid": 2491490,
-      "name": "Pit Panic",
-      "release": "21 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0339,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 4,
-      "demo_ccu": 2,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 4,
-      "has_news": true,
-      "dev_best_peak": 2,
-      "dev_best_reviews": 0,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Adventure",
-        "Indie"
-      ]
-    },
-    {
       "appid": 4848100,
       "name": "Blood Without a Name",
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0337,
+      "spike_prob": 0.0331,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1308,7 +1176,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0337,
+      "spike_prob": 0.0331,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1343,12 +1211,56 @@
       ]
     },
     {
+      "appid": 4453300,
+      "name": "Cup and Counter: Coffee Shop Simulator",
+      "release": "20 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0331,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "high"
+        },
+        {
+          "name": "dev_best_peak",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 4,
+      "demo_ccu": 19,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 10,
+      "has_news": true,
+      "dev_best_peak": 19,
+      "dev_best_reviews": 0,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Casual",
+        "Indie",
+        "Simulation"
+      ]
+    },
+    {
       "appid": 4633390,
       "name": "DeadZone Outpost",
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0337,
+      "spike_prob": 0.0331,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1383,12 +1295,57 @@
       ]
     },
     {
+      "appid": 4568910,
+      "name": "FragMiner",
+      "release": "21 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0331,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "high"
+        },
+        {
+          "name": "dev_best_peak",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 4,
+      "demo_ccu": 6,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 5,
+      "has_news": true,
+      "dev_best_peak": 6,
+      "dev_best_reviews": 0,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Casual",
+        "Indie",
+        "Simulation",
+        "Strategy"
+      ]
+    },
+    {
       "appid": 3864290,
       "name": "Monkey Wave",
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0337,
+      "spike_prob": 0.0331,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1427,7 +1384,7 @@
       "release": "2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0337,
+      "spike_prob": 0.0331,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1461,12 +1418,55 @@
       ]
     },
     {
+      "appid": 2491490,
+      "name": "Pit Panic",
+      "release": "21 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0331,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "high"
+        },
+        {
+          "name": "dev_best_peak",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 4,
+      "demo_ccu": 2,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 4,
+      "has_news": true,
+      "dev_best_peak": 2,
+      "dev_best_reviews": 0,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Adventure",
+        "Indie"
+      ]
+    },
+    {
       "appid": 4526510,
       "name": "Chinese Newcomer",
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0319,
+      "spike_prob": 0.031,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1512,7 +1512,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0319,
+      "spike_prob": 0.031,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1556,7 +1556,7 @@
       "release": "2 Nov, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0319,
+      "spike_prob": 0.031,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1598,7 +1598,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.03,
+      "spike_prob": 0.0292,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1619,12 +1619,12 @@
         }
       ],
       "active_signals": 5,
-      "demo_ccu": 4,
+      "demo_ccu": 8,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 4,
       "has_news": true,
-      "dev_best_peak": 4,
+      "dev_best_peak": 8,
       "dev_best_reviews": 100,
       "web_news": null,
       "web_views": null,
@@ -1642,7 +1642,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.03,
+      "spike_prob": 0.0292,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1685,7 +1685,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0283,
+      "spike_prob": 0.0275,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1728,7 +1728,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0283,
+      "spike_prob": 0.0275,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1772,7 +1772,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0282,
+      "spike_prob": 0.0273,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1817,7 +1817,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0282,
+      "spike_prob": 0.0273,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1862,7 +1862,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0249,
+      "spike_prob": 0.0243,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1905,7 +1905,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0249,
+      "spike_prob": 0.0243,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1949,7 +1949,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0217,
+      "spike_prob": 0.0221,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1993,7 +1993,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0217,
+      "spike_prob": 0.0221,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2035,7 +2035,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0217,
+      "spike_prob": 0.0221,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2080,7 +2080,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0217,
+      "spike_prob": 0.0221,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2125,7 +2125,7 @@
       "release": "22 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0187,
+      "spike_prob": 0.0186,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2164,7 +2164,7 @@
       "release": "22 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0187,
+      "spike_prob": 0.0186,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2204,7 +2204,7 @@
       "release": "19 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0166,
+      "spike_prob": 0.0155,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2220,7 +2220,7 @@
         }
       ],
       "active_signals": 3,
-      "demo_ccu": 11,
+      "demo_ccu": 17,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 2,
@@ -2245,7 +2245,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0166,
+      "spike_prob": 0.0155,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2285,7 +2285,7 @@
       "release": "19 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2324,7 +2324,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2364,7 +2364,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2403,7 +2403,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2443,7 +2443,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2486,7 +2486,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2525,7 +2525,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2564,7 +2564,7 @@
       "release": "18 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2603,7 +2603,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2642,7 +2642,7 @@
       "release": "3 Aug, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2680,7 +2680,7 @@
       "release": "19 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2720,7 +2720,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2760,7 +2760,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2798,7 +2798,7 @@
       "release": "19 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2835,7 +2835,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2872,7 +2872,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2909,7 +2909,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2946,7 +2946,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2985,7 +2985,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3026,7 +3026,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3066,7 +3066,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3105,7 +3105,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3144,7 +3144,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3184,7 +3184,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0128,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3224,7 +3224,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0121,
+      "spike_prob": 0.0117,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3268,7 +3268,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0121,
+      "spike_prob": 0.0117,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3313,7 +3313,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.011,
+      "spike_prob": 0.0106,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3347,7 +3347,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0106,
+      "spike_prob": 0.0103,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3392,7 +3392,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0106,
+      "spike_prob": 0.0103,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3437,7 +3437,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0104,
+      "spike_prob": 0.0099,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3474,7 +3474,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0091,
+      "spike_prob": 0.0087,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3514,7 +3514,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0091,
+      "spike_prob": 0.0087,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3553,7 +3553,7 @@
       "release": "2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0076,
+      "spike_prob": 0.0072,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3592,7 +3592,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0076,
+      "spike_prob": 0.0072,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3865,7 +3865,7 @@
       "release": "2026-07-21",
       "release_known": true,
       "coming_soon": false,
-      "spike_prob": 0.0063,
+      "spike_prob": 0.0061,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3899,7 +3899,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0063,
+      "spike_prob": 0.0061,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3937,7 +3937,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0063,
+      "spike_prob": 0.0061,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3970,7 +3970,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0063,
+      "spike_prob": 0.0061,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -4004,7 +4004,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0063,
+      "spike_prob": 0.0061,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -4038,7 +4038,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0063,
+      "spike_prob": 0.0061,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -4073,7 +4073,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0063,
+      "spike_prob": 0.0061,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -4100,44 +4100,6 @@
         "Adventure",
         "Indie",
         "Simulation"
-      ]
-    },
-    {
-      "appid": 4670720,
-      "name": "GeneLoot",
-      "release": "19 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0062,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "hot"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": 1,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Indie",
-        "RPG"
       ]
     },
     {
@@ -4216,12 +4178,50 @@
       ]
     },
     {
+      "appid": 4670720,
+      "name": "GeneLoot",
+      "release": "19 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0058,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "hot"
+        },
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 2,
+      "demo_ccu": 1,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Indie",
+        "RPG"
+      ]
+    },
+    {
       "appid": 4256560,
       "name": "Against Wokou Frontline",
       "release": "19 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0054,
+      "spike_prob": 0.0049,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -4255,7 +4255,7 @@
       "release": "22 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0054,
+      "spike_prob": 0.0049,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -4288,7 +4288,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0044,
+      "spike_prob": 0.004,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -4321,7 +4321,7 @@
       "release": "19 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0041,
+      "spike_prob": 0.0039,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -4354,7 +4354,7 @@
       "release": "19 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0041,
+      "spike_prob": 0.0039,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -4389,7 +4389,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0041,
+      "spike_prob": 0.0039,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -4423,7 +4423,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0041,
+      "spike_prob": 0.0039,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -4458,7 +4458,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0041,
+      "spike_prob": 0.0039,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -4491,7 +4491,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0041,
+      "spike_prob": 0.0039,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -4525,7 +4525,7 @@
       "release": "July 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0041,
+      "spike_prob": 0.0039,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -4559,7 +4559,7 @@
       "release": "July 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0041,
+      "spike_prob": 0.0039,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -4593,7 +4593,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0041,
+      "spike_prob": 0.0039,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -4625,7 +4625,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0041,
+      "spike_prob": 0.0039,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -4658,7 +4658,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0041,
+      "spike_prob": 0.0039,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -4692,7 +4692,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0041,
+      "spike_prob": 0.0039,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -4724,7 +4724,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0041,
+      "spike_prob": 0.0039,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -4758,7 +4758,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0041,
+      "spike_prob": 0.0039,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -4792,7 +4792,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0041,
+      "spike_prob": 0.0039,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -4827,7 +4827,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0041,
+      "spike_prob": 0.0039,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -4862,7 +4862,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0041,
+      "spike_prob": 0.0039,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -4897,7 +4897,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0041,
+      "spike_prob": 0.0039,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -4932,7 +4932,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0041,
+      "spike_prob": 0.0039,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -4965,7 +4965,7 @@
       "release": "Q4 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0039,
+      "spike_prob": 0.0037,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -5002,7 +5002,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0039,
+      "spike_prob": 0.0037,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -5018,12 +5018,12 @@
         }
       ],
       "active_signals": 3,
-      "demo_ccu": 5,
+      "demo_ccu": 6,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 0,
       "has_news": false,
-      "dev_best_peak": 5,
+      "dev_best_peak": 6,
       "dev_best_reviews": 0,
       "web_news": null,
       "web_views": null,
@@ -5035,12 +5035,47 @@
       ]
     },
     {
+      "appid": 4808380,
+      "name": "MEATHOOK Soundtrack",
+      "release": "21 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0035,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "dev_best_peak",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": 2,
+      "dev_best_reviews": 77,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": []
+    },
+    {
       "appid": 3617840,
       "name": "A Game About Penguins: First Catch",
       "release": "22 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0035,
+      "spike_prob": 0.0034,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -5075,7 +5110,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0034,
+      "spike_prob": 0.0033,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -5102,12 +5137,467 @@
       ]
     },
     {
+      "appid": 4867700,
+      "name": "Brainrot Fight",
+      "release": "July 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0033,
+      "expect": "low",
+      "conf": "mid",
+      "factors": [
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 1,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Casual",
+        "Indie",
+        "Strategy"
+      ]
+    },
+    {
+      "appid": 4859260,
+      "name": "Celebrity Memory - 12in12 Game 1",
+      "release": "20 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0033,
+      "expect": "low",
+      "conf": "mid",
+      "factors": [
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 1,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Casual",
+        "Indie"
+      ]
+    },
+    {
+      "appid": 4376480,
+      "name": "Clockworks",
+      "release": "20 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0033,
+      "expect": "low",
+      "conf": "mid",
+      "factors": [
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 1,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Casual",
+        "Indie"
+      ]
+    },
+    {
+      "appid": 4749870,
+      "name": "Decline",
+      "release": "20 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0033,
+      "expect": "low",
+      "conf": "mid",
+      "factors": [
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 1,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Indie"
+      ]
+    },
+    {
+      "appid": 4912930,
+      "name": "Don't Play Their Game",
+      "release": "20 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0033,
+      "expect": "low",
+      "conf": "mid",
+      "factors": [
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 1,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": 0,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Indie"
+      ]
+    },
+    {
+      "appid": 4880030,
+      "name": "Echoes Of The Unseen",
+      "release": "20 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0033,
+      "expect": "low",
+      "conf": "mid",
+      "factors": [
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 1,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Indie"
+      ]
+    },
+    {
+      "appid": 4889020,
+      "name": "Fat File Finder",
+      "release": "21 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0033,
+      "expect": "low",
+      "conf": "mid",
+      "factors": [
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 1,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Utilities"
+      ]
+    },
+    {
+      "appid": 3584240,
+      "name": "Frogrammer",
+      "release": "19 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0033,
+      "expect": "low",
+      "conf": "mid",
+      "factors": [
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 1,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Indie",
+        "Strategy"
+      ]
+    },
+    {
+      "appid": 4794980,
+      "name": "Funge",
+      "release": "19 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0033,
+      "expect": "low",
+      "conf": "mid",
+      "factors": [
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 1,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Casual",
+        "Indie"
+      ]
+    },
+    {
+      "appid": 4862750,
+      "name": "KEBAB CLICKER: El Imperio del Dürüm",
+      "release": "20 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0033,
+      "expect": "low",
+      "conf": "mid",
+      "factors": [
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 1,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Indie"
+      ]
+    },
+    {
+      "appid": 4591990,
+      "name": "KNOWLEDGE",
+      "release": "20 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0033,
+      "expect": "low",
+      "conf": "mid",
+      "factors": [
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 1,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Casual"
+      ]
+    },
+    {
+      "appid": 4914550,
+      "name": "Massive Wild Monsters Spawn Near the Castle",
+      "release": "21 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0033,
+      "expect": "low",
+      "conf": "mid",
+      "factors": [
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 1,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Strategy"
+      ]
+    },
+    {
+      "appid": 4744730,
+      "name": "Monke Brain",
+      "release": "20 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0033,
+      "expect": "low",
+      "conf": "mid",
+      "factors": [
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 1,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Strategy"
+      ]
+    },
+    {
+      "appid": 4861910,
+      "name": "Pin-Finite",
+      "release": "2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0033,
+      "expect": "low",
+      "conf": "mid",
+      "factors": [
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 1,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Indie",
+        "Strategy"
+      ]
+    },
+    {
       "appid": 4730500,
       "name": "At Night : Freakshow",
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0034,
+      "spike_prob": 0.0032,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -5142,306 +5632,12 @@
       ]
     },
     {
-      "appid": 4867700,
-      "name": "Brainrot Fight",
-      "release": "July 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0034,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Casual",
-        "Indie",
-        "Strategy"
-      ]
-    },
-    {
-      "appid": 4859260,
-      "name": "Celebrity Memory - 12in12 Game 1",
-      "release": "20 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0034,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Casual",
-        "Indie"
-      ]
-    },
-    {
-      "appid": 4376480,
-      "name": "Clockworks",
-      "release": "20 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0034,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Casual",
-        "Indie"
-      ]
-    },
-    {
-      "appid": 4749870,
-      "name": "Decline",
-      "release": "20 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0034,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Indie"
-      ]
-    },
-    {
-      "appid": 4912930,
-      "name": "Don't Play Their Game",
-      "release": "20 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0034,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": 0,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Indie"
-      ]
-    },
-    {
-      "appid": 4880030,
-      "name": "Echoes Of The Unseen",
-      "release": "20 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0034,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Indie"
-      ]
-    },
-    {
-      "appid": 4889020,
-      "name": "Fat File Finder",
-      "release": "21 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0034,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Utilities"
-      ]
-    },
-    {
-      "appid": 3584240,
-      "name": "Frogrammer",
-      "release": "19 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0034,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Indie",
-        "Strategy"
-      ]
-    },
-    {
-      "appid": 4794980,
-      "name": "Funge",
-      "release": "19 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0034,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Casual",
-        "Indie"
-      ]
-    },
-    {
       "appid": 3872710,
       "name": "Is the Vat Utopia or Dystopia? 这里没有地雷妹！",
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0034,
+      "spike_prob": 0.0032,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -5475,76 +5671,12 @@
       ]
     },
     {
-      "appid": 4862750,
-      "name": "KEBAB CLICKER: El Imperio del Dürüm",
-      "release": "20 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0034,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Indie"
-      ]
-    },
-    {
-      "appid": 4591990,
-      "name": "KNOWLEDGE",
-      "release": "20 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0034,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Casual"
-      ]
-    },
-    {
       "appid": 4335540,
       "name": "Lepidarium",
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0034,
+      "spike_prob": 0.0032,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -5578,144 +5710,12 @@
       ]
     },
     {
-      "appid": 4808380,
-      "name": "MEATHOOK Soundtrack",
-      "release": "21 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0034,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "dev_best_peak",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 2,
-      "dev_best_reviews": 77,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": []
-    },
-    {
-      "appid": 4914550,
-      "name": "Massive Wild Monsters Spawn Near the Castle",
-      "release": "21 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0034,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Strategy"
-      ]
-    },
-    {
-      "appid": 4744730,
-      "name": "Monke Brain",
-      "release": "20 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0034,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Strategy"
-      ]
-    },
-    {
-      "appid": 4861910,
-      "name": "Pin-Finite",
-      "release": "2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0034,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Indie",
-        "Strategy"
-      ]
-    },
-    {
       "appid": 4853710,
       "name": "Borrow or Rob",
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0032,
+      "spike_prob": 0.003,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -5753,7 +5753,7 @@
       "release": "2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0028,
+      "spike_prob": 0.0027,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -5791,7 +5791,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.002,
+      "spike_prob": 0.0019,
       "expect": "low",
       "conf": "low",
       "factors": [
@@ -5821,7 +5821,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.002,
+      "spike_prob": 0.0019,
       "expect": "low",
       "conf": "high",
       "factors": [],
@@ -5842,40 +5842,6 @@
         "Casual",
         "Indie",
         "Free To Play"
-      ]
-    },
-    {
-      "appid": 4915240,
-      "name": "Compile & Defend",
-      "release": "20 Jul, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.002,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": 1,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Indie",
-        "Simulation",
-        "Strategy"
       ]
     },
     {
@@ -5884,7 +5850,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.002,
+      "spike_prob": 0.0019,
       "expect": "low",
       "conf": "high",
       "factors": [],
@@ -5908,46 +5874,12 @@
       ]
     },
     {
-      "appid": 4423110,
-      "name": "Don’t Pull Me!",
-      "release": "Q3 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.002,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": 35,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "genres": [
-        "Adventure",
-        "Casual",
-        "Indie"
-      ]
-    },
-    {
       "appid": 4887340,
       "name": "Eyes Wide Open Demo",
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.002,
+      "spike_prob": 0.0019,
       "expect": "low",
       "conf": "high",
       "factors": [],
@@ -5975,7 +5907,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.002,
+      "spike_prob": 0.0019,
       "expect": "low",
       "conf": "high",
       "factors": [],
@@ -6004,7 +5936,7 @@
       "release": "21 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.002,
+      "spike_prob": 0.0019,
       "expect": "low",
       "conf": "high",
       "factors": [],
@@ -6031,7 +5963,7 @@
       "release": "18 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.002,
+      "spike_prob": 0.0019,
       "expect": "low",
       "conf": "high",
       "factors": [],
@@ -6054,12 +5986,80 @@
       ]
     },
     {
+      "appid": 4915240,
+      "name": "Compile & Defend",
+      "release": "20 Jul, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0018,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 2,
+      "demo_ccu": 1,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Indie",
+        "Simulation",
+        "Strategy"
+      ]
+    },
+    {
+      "appid": 4423110,
+      "name": "Don’t Pull Me!",
+      "release": "Q3 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0018,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 2,
+      "demo_ccu": 35,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "genres": [
+        "Adventure",
+        "Casual",
+        "Indie"
+      ]
+    },
+    {
       "appid": 4916930,
       "name": "Don't Play Their Game - Demo",
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0017,
+      "spike_prob": 0.0016,
       "expect": "low",
       "conf": "high",
       "factors": [],
@@ -6085,7 +6085,7 @@
       "release": "20 Jul, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0017,
+      "spike_prob": 0.0016,
       "expect": "low",
       "conf": "high",
       "factors": [],
@@ -6111,7 +6111,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0017,
+      "spike_prob": 0.0016,
       "expect": "low",
       "conf": "high",
       "factors": [],
@@ -6138,7 +6138,7 @@
       "release": "2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0016,
+      "spike_prob": 0.0015,
       "expect": "low",
       "conf": "high",
       "factors": [
