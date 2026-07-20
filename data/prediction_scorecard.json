@@ -2,7 +2,7 @@
   "view": "prediction_scorecard",
   "schema": "prediction_scorecard_v1",
   "note": "羽根予想の答え合わせ（as-of・リーク無し）。holdout=過去を70/30分割しtrainだけで学習しtestを採点（honestなバックテスト）。live=発売前に記録した予測→発売後の結果（最も硬い真のout-of-sample・日々増える）。calibration は「◯%と予測した群が実際に何%跳ねたか」＝予測と実測が近いほど信頼できる。",
-  "generated_at": "2026-07-19T08:01:56.695940+00:00",
+  "generated_at": "2026-07-20T08:43:19.414627+00:00",
   "params": {
     "lookback_days": 180,
     "outcome_days": 14,
@@ -18,18 +18,18 @@
     ]
   },
   "holdout": {
-    "n_pairs": 2003,
-    "train_n": 1431,
-    "test_n": 572,
+    "n_pairs": 2017,
+    "train_n": 1439,
+    "test_n": 578,
     "ready": true,
     "metrics": {
-      "n": 572,
+      "n": 578,
       "hits": 25,
-      "base_rate": 0.04371,
+      "base_rate": 0.04325,
       "top_decile_n": 57,
       "top_decile_rate": 0.21053,
-      "top_decile_lift": 4.82,
-      "brier": 0.04126,
+      "top_decile_lift": 4.87,
+      "brier": 0.04088,
       "high_conf_n": 21,
       "high_conf_rate": 0.33333
     },
@@ -39,18 +39,18 @@
           0.0,
           0.02
         ],
-        "n": 453,
+        "n": 458,
         "pred_mean": 0.0046,
-        "actual_rate": 0.0199
+        "actual_rate": 0.0197
       },
       {
         "range": [
           0.02,
           0.05
         ],
-        "n": 68,
-        "pred_mean": 0.0243,
-        "actual_rate": 0.0588
+        "n": 69,
+        "pred_mean": 0.0246,
+        "actual_rate": 0.058
       },
       {
         "range": [
@@ -58,7 +58,7 @@
           0.1
         ],
         "n": 29,
-        "pred_mean": 0.0695,
+        "pred_mean": 0.0702,
         "actual_rate": 0.1724
       },
       {
@@ -67,7 +67,7 @@
           0.2
         ],
         "n": 5,
-        "pred_mean": 0.1565,
+        "pred_mean": 0.1564,
         "actual_rate": 0.4
       },
       {
@@ -76,7 +76,7 @@
           0.4
         ],
         "n": 3,
-        "pred_mean": 0.2208,
+        "pred_mean": 0.2182,
         "actual_rate": 0.0
       },
       {
@@ -85,64 +85,64 @@
           1.0
         ],
         "n": 14,
-        "pred_mean": 0.6696,
+        "pred_mean": 0.673,
         "actual_rate": 0.3571
       }
     ],
     "examples": [
       {
-        "appid": 3276050,
-        "name": "SpaceCraft",
-        "release": "2026-06-11",
-        "pred": 0.956,
-        "hit": true,
-        "launch_peak": 7685
-      },
-      {
         "appid": 2417470,
         "name": "Beastro",
         "release": "2026-06-11",
-        "pred": 0.956,
+        "pred": 0.9572,
         "hit": false,
         "launch_peak": 657
       },
       {
-        "appid": 3751950,
-        "name": "Assassin's Creed Black Flag Resynced",
-        "release": "2026-07-09",
-        "pred": 0.8955,
+        "appid": 3276050,
+        "name": "SpaceCraft",
+        "release": "2026-06-11",
+        "pred": 0.9572,
         "hit": true,
-        "launch_peak": 104679
+        "launch_peak": 7685
       },
       {
         "appid": 1454370,
         "name": "STARSEEKER: Astroneer Expeditions",
         "release": "2026-06-11",
-        "pred": 0.8955,
+        "pred": 0.8979,
         "hit": false,
         "launch_peak": 701
       },
       {
-        "appid": 4540230,
-        "name": "Road To Glory",
-        "release": "2026-06-23",
-        "pred": 0.7014,
-        "hit": false,
-        "launch_peak": 3
+        "appid": 3751950,
+        "name": "Assassin's Creed Black Flag Resynced",
+        "release": "2026-07-09",
+        "pred": 0.8979,
+        "hit": true,
+        "launch_peak": 104679
       },
       {
         "appid": 2805850,
         "name": "Atre: Dominance Wars",
         "release": "2026-06-08",
-        "pred": 0.7014,
+        "pred": 0.7052,
         "hit": false,
         "launch_peak": 23
+      },
+      {
+        "appid": 4540230,
+        "name": "Road To Glory",
+        "release": "2026-06-23",
+        "pred": 0.7052,
+        "hit": false,
+        "launch_peak": 3
       },
       {
         "appid": 2377930,
         "name": "Destiny of Immortal",
         "release": "2026-07-07",
-        "pred": 0.7014,
+        "pred": 0.7052,
         "hit": true,
         "launch_peak": 8306
       },
@@ -150,7 +150,7 @@
         "appid": 3152750,
         "name": "Taival",
         "release": "2026-07-14",
-        "pred": 0.604,
+        "pred": 0.6085,
         "hit": false,
         "launch_peak": 65
       },
@@ -158,7 +158,7 @@
         "appid": 3760100,
         "name": "8 Ball by Pokerist",
         "release": "2026-06-16",
-        "pred": 0.5668,
+        "pred": 0.5727,
         "hit": false,
         "launch_peak": 167
       },
@@ -166,15 +166,23 @@
         "appid": 4144680,
         "name": "DEAD OR ALIVE 6 Last Round",
         "release": "2026-06-24",
-        "pred": 0.4972,
+        "pred": 0.5019,
         "hit": false,
         "launch_peak": 642
+      },
+      {
+        "appid": 3939700,
+        "name": "Treasure Beach",
+        "release": "2026-06-20",
+        "pred": 0.485,
+        "hit": false,
+        "launch_peak": 416
       },
       {
         "appid": 2211170,
         "name": "Unrailed 2: Back on Track",
         "release": "2026-06-11",
-        "pred": 0.4812,
+        "pred": 0.485,
         "hit": true,
         "launch_peak": 1140
       },
@@ -182,23 +190,15 @@
         "appid": 4323990,
         "name": "EMPULSE",
         "release": "2026-06-24",
-        "pred": 0.4812,
+        "pred": 0.485,
         "hit": true,
         "launch_peak": 2843
-      },
-      {
-        "appid": 3939700,
-        "name": "Treasure Beach",
-        "release": "2026-06-20",
-        "pred": 0.4812,
-        "hit": false,
-        "launch_peak": 416
       },
       {
         "appid": 4093240,
         "name": "Tokyo Valkyries",
         "release": "2026-07-08",
-        "pred": 0.4557,
+        "pred": 0.4586,
         "hit": false,
         "launch_peak": 271
       },
@@ -206,7 +206,7 @@
         "appid": 3642850,
         "name": "North Hunt",
         "release": "2026-07-13",
-        "pred": 0.2358,
+        "pred": 0.2243,
         "hit": false,
         "launch_peak": 11
       }
