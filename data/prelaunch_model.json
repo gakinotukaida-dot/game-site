@@ -2,7 +2,7 @@
   "view": "prelaunch_model",
   "schema": "prelaunch_model_v1",
   "note": "羽根予想モデル（自社実績で較正したスコアカード）。跳ね確率は log-odds 合算＝解釈可能・材料が薄いほど基準確率に寄る。強さ指標 top_decile_lift は 70/30 ホールドアウトの out-of-sample。readiness=collecting の間は控えめ運用。",
-  "generated_at": "2026-07-24T06:39:55.289625+00:00",
+  "generated_at": "2026-07-24T17:52:32.233502+00:00",
   "params": {
     "lookback_days": 180,
     "outcome_days": 14,
@@ -30,8 +30,8 @@
   "woe": {
     "demo_ccu": {
       "none": -0.01679,
-      "low": -1.29598,
       "mid": 1.91783,
+      "low": -1.29598,
       "high": 2.33542
     },
     "twitch_peak": {
@@ -42,9 +42,9 @@
       "none": 0.0
     },
     "news_count": {
+      "high": 1.21338,
       "low": -0.06411,
-      "none": -1.06923,
-      "high": 1.21338
+      "none": -1.06923
     },
     "web_news": {
       "none": 0.0
@@ -61,8 +61,8 @@
     "dev_best_peak": {
       "none": -0.28957,
       "low": 0.34814,
-      "mid": 2.60591,
-      "high": 1.6474
+      "high": 1.6474,
+      "mid": 2.60591
     },
     "dev_best_reviews": {
       "none": -0.30909,
@@ -74,13 +74,28 @@
       "free": -0.45821
     },
     "genre": {
-      "hot": 0.47152,
       "warm": -0.52468,
+      "hot": 0.47152,
       "cold": -1.04096,
       "na": -1.47843
     }
   },
   "genre_rates": {
+    "Adventure": {
+      "n": 696,
+      "hits": 38,
+      "rate": 0.05443
+    },
+    "Casual": {
+      "n": 1030,
+      "hits": 27,
+      "rate": 0.02632
+    },
+    "Simulation": {
+      "n": 709,
+      "hits": 39,
+      "rate": 0.05484
+    },
     "Action": {
       "n": 691,
       "hits": 47,
@@ -91,50 +106,30 @@
       "hits": 17,
       "rate": 0.0284
     },
-    "Adventure": {
-      "n": 696,
-      "hits": 38,
-      "rate": 0.05443
-    },
     "Indie": {
       "n": 1595,
       "hits": 47,
       "rate": 0.02952
-    },
-    "Simulation": {
-      "n": 709,
-      "hits": 39,
-      "rate": 0.05484
-    },
-    "Casual": {
-      "n": 1030,
-      "hits": 27,
-      "rate": 0.02632
     },
     "Free To Play": {
       "n": 354,
       "hits": 10,
       "rate": 0.02851
     },
+    "RPG": {
+      "n": 471,
+      "hits": 40,
+      "rate": 0.08418
+    },
     "Early Access": {
       "n": 338,
       "hits": 20,
       "rate": 0.05873
     },
-    "Utilities": {
-      "n": 7,
-      "hits": 0,
-      "rate": 0.02143
-    },
     "Sports": {
       "n": 100,
       "hits": 8,
       "rate": 0.07705
-    },
-    "RPG": {
-      "n": 471,
-      "hits": 40,
-      "rate": 0.08418
     },
     "Racing": {
       "n": 42,
@@ -145,6 +140,11 @@
       "n": 66,
       "hits": 7,
       "rate": 0.09894
+    },
+    "Utilities": {
+      "n": 7,
+      "hits": 0,
+      "rate": 0.02143
     },
     "Education": {
       "n": 2,
