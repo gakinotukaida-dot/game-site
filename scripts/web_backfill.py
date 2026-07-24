@@ -36,8 +36,8 @@ from web_mentions_sweep import DDL, pageviews_between  # テーブル定義と�
 DATABASE_URL = os.environ["DATABASE_URL"]
 LOOKBACK_DAYS = int(os.environ.get("LOOKBACK_DAYS") or "180")   # 学習窓と一致（この範囲の発売済みを覆う）
 PAGEVIEW_DAYS = int(os.environ.get("PAGEVIEW_DAYS") or "14")    # 発売前の実閲覧を測る窓（日次収集と一致）
-BACKFILL_CAP = int(os.environ.get("BACKFILL_CAP") or "100")    # 1回の処理件数（言語数ぶんAPIを叩く。加速のため増量・10件ごと書込で安全）
-FLUSH_EVERY = int(os.environ.get("FLUSH_EVERY") or "5")        # この件数ごとに書き込む＝計算(HTTP)中も write-primary を温存し cold-start を回避（短め）
+BACKFILL_CAP = int(os.environ.get("BACKFILL_CAP") or "150")    # 1回の処理件数（Neon autosuspend 無効化で cold-start が消えたため増量。150×8/日で約2日一巡）
+FLUSH_EVERY = int(os.environ.get("FLUSH_EVERY") or "20")       # この件数ごとに書き込む（常時起動になったので温存目的の細かい flush は不要）
 
 # 発売済み（直近LOOKBACK日）で、まだ“発売前 web_views”を持たない作品。発売日が新しい順に少しずつ。
 TARGET_QUERY = f"""
@@ -66,8 +66,8 @@ INSERT_SQL = ("INSERT INTO web_mentions (appid, source, mentions, recorded_at) "
 def _connect_retry(fn, attempts=None):
     """接続して fn(conn) を実行。Neon の write-primary は深いアイドルからの復帰(cold-start)が数分かかることがあるため、
     一時 read-only(25006)/接続断に **長め**の指数バックオフ再試行（既定14回・cap45s＝合計~8分）で吸収する。"""
-    attempts = attempts or int(os.environ.get("WRITE_RETRIES") or "10")
-    cap = int(os.environ.get("WRITE_BACKOFF_CAP") or "45")
+    attempts = attempts or int(os.environ.get("WRITE_RETRIES") or "6")   # autosuspend無効化で cold-start は消滅。定期メンテ再起動用に小さめの buffer だけ残す。
+    cap = int(os.environ.get("WRITE_BACKOFF_CAP") or "30")
     for i in range(attempts):
         conn = None
         try:
@@ -94,7 +94,7 @@ def _warmup():
     """発売前の長い計算(全言語ページビュー)に入る前に、CREATE TABLE IF NOT EXISTS で **write-primary を先に起こす**。
     cold-start をここ（計算前）で吸収し、以降の FLUSH_EVERY 件ごとの書き込みは温存された primary に速く入る＝最後にまとめて落ちない。"""
     _connect_retry(lambda conn: conn.cursor().execute(DDL),
-                   attempts=int(os.environ.get("WARMUP_RETRIES") or "11"))
+                   attempts=int(os.environ.get("WARMUP_RETRIES") or "4"))
 
 
 def get_targets():
