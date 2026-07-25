@@ -2,7 +2,7 @@
   "view": "prediction_scorecard",
   "schema": "prediction_scorecard_v1",
   "note": "羽根予想の答え合わせ（as-of・リーク無し）。holdout=過去を70/30分割しtrainだけで学習しtestを採点（honestなバックテスト）。live=発売前に記録した予測→発売後の結果（最も硬い真のout-of-sample・日々増える）。calibration は「◯%と予測した群が実際に何%跳ねたか」＝予測と実測が近いほど信頼できる。",
-  "generated_at": "2026-07-24T08:10:07.380204+00:00",
+  "generated_at": "2026-07-25T07:52:20.695636+00:00",
   "params": {
     "lookback_days": 180,
     "outcome_days": 14,
@@ -18,8 +18,8 @@
     ]
   },
   "holdout": {
-    "n_pairs": 2265,
-    "train_n": 1612,
+    "n_pairs": 2266,
+    "train_n": 1613,
     "test_n": 653,
     "ready": true,
     "metrics": {
@@ -27,8 +27,8 @@
       "hits": 27,
       "base_rate": 0.04135,
       "top_decile_n": 65,
-      "top_decile_rate": 0.23077,
-      "top_decile_lift": 5.58,
+      "top_decile_rate": 0.2,
+      "top_decile_lift": 4.84,
       "brier": 0.03863,
       "high_conf_n": 33,
       "high_conf_rate": 0.24242
@@ -49,7 +49,7 @@
           0.05
         ],
         "n": 98,
-        "pred_mean": 0.0269,
+        "pred_mean": 0.0268,
         "actual_rate": 0.0408
       },
       {
@@ -58,7 +58,7 @@
           0.1
         ],
         "n": 55,
-        "pred_mean": 0.0689,
+        "pred_mean": 0.0688,
         "actual_rate": 0.1455
       },
       {
@@ -67,7 +67,7 @@
           0.2
         ],
         "n": 13,
-        "pred_mean": 0.1679,
+        "pred_mean": 0.1677,
         "actual_rate": 0.1538
       },
       {
@@ -76,7 +76,7 @@
           0.4
         ],
         "n": 2,
-        "pred_mean": 0.2731,
+        "pred_mean": 0.2725,
         "actual_rate": 0.0
       },
       {
@@ -85,19 +85,11 @@
           1.0
         ],
         "n": 18,
-        "pred_mean": 0.6357,
+        "pred_mean": 0.6355,
         "actual_rate": 0.3333
       }
     ],
     "examples": [
-      {
-        "appid": 1454370,
-        "name": "STARSEEKER: Astroneer Expeditions",
-        "release": "2026-06-11",
-        "pred": 0.9446,
-        "hit": false,
-        "launch_peak": 701
-      },
       {
         "appid": 3751950,
         "name": "Assassin's Creed Black Flag Resynced",
@@ -105,6 +97,14 @@
         "pred": 0.9446,
         "hit": true,
         "launch_peak": 104679
+      },
+      {
+        "appid": 1454370,
+        "name": "STARSEEKER: Astroneer Expeditions",
+        "release": "2026-06-11",
+        "pred": 0.9446,
+        "hit": false,
+        "launch_peak": 701
       },
       {
         "appid": 3276050,
@@ -126,7 +126,7 @@
         "appid": 4144680,
         "name": "DEAD OR ALIVE 6 Last Round",
         "release": "2026-06-24",
-        "pred": 0.6639,
+        "pred": 0.6636,
         "hit": false,
         "launch_peak": 642
       },
@@ -182,15 +182,23 @@
         "appid": 3760100,
         "name": "8 Ball by Pokerist",
         "release": "2026-06-16",
-        "pred": 0.5829,
+        "pred": 0.5828,
         "hit": false,
         "launch_peak": 167
+      },
+      {
+        "appid": 4090360,
+        "name": "Forest Escape: Last Train",
+        "release": "2026-07-10",
+        "pred": 0.4268,
+        "hit": false,
+        "launch_peak": 309
       },
       {
         "appid": 3837350,
         "name": "Staffer Retro : A Supernatural Mystery Quest",
         "release": "2026-07-22",
-        "pred": 0.4276,
+        "pred": 0.4259,
         "hit": true,
         "launch_peak": 1559
       },
@@ -198,17 +206,9 @@
         "appid": 3939700,
         "name": "Treasure Beach",
         "release": "2026-06-20",
-        "pred": 0.4276,
+        "pred": 0.4259,
         "hit": false,
         "launch_peak": 416
-      },
-      {
-        "appid": 3393240,
-        "name": "Banker Simulator",
-        "release": "2026-07-17",
-        "pred": 0.4276,
-        "hit": false,
-        "launch_peak": 89
       }
     ]
   },
