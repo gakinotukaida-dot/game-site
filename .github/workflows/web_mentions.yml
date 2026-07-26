@@ -40,6 +40,7 @@ jobs:
       - name: Collect web mention counts (isolated table / INSERT only)
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          WRITE_RETRIES: 10
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           MENTIONS_CAP: ${{ github.event.inputs.cap || '50' }}
           MENTIONS_SOURCES: ${{ github.event.inputs.sources || 'gdelt,wikidata_sitelinks,youtube,wikipedia_en,wikipedia_ja,hackernews' }}
