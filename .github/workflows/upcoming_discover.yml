@@ -26,6 +26,7 @@ jobs:
       - name: Discover coming-soon games into games table
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          WRITE_RETRIES: 10
           CC: "JP"
           LANG_STORE: "japanese"
         run: python scripts/upcoming_discover.py
