@@ -34,6 +34,7 @@ jobs:
       - run: pip install "psycopg2-binary>=2.9"
       - name: Collect all-language Wikipedia pageviews (isolated table / INSERT only)
         env:
+          WRITE_RETRIES: 10
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           MENTIONS_CAP: ${{ github.event.inputs.cap || '30' }}
           MENTIONS_SOURCES: "wikipedia_pageviews"
