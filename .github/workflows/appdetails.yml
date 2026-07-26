@@ -28,6 +28,7 @@ jobs:
       - uses: actions/checkout@v5
       - name: App details rolling sweep
         env:
+          WRITE_RETRIES: 10
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           # STEAM_API_KEY は不要（store の appdetails はキーなし・別系統）。
           APPDETAILS_CAP: ${{ github.event.inputs.cap || '6000' }}
