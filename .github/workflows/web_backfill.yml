@@ -33,6 +33,9 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           BACKFILL_CAP: ${{ github.event.inputs.cap || '50' }}
+          WARMUP_RETRIES: 11
+          WRITE_RETRIES: 10
+          FLUSH_EVERY: 5
           # LOOKBACK_DAYS: "180"   # 学習窓と一致
           # PAGEVIEW_DAYS: "14"    # 発売前の実閲覧を測る窓
         run: python scripts/web_backfill.py
