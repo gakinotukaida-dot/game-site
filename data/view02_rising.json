@@ -1,7 +1,7 @@
 {
   "meta": {
     "schema_version": 1,
-    "generated_at": "2026-07-29T15:23:14Z",
+    "generated_at": "2026-07-29T20:21:26Z",
     "method": "v1_transparent_provisional",
     "experimental": true,
     "disclaimer_code": "provisional_weights_experimental",
@@ -39,16 +39,26 @@
         "Steam Achievements",
         "Camera Comfort"
       ],
-      "signals": [],
+      "signals": [
+        {
+          "type": "review_surge",
+          "layer": "trigger",
+          "value": {
+            "delta": 20
+          }
+        }
+      ],
       "prediction": {
-        "known": false,
-        "cause_types": []
+        "known": true,
+        "cause_types": [
+          "review_surge"
+        ]
       },
-      "confidence": "mid",
+      "confidence": "high",
       "score": {
-        "eff": 29.14,
+        "eff": 30.59,
         "base": 29.14,
-        "boost": 0,
+        "boost": 0.05,
         "boost_capped": false
       },
       "history": [
@@ -129,165 +139,6 @@
           "free",
           "review",
           "jp_news",
-          "twitch",
-          "web"
-        ],
-        "results": {
-          "sale": {
-            "queried": true,
-            "hit": false
-          },
-          "news": {
-            "queried": true,
-            "hit": false
-          },
-          "launch": {
-            "queried": true,
-            "hit": false
-          },
-          "free": {
-            "queried": true,
-            "hit": false
-          },
-          "review": {
-            "queried": true,
-            "hit": false
-          },
-          "jp_news": {
-            "queried": true,
-            "hit": false
-          },
-          "twitch": {
-            "queried": true,
-            "hit": false
-          },
-          "web": {
-            "queried": true,
-            "hit": false,
-            "articles": 0,
-            "error": false
-          }
-        },
-        "unknown_reason": "investigated_all_negative"
-      }
-    },
-    {
-      "rank": 2,
-      "appid": 4481850,
-      "name": "가리사니 흥신소",
-      "detection": {
-        "current_ccu": 587,
-        "recent_value": 859,
-        "baseline": 58,
-        "ratio": 14.8,
-        "robust_z": 6.2,
-        "n_points": 190,
-        "is_riser": true,
-        "is_launch": false
-      },
-      "genres": [
-        "Adventure",
-        "Indie",
-        "Strategy",
-        "Free To Play"
-      ],
-      "categories": [
-        "Multi-player",
-        "Co-op",
-        "Online Co-op",
-        "Stats",
-        "Family Sharing"
-      ],
-      "signals": [],
-      "prediction": {
-        "known": false,
-        "cause_types": []
-      },
-      "confidence": "mid",
-      "score": {
-        "eff": 14.13,
-        "base": 14.13,
-        "boost": 0,
-        "boost_capped": false
-      },
-      "history": [
-        [
-          1784246400,
-          83
-        ],
-        [
-          1784268000,
-          150
-        ],
-        [
-          1784289600,
-          288
-        ],
-        [
-          1784311200,
-          55
-        ],
-        [
-          1784332800,
-          89
-        ],
-        [
-          1784354400,
-          162
-        ],
-        [
-          1784376000,
-          262
-        ],
-        [
-          1784397600,
-          50
-        ],
-        [
-          1784440800,
-          142
-        ],
-        [
-          1784484000,
-          18
-        ],
-        [
-          1784505600,
-          26
-        ],
-        [
-          1784527200,
-          63
-        ],
-        [
-          1784872800,
-          344
-        ],
-        [
-          1784894400,
-          920
-        ],
-        [
-          1784916000,
-          132
-        ],
-        [
-          1785304800,
-          429
-        ],
-        [
-          1785326400,
-          863
-        ]
-      ],
-      "investigation": {
-        "queried": [
-          "sale",
-          "news",
-          "launch",
-          "free",
-          "review",
-          "jp_news",
           "twitch"
         ],
         "results": {
@@ -309,7 +160,7 @@
           },
           "review": {
             "queried": true,
-            "hit": false
+            "hit": true
           },
           "jp_news": {
             "queried": true,
@@ -326,20 +177,20 @@
             "error": true
           }
         },
-        "unknown_reason": "web_query_failed"
+        "unknown_reason": null
       }
     },
     {
-      "rank": 3,
+      "rank": 2,
       "appid": 238960,
       "name": "Path of Exile",
       "detection": {
-        "current_ccu": 102842,
-        "recent_value": 99470,
-        "baseline": 6456,
-        "ratio": 15.4,
-        "robust_z": 1.4,
-        "n_points": 864,
+        "current_ccu": 110015,
+        "recent_value": 113017,
+        "baseline": 6660,
+        "ratio": 17.0,
+        "robust_z": 1.5,
+        "n_points": 862,
         "is_riser": false,
         "is_launch": false
       },
@@ -390,19 +241,15 @@
       },
       "confidence": "mid",
       "score": {
-        "eff": 11.52,
-        "base": 10.02,
+        "eff": 12.94,
+        "base": 11.25,
         "boost": 0.15,
         "boost_capped": false
       },
       "history": [
         [
-          1784116800,
-          4940
-        ],
-        [
           1784138400,
-          4988
+          4405
         ],
         [
           1784160000,
@@ -622,7 +469,11 @@
         ],
         [
           1785326400,
-          102842
+          113338
+        ],
+        [
+          1785348000,
+          113342
         ]
       ],
       "investigation": {
@@ -663,6 +514,351 @@
           "twitch": {
             "queried": true,
             "hit": true
+          },
+          "web": {
+            "queried": false,
+            "hit": false,
+            "articles": 0,
+            "error": true
+          }
+        },
+        "unknown_reason": null
+      }
+    },
+    {
+      "rank": 3,
+      "appid": 1149460,
+      "name": "ICARUS",
+      "detection": {
+        "current_ccu": 15343,
+        "recent_value": 15349,
+        "baseline": 4395,
+        "ratio": 3.5,
+        "robust_z": 2.1,
+        "n_points": 857,
+        "is_riser": false,
+        "is_launch": false
+      },
+      "genres": [
+        "Action",
+        "Adventure",
+        "Simulation"
+      ],
+      "categories": [
+        "Single-player",
+        "Multi-player",
+        "Co-op",
+        "Online Co-op",
+        "Steam Achievements",
+        "Steam Trading Cards"
+      ],
+      "signals": [
+        {
+          "type": "sale",
+          "layer": "trigger",
+          "value": {
+            "discount_percent": 80,
+            "is_best": true
+          }
+        },
+        {
+          "type": "news",
+          "layer": "trigger",
+          "value": {
+            "days_ago": 5
+          }
+        },
+        {
+          "type": "review_surge",
+          "layer": "trigger",
+          "value": {
+            "delta": 926
+          }
+        }
+      ],
+      "prediction": {
+        "known": true,
+        "cause_types": [
+          "sale",
+          "news",
+          "review_surge"
+        ]
+      },
+      "confidence": "high",
+      "score": {
+        "eff": 3.38,
+        "base": 2.94,
+        "boost": 0.15,
+        "boost_capped": false
+      },
+      "history": [
+        [
+          1784138400,
+          4153
+        ],
+        [
+          1784160000,
+          3481
+        ],
+        [
+          1784181600,
+          2619
+        ],
+        [
+          1784203200,
+          4242
+        ],
+        [
+          1784224800,
+          4575
+        ],
+        [
+          1784246400,
+          3549
+        ],
+        [
+          1784268000,
+          2669
+        ],
+        [
+          1784289600,
+          4405
+        ],
+        [
+          1784311200,
+          4947
+        ],
+        [
+          1784332800,
+          3845
+        ],
+        [
+          1784354400,
+          3906
+        ],
+        [
+          1784376000,
+          5702
+        ],
+        [
+          1784397600,
+          6310
+        ],
+        [
+          1784419200,
+          4645
+        ],
+        [
+          1784440800,
+          4681
+        ],
+        [
+          1784462400,
+          6682
+        ],
+        [
+          1784484000,
+          6809
+        ],
+        [
+          1784505600,
+          4411
+        ],
+        [
+          1784527200,
+          2671
+        ],
+        [
+          1784548800,
+          4610
+        ],
+        [
+          1784570400,
+          4875
+        ],
+        [
+          1784592000,
+          3664
+        ],
+        [
+          1784613600,
+          2564
+        ],
+        [
+          1784635200,
+          4327
+        ],
+        [
+          1784656800,
+          4851
+        ],
+        [
+          1784678400,
+          3554
+        ],
+        [
+          1784700000,
+          2667
+        ],
+        [
+          1784721600,
+          4154
+        ],
+        [
+          1784743200,
+          4751
+        ],
+        [
+          1784764800,
+          3368
+        ],
+        [
+          1784786400,
+          2628
+        ],
+        [
+          1784808000,
+          4186
+        ],
+        [
+          1784829600,
+          5642
+        ],
+        [
+          1784851200,
+          5415
+        ],
+        [
+          1784872800,
+          5018
+        ],
+        [
+          1784894400,
+          9612
+        ],
+        [
+          1784916000,
+          11474
+        ],
+        [
+          1784937600,
+          9001
+        ],
+        [
+          1784959200,
+          10068
+        ],
+        [
+          1784980800,
+          15883
+        ],
+        [
+          1785002400,
+          17796
+        ],
+        [
+          1785024000,
+          13001
+        ],
+        [
+          1785045600,
+          13875
+        ],
+        [
+          1785067200,
+          21438
+        ],
+        [
+          1785088800,
+          23249
+        ],
+        [
+          1785110400,
+          14921
+        ],
+        [
+          1785132000,
+          9445
+        ],
+        [
+          1785153600,
+          15900
+        ],
+        [
+          1785175200,
+          16716
+        ],
+        [
+          1785196800,
+          11880
+        ],
+        [
+          1785218400,
+          8395
+        ],
+        [
+          1785240000,
+          15268
+        ],
+        [
+          1785261600,
+          16447
+        ],
+        [
+          1785283200,
+          11866
+        ],
+        [
+          1785304800,
+          8597
+        ],
+        [
+          1785326400,
+          14705
+        ],
+        [
+          1785348000,
+          15443
+        ]
+      ],
+      "investigation": {
+        "queried": [
+          "sale",
+          "news",
+          "launch",
+          "free",
+          "review",
+          "jp_news",
+          "twitch"
+        ],
+        "results": {
+          "sale": {
+            "queried": true,
+            "hit": true
+          },
+          "news": {
+            "queried": true,
+            "hit": true
+          },
+          "launch": {
+            "queried": true,
+            "hit": false
+          },
+          "free": {
+            "queried": true,
+            "hit": false
+          },
+          "review": {
+            "queried": true,
+            "hit": true
+          },
+          "jp_news": {
+            "queried": true,
+            "hit": false
+          },
+          "twitch": {
+            "queried": true,
+            "hit": false
           },
           "web": {
             "queried": false,
@@ -739,7 +935,8 @@
           "free",
           "review",
           "jp_news",
-          "twitch"
+          "twitch",
+          "web"
         ],
         "results": {
           "sale": {
@@ -771,26 +968,353 @@
             "hit": false
           },
           "web": {
+            "queried": true,
+            "hit": false,
+            "articles": 0,
+            "error": false
+          }
+        },
+        "unknown_reason": "investigated_all_negative"
+      }
+    },
+    {
+      "rank": 5,
+      "appid": 108600,
+      "name": "Project Zomboid",
+      "detection": {
+        "current_ccu": 74686,
+        "recent_value": 74674,
+        "baseline": 27085,
+        "ratio": 2.8,
+        "robust_z": 6.1,
+        "n_points": 862,
+        "is_riser": false,
+        "is_launch": false
+      },
+      "genres": [
+        "Indie",
+        "RPG",
+        "Simulation",
+        "Early Access"
+      ],
+      "categories": [
+        "Single-player",
+        "Multi-player",
+        "PvP",
+        "Online PvP",
+        "Co-op",
+        "Online Co-op"
+      ],
+      "signals": [
+        {
+          "type": "b1_attention",
+          "layer": "trigger",
+          "value": null
+        }
+      ],
+      "prediction": {
+        "known": true,
+        "cause_types": [
+          "b1_attention"
+        ]
+      },
+      "confidence": "high",
+      "score": {
+        "eff": 2.87,
+        "base": 2.74,
+        "boost": 0.05,
+        "boost_capped": false
+      },
+      "history": [
+        [
+          1784138400,
+          28837
+        ],
+        [
+          1784160000,
+          26238
+        ],
+        [
+          1784181600,
+          22217
+        ],
+        [
+          1784203200,
+          31116
+        ],
+        [
+          1784224800,
+          31723
+        ],
+        [
+          1784246400,
+          26498
+        ],
+        [
+          1784268000,
+          22048
+        ],
+        [
+          1784289600,
+          31420
+        ],
+        [
+          1784311200,
+          31901
+        ],
+        [
+          1784332800,
+          27765
+        ],
+        [
+          1784354400,
+          25805
+        ],
+        [
+          1784376000,
+          36352
+        ],
+        [
+          1784397600,
+          37047
+        ],
+        [
+          1784419200,
+          29427
+        ],
+        [
+          1784440800,
+          29426
+        ],
+        [
+          1784462400,
+          38928
+        ],
+        [
+          1784484000,
+          37900
+        ],
+        [
+          1784505600,
+          29396
+        ],
+        [
+          1784527200,
+          21769
+        ],
+        [
+          1784548800,
+          32574
+        ],
+        [
+          1784570400,
+          33515
+        ],
+        [
+          1784592000,
+          27932
+        ],
+        [
+          1784613600,
+          22425
+        ],
+        [
+          1784635200,
+          31729
+        ],
+        [
+          1784656800,
+          32719
+        ],
+        [
+          1784678400,
+          27308
+        ],
+        [
+          1784700000,
+          22420
+        ],
+        [
+          1784721600,
+          31089
+        ],
+        [
+          1784743200,
+          32494
+        ],
+        [
+          1784764800,
+          26757
+        ],
+        [
+          1784786400,
+          22540
+        ],
+        [
+          1784808000,
+          31562
+        ],
+        [
+          1784829600,
+          32110
+        ],
+        [
+          1784851200,
+          26495
+        ],
+        [
+          1784872800,
+          21940
+        ],
+        [
+          1784894400,
+          31673
+        ],
+        [
+          1784916000,
+          32057
+        ],
+        [
+          1784937600,
+          26718
+        ],
+        [
+          1784959200,
+          25291
+        ],
+        [
+          1784980800,
+          34680
+        ],
+        [
+          1785002400,
+          34635
+        ],
+        [
+          1785024000,
+          28332
+        ],
+        [
+          1785045600,
+          27475
+        ],
+        [
+          1785067200,
+          37196
+        ],
+        [
+          1785088800,
+          38399
+        ],
+        [
+          1785110400,
+          29305
+        ],
+        [
+          1785132000,
+          21187
+        ],
+        [
+          1785153600,
+          30596
+        ],
+        [
+          1785175200,
+          31751
+        ],
+        [
+          1785196800,
+          26115
+        ],
+        [
+          1785218400,
+          20356
+        ],
+        [
+          1785240000,
+          28685
+        ],
+        [
+          1785261600,
+          29386
+        ],
+        [
+          1785283200,
+          24160
+        ],
+        [
+          1785304800,
+          20064
+        ],
+        [
+          1785326400,
+          72357
+        ],
+        [
+          1785348000,
+          74958
+        ]
+      ],
+      "investigation": {
+        "queried": [
+          "sale",
+          "news",
+          "launch",
+          "free",
+          "review",
+          "jp_news",
+          "twitch"
+        ],
+        "results": {
+          "sale": {
+            "queried": true,
+            "hit": false
+          },
+          "news": {
+            "queried": true,
+            "hit": false
+          },
+          "launch": {
+            "queried": true,
+            "hit": false
+          },
+          "free": {
+            "queried": true,
+            "hit": false
+          },
+          "review": {
+            "queried": true,
+            "hit": false
+          },
+          "jp_news": {
+            "queried": true,
+            "hit": false
+          },
+          "twitch": {
+            "queried": true,
+            "hit": true
+          },
+          "web": {
             "queried": false,
             "hit": false,
             "articles": 0,
             "error": true
           }
         },
-        "unknown_reason": "web_query_failed"
+        "unknown_reason": null
       }
     },
     {
-      "rank": 5,
+      "rank": 6,
       "appid": 219990,
       "name": "Grim Dawn",
       "detection": {
-        "current_ccu": 19242,
-        "recent_value": 19495,
-        "baseline": 5407,
-        "ratio": 3.6,
-        "robust_z": 1.2,
-        "n_points": 864,
+        "current_ccu": 16170,
+        "recent_value": 19310,
+        "baseline": 5520,
+        "ratio": 3.5,
+        "robust_z": 1.1,
+        "n_points": 862,
         "is_riser": false,
         "is_launch": false
       },
@@ -833,19 +1357,15 @@
       },
       "confidence": "mid",
       "score": {
-        "eff": 2.75,
-        "base": 2.5,
+        "eff": 2.64,
+        "base": 2.4,
         "boost": 0.1,
         "boost_capped": false
       },
       "history": [
         [
-          1784116800,
-          5693
-        ],
-        [
           1784138400,
-          4816
+          4288
         ],
         [
           1784160000,
@@ -1066,6 +1586,10 @@
         [
           1785326400,
           19599
+        ],
+        [
+          1785348000,
+          16832
         ]
       ],
       "investigation": {
@@ -1111,23 +1635,23 @@
             "queried": false,
             "hit": false,
             "articles": 0,
-            "error": false
+            "error": true
           }
         },
         "unknown_reason": null
       }
     },
     {
-      "rank": 6,
+      "rank": 7,
       "appid": 3561220,
       "name": "Pass the Fear",
       "detection": {
-        "current_ccu": 20389,
-        "recent_value": 22741,
+        "current_ccu": 3355,
+        "recent_value": 20842,
         "baseline": 7651,
-        "ratio": 3.0,
-        "robust_z": 1.6,
-        "n_points": 333,
+        "ratio": 2.7,
+        "robust_z": 1.4,
+        "n_points": 345,
         "is_riser": false,
         "is_launch": true
       },
@@ -1187,8 +1711,8 @@
       },
       "confidence": "mid",
       "score": {
-        "eff": 2.75,
-        "base": 2.29,
+        "eff": 2.47,
+        "base": 2.06,
         "boost": 0.2,
         "boost_capped": false
       },
@@ -1296,6 +1820,10 @@
         [
           1785326400,
           22953
+        ],
+        [
+          1785348000,
+          6345
         ]
       ],
       "investigation": {
@@ -1341,23 +1869,341 @@
             "queried": false,
             "hit": false,
             "articles": 0,
-            "error": false
+            "error": true
           }
         },
         "unknown_reason": null
       }
     },
     {
-      "rank": 7,
+      "rank": 8,
+      "appid": 284160,
+      "name": "BeamNG.drive",
+      "detection": {
+        "current_ccu": 46900,
+        "recent_value": 47206,
+        "baseline": 19587,
+        "ratio": 2.4,
+        "robust_z": 3.4,
+        "n_points": 862,
+        "is_riser": false,
+        "is_launch": false
+      },
+      "genres": [
+        "Racing",
+        "Simulation",
+        "Early Access"
+      ],
+      "categories": [
+        "Single-player",
+        "Steam Achievements",
+        "Steam Trading Cards",
+        "Camera Comfort",
+        "Custom Volume Controls",
+        "Keyboard Only Option"
+      ],
+      "signals": [],
+      "prediction": {
+        "known": false,
+        "cause_types": []
+      },
+      "confidence": "mid",
+      "score": {
+        "eff": 2.39,
+        "base": 2.39,
+        "boost": 0,
+        "boost_capped": false
+      },
+      "history": [
+        [
+          1784138400,
+          24509
+        ],
+        [
+          1784160000,
+          17331
+        ],
+        [
+          1784181600,
+          19115
+        ],
+        [
+          1784203200,
+          24999
+        ],
+        [
+          1784224800,
+          25959
+        ],
+        [
+          1784246400,
+          17834
+        ],
+        [
+          1784268000,
+          19916
+        ],
+        [
+          1784289600,
+          25286
+        ],
+        [
+          1784311200,
+          26616
+        ],
+        [
+          1784332800,
+          17855
+        ],
+        [
+          1784354400,
+          21118
+        ],
+        [
+          1784376000,
+          26753
+        ],
+        [
+          1784397600,
+          27643
+        ],
+        [
+          1784419200,
+          18807
+        ],
+        [
+          1784440800,
+          22474
+        ],
+        [
+          1784462400,
+          29015
+        ],
+        [
+          1784484000,
+          29463
+        ],
+        [
+          1784505600,
+          18597
+        ],
+        [
+          1784527200,
+          20043
+        ],
+        [
+          1784548800,
+          26785
+        ],
+        [
+          1784570400,
+          27803
+        ],
+        [
+          1784592000,
+          18422
+        ],
+        [
+          1784613600,
+          20606
+        ],
+        [
+          1784635200,
+          26889
+        ],
+        [
+          1784656800,
+          28148
+        ],
+        [
+          1784678400,
+          18202
+        ],
+        [
+          1784700000,
+          20167
+        ],
+        [
+          1784721600,
+          26912
+        ],
+        [
+          1784743200,
+          27999
+        ],
+        [
+          1784764800,
+          17657
+        ],
+        [
+          1784786400,
+          20845
+        ],
+        [
+          1784808000,
+          26589
+        ],
+        [
+          1784829600,
+          27729
+        ],
+        [
+          1784851200,
+          17878
+        ],
+        [
+          1784872800,
+          21408
+        ],
+        [
+          1784894400,
+          26624
+        ],
+        [
+          1784916000,
+          27626
+        ],
+        [
+          1784937600,
+          18422
+        ],
+        [
+          1784959200,
+          21822
+        ],
+        [
+          1784980800,
+          27217
+        ],
+        [
+          1785002400,
+          28126
+        ],
+        [
+          1785024000,
+          19211
+        ],
+        [
+          1785045600,
+          22588
+        ],
+        [
+          1785067200,
+          29593
+        ],
+        [
+          1785088800,
+          30596
+        ],
+        [
+          1785110400,
+          19245
+        ],
+        [
+          1785132000,
+          21026
+        ],
+        [
+          1785153600,
+          27730
+        ],
+        [
+          1785175200,
+          28561
+        ],
+        [
+          1785196800,
+          18369
+        ],
+        [
+          1785218400,
+          20168
+        ],
+        [
+          1785240000,
+          27395
+        ],
+        [
+          1785261600,
+          28191
+        ],
+        [
+          1785283200,
+          18239
+        ],
+        [
+          1785304800,
+          20347
+        ],
+        [
+          1785326400,
+          45450
+        ],
+        [
+          1785348000,
+          47350
+        ]
+      ],
+      "investigation": {
+        "queried": [
+          "sale",
+          "news",
+          "launch",
+          "free",
+          "review",
+          "jp_news",
+          "twitch"
+        ],
+        "results": {
+          "sale": {
+            "queried": true,
+            "hit": false
+          },
+          "news": {
+            "queried": true,
+            "hit": false
+          },
+          "launch": {
+            "queried": true,
+            "hit": false
+          },
+          "free": {
+            "queried": true,
+            "hit": false
+          },
+          "review": {
+            "queried": true,
+            "hit": false
+          },
+          "jp_news": {
+            "queried": true,
+            "hit": false
+          },
+          "twitch": {
+            "queried": true,
+            "hit": false
+          },
+          "web": {
+            "queried": false,
+            "hit": false,
+            "articles": 0,
+            "error": true
+          }
+        },
+        "unknown_reason": "web_query_failed"
+      }
+    },
+    {
+      "rank": 9,
       "appid": 3722330,
       "name": "Shift At Midnight",
       "detection": {
-        "current_ccu": 27667,
-        "recent_value": 31781,
-        "baseline": 14798,
-        "ratio": 2.1,
-        "robust_z": 2.8,
-        "n_points": 333,
+        "current_ccu": 11782,
+        "recent_value": 28515,
+        "baseline": 14805,
+        "ratio": 1.9,
+        "robust_z": 2.2,
+        "n_points": 345,
         "is_riser": false,
         "is_launch": true
       },
@@ -1405,6 +2251,11 @@
           "type": "jp_news",
           "layer": "trigger",
           "value": null
+        },
+        {
+          "type": "b1_attention",
+          "layer": "trigger",
+          "value": null
         }
       ],
       "prediction": {
@@ -1414,14 +2265,15 @@
           "news",
           "launch",
           "review_surge",
-          "jp_news"
+          "jp_news",
+          "b1_attention"
         ]
       },
       "confidence": "high",
       "score": {
-        "eff": 2.53,
-        "base": 2.05,
-        "boost": 0.23,
+        "eff": 2.22,
+        "base": 1.74,
+        "boost": 0.28,
         "boost_capped": false
       },
       "history": [
@@ -1528,6 +2380,10 @@
         [
           1785326400,
           32359
+        ],
+        [
+          1785348000,
+          14348
         ]
       ],
       "investigation": {
@@ -1567,7 +2423,7 @@
           },
           "twitch": {
             "queried": true,
-            "hit": false
+            "hit": true
           },
           "web": {
             "queried": false,
@@ -1580,361 +2436,16 @@
       }
     },
     {
-      "rank": 8,
-      "appid": 1149460,
-      "name": "ICARUS",
-      "detection": {
-        "current_ccu": 12503,
-        "recent_value": 11925,
-        "baseline": 4344,
-        "ratio": 2.7,
-        "robust_z": 1.6,
-        "n_points": 859,
-        "is_riser": false,
-        "is_launch": false
-      },
-      "genres": [
-        "Action",
-        "Adventure",
-        "Simulation"
-      ],
-      "categories": [
-        "Single-player",
-        "Multi-player",
-        "Co-op",
-        "Online Co-op",
-        "Steam Achievements",
-        "Steam Trading Cards"
-      ],
-      "signals": [
-        {
-          "type": "sale",
-          "layer": "trigger",
-          "value": {
-            "discount_percent": 80,
-            "is_best": true
-          }
-        },
-        {
-          "type": "news",
-          "layer": "trigger",
-          "value": {
-            "days_ago": 5
-          }
-        },
-        {
-          "type": "review_surge",
-          "layer": "trigger",
-          "value": {
-            "delta": 926
-          }
-        }
-      ],
-      "prediction": {
-        "known": true,
-        "cause_types": [
-          "sale",
-          "news",
-          "review_surge"
-        ]
-      },
-      "confidence": "mid",
-      "score": {
-        "eff": 2.48,
-        "base": 2.15,
-        "boost": 0.15,
-        "boost_capped": false
-      },
-      "history": [
-        [
-          1784116800,
-          4216
-        ],
-        [
-          1784138400,
-          4541
-        ],
-        [
-          1784160000,
-          3481
-        ],
-        [
-          1784181600,
-          2619
-        ],
-        [
-          1784203200,
-          4242
-        ],
-        [
-          1784224800,
-          4575
-        ],
-        [
-          1784246400,
-          3549
-        ],
-        [
-          1784268000,
-          2669
-        ],
-        [
-          1784289600,
-          4405
-        ],
-        [
-          1784311200,
-          4947
-        ],
-        [
-          1784332800,
-          3845
-        ],
-        [
-          1784354400,
-          3906
-        ],
-        [
-          1784376000,
-          5702
-        ],
-        [
-          1784397600,
-          6310
-        ],
-        [
-          1784419200,
-          4645
-        ],
-        [
-          1784440800,
-          4681
-        ],
-        [
-          1784462400,
-          6682
-        ],
-        [
-          1784484000,
-          6809
-        ],
-        [
-          1784505600,
-          4411
-        ],
-        [
-          1784527200,
-          2671
-        ],
-        [
-          1784548800,
-          4610
-        ],
-        [
-          1784570400,
-          4875
-        ],
-        [
-          1784592000,
-          3664
-        ],
-        [
-          1784613600,
-          2564
-        ],
-        [
-          1784635200,
-          4327
-        ],
-        [
-          1784656800,
-          4851
-        ],
-        [
-          1784678400,
-          3554
-        ],
-        [
-          1784700000,
-          2667
-        ],
-        [
-          1784721600,
-          4154
-        ],
-        [
-          1784743200,
-          4751
-        ],
-        [
-          1784764800,
-          3368
-        ],
-        [
-          1784786400,
-          2628
-        ],
-        [
-          1784808000,
-          4186
-        ],
-        [
-          1784829600,
-          5642
-        ],
-        [
-          1784851200,
-          5415
-        ],
-        [
-          1784872800,
-          5018
-        ],
-        [
-          1784894400,
-          9612
-        ],
-        [
-          1784916000,
-          11474
-        ],
-        [
-          1784937600,
-          9001
-        ],
-        [
-          1784959200,
-          10068
-        ],
-        [
-          1784980800,
-          15883
-        ],
-        [
-          1785002400,
-          17796
-        ],
-        [
-          1785024000,
-          13001
-        ],
-        [
-          1785045600,
-          13875
-        ],
-        [
-          1785067200,
-          21438
-        ],
-        [
-          1785088800,
-          23249
-        ],
-        [
-          1785110400,
-          14921
-        ],
-        [
-          1785132000,
-          9445
-        ],
-        [
-          1785153600,
-          15900
-        ],
-        [
-          1785175200,
-          16716
-        ],
-        [
-          1785196800,
-          11880
-        ],
-        [
-          1785218400,
-          8395
-        ],
-        [
-          1785240000,
-          15268
-        ],
-        [
-          1785261600,
-          16447
-        ],
-        [
-          1785283200,
-          11866
-        ],
-        [
-          1785304800,
-          8597
-        ],
-        [
-          1785326400,
-          12503
-        ]
-      ],
-      "investigation": {
-        "queried": [
-          "sale",
-          "news",
-          "launch",
-          "free",
-          "review",
-          "jp_news",
-          "twitch"
-        ],
-        "results": {
-          "sale": {
-            "queried": true,
-            "hit": true
-          },
-          "news": {
-            "queried": true,
-            "hit": true
-          },
-          "launch": {
-            "queried": true,
-            "hit": false
-          },
-          "free": {
-            "queried": true,
-            "hit": false
-          },
-          "review": {
-            "queried": true,
-            "hit": true
-          },
-          "jp_news": {
-            "queried": true,
-            "hit": false
-          },
-          "twitch": {
-            "queried": true,
-            "hit": false
-          },
-          "web": {
-            "queried": false,
-            "hit": false,
-            "articles": 0,
-            "error": false
-          }
-        },
-        "unknown_reason": null
-      }
-    },
-    {
-      "rank": 9,
+      "rank": 10,
       "appid": 1049590,
       "name": "Eternal Return",
       "detection": {
-        "current_ccu": 16386,
-        "recent_value": 19998,
-        "baseline": 7074,
-        "ratio": 2.8,
-        "robust_z": 1.7,
-        "n_points": 533,
+        "current_ccu": 3644,
+        "recent_value": 18107,
+        "baseline": 7086,
+        "ratio": 2.6,
+        "robust_z": 1.4,
+        "n_points": 545,
         "is_riser": false,
         "is_launch": false
       },
@@ -1964,8 +2475,8 @@
       },
       "confidence": "mid",
       "score": {
-        "eff": 2.34,
-        "base": 2.23,
+        "eff": 2.05,
+        "base": 1.96,
         "boost": 0.05,
         "boost_capped": false
       },
@@ -2125,6 +2636,10 @@
         [
           1785326400,
           20169
+        ],
+        [
+          1785348000,
+          6360
         ]
       ],
       "investigation": {
@@ -2157,157 +2672,6 @@
           "review": {
             "queried": true,
             "hit": false
-          },
-          "jp_news": {
-            "queried": true,
-            "hit": false
-          },
-          "twitch": {
-            "queried": true,
-            "hit": false
-          },
-          "web": {
-            "queried": false,
-            "hit": false,
-            "articles": 0,
-            "error": false
-          }
-        },
-        "unknown_reason": null
-      }
-    },
-    {
-      "rank": 10,
-      "appid": 4887360,
-      "name": "erdetspill",
-      "detection": {
-        "current_ccu": 147,
-        "recent_value": 134,
-        "baseline": 44,
-        "ratio": 3.0,
-        "robust_z": 1.1,
-        "n_points": 45,
-        "is_riser": false,
-        "is_launch": true
-      },
-      "genres": [
-        "Action",
-        "Adventure",
-        "Casual",
-        "Indie",
-        "Free To Play"
-      ],
-      "categories": [
-        "Single-player",
-        "Steam Achievements",
-        "Custom Volume Controls",
-        "Stereo Sound",
-        "Family Sharing"
-      ],
-      "signals": [
-        {
-          "type": "news",
-          "layer": "trigger",
-          "value": {
-            "days_ago": 2
-          }
-        },
-        {
-          "type": "launch",
-          "layer": "trigger",
-          "value": null
-        },
-        {
-          "type": "review_surge",
-          "layer": "trigger",
-          "value": {
-            "delta": 473
-          }
-        }
-      ],
-      "prediction": {
-        "known": true,
-        "cause_types": [
-          "news",
-          "launch",
-          "review_surge"
-        ]
-      },
-      "confidence": "mid",
-      "score": {
-        "eff": 2.23,
-        "base": 1.94,
-        "boost": 0.15,
-        "boost_capped": false
-      },
-      "history": [
-        [
-          1785153600,
-          161
-        ],
-        [
-          1785175200,
-          69
-        ],
-        [
-          1785196800,
-          63
-        ],
-        [
-          1785218400,
-          100
-        ],
-        [
-          1785240000,
-          187
-        ],
-        [
-          1785261600,
-          187
-        ],
-        [
-          1785283200,
-          59
-        ],
-        [
-          1785304800,
-          78
-        ],
-        [
-          1785326400,
-          147
-        ]
-      ],
-      "investigation": {
-        "queried": [
-          "sale",
-          "news",
-          "launch",
-          "free",
-          "review",
-          "jp_news",
-          "twitch"
-        ],
-        "results": {
-          "sale": {
-            "queried": true,
-            "hit": false
-          },
-          "news": {
-            "queried": true,
-            "hit": true
-          },
-          "launch": {
-            "queried": true,
-            "hit": true
-          },
-          "free": {
-            "queried": true,
-            "hit": false
-          },
-          "review": {
-            "queried": true,
-            "hit": true
           },
           "jp_news": {
             "queried": true,
@@ -2329,1110 +2693,11 @@
     },
     {
       "rank": 11,
-      "appid": 108600,
-      "name": "Project Zomboid",
-      "detection": {
-        "current_ccu": 63536,
-        "recent_value": 60361,
-        "baseline": 27100,
-        "ratio": 2.2,
-        "robust_z": 4.2,
-        "n_points": 864,
-        "is_riser": false,
-        "is_launch": false
-      },
-      "genres": [
-        "Indie",
-        "RPG",
-        "Simulation",
-        "Early Access"
-      ],
-      "categories": [
-        "Single-player",
-        "Multi-player",
-        "PvP",
-        "Online PvP",
-        "Co-op",
-        "Online Co-op"
-      ],
-      "signals": [],
-      "prediction": {
-        "known": false,
-        "cause_types": []
-      },
-      "confidence": "mid",
-      "score": {
-        "eff": 2.21,
-        "base": 2.21,
-        "boost": 0,
-        "boost_capped": false
-      },
-      "history": [
-        [
-          1784116800,
-          31312
-        ],
-        [
-          1784138400,
-          31507
-        ],
-        [
-          1784160000,
-          26238
-        ],
-        [
-          1784181600,
-          22217
-        ],
-        [
-          1784203200,
-          31116
-        ],
-        [
-          1784224800,
-          31723
-        ],
-        [
-          1784246400,
-          26498
-        ],
-        [
-          1784268000,
-          22048
-        ],
-        [
-          1784289600,
-          31420
-        ],
-        [
-          1784311200,
-          31901
-        ],
-        [
-          1784332800,
-          27765
-        ],
-        [
-          1784354400,
-          25805
-        ],
-        [
-          1784376000,
-          36352
-        ],
-        [
-          1784397600,
-          37047
-        ],
-        [
-          1784419200,
-          29427
-        ],
-        [
-          1784440800,
-          29426
-        ],
-        [
-          1784462400,
-          38928
-        ],
-        [
-          1784484000,
-          37900
-        ],
-        [
-          1784505600,
-          29396
-        ],
-        [
-          1784527200,
-          21769
-        ],
-        [
-          1784548800,
-          32574
-        ],
-        [
-          1784570400,
-          33515
-        ],
-        [
-          1784592000,
-          27932
-        ],
-        [
-          1784613600,
-          22425
-        ],
-        [
-          1784635200,
-          31729
-        ],
-        [
-          1784656800,
-          32719
-        ],
-        [
-          1784678400,
-          27308
-        ],
-        [
-          1784700000,
-          22420
-        ],
-        [
-          1784721600,
-          31089
-        ],
-        [
-          1784743200,
-          32494
-        ],
-        [
-          1784764800,
-          26757
-        ],
-        [
-          1784786400,
-          22540
-        ],
-        [
-          1784808000,
-          31562
-        ],
-        [
-          1784829600,
-          32110
-        ],
-        [
-          1784851200,
-          26495
-        ],
-        [
-          1784872800,
-          21940
-        ],
-        [
-          1784894400,
-          31673
-        ],
-        [
-          1784916000,
-          32057
-        ],
-        [
-          1784937600,
-          26718
-        ],
-        [
-          1784959200,
-          25291
-        ],
-        [
-          1784980800,
-          34680
-        ],
-        [
-          1785002400,
-          34635
-        ],
-        [
-          1785024000,
-          28332
-        ],
-        [
-          1785045600,
-          27475
-        ],
-        [
-          1785067200,
-          37196
-        ],
-        [
-          1785088800,
-          38399
-        ],
-        [
-          1785110400,
-          29305
-        ],
-        [
-          1785132000,
-          21187
-        ],
-        [
-          1785153600,
-          30596
-        ],
-        [
-          1785175200,
-          31751
-        ],
-        [
-          1785196800,
-          26115
-        ],
-        [
-          1785218400,
-          20356
-        ],
-        [
-          1785240000,
-          28685
-        ],
-        [
-          1785261600,
-          29386
-        ],
-        [
-          1785283200,
-          24160
-        ],
-        [
-          1785304800,
-          20064
-        ],
-        [
-          1785326400,
-          63536
-        ]
-      ],
-      "investigation": {
-        "queried": [
-          "sale",
-          "news",
-          "launch",
-          "free",
-          "review",
-          "jp_news",
-          "twitch"
-        ],
-        "results": {
-          "sale": {
-            "queried": true,
-            "hit": false
-          },
-          "news": {
-            "queried": true,
-            "hit": false
-          },
-          "launch": {
-            "queried": true,
-            "hit": false
-          },
-          "free": {
-            "queried": true,
-            "hit": false
-          },
-          "review": {
-            "queried": true,
-            "hit": false
-          },
-          "jp_news": {
-            "queried": true,
-            "hit": false
-          },
-          "twitch": {
-            "queried": true,
-            "hit": false
-          },
-          "web": {
-            "queried": false,
-            "hit": false,
-            "articles": 0,
-            "error": true
-          }
-        },
-        "unknown_reason": "web_query_failed"
-      }
-    },
-    {
-      "rank": 12,
-      "appid": 3683770,
-      "name": "奶茶店模拟器 - 重生之我在冰堡甜城当店长",
-      "detection": {
-        "current_ccu": 7021,
-        "recent_value": 7768,
-        "baseline": 3315,
-        "ratio": 2.3,
-        "robust_z": 1.3,
-        "n_points": 211,
-        "is_riser": false,
-        "is_launch": true
-      },
-      "genres": [
-        "Casual",
-        "RPG",
-        "Simulation"
-      ],
-      "categories": [
-        "Single-player",
-        "Multi-player",
-        "Co-op",
-        "Online Co-op",
-        "Steam Achievements",
-        "Camera Comfort"
-      ],
-      "signals": [
-        {
-          "type": "sale",
-          "layer": "trigger",
-          "value": {
-            "discount_percent": 35,
-            "is_best": true
-          }
-        },
-        {
-          "type": "news",
-          "layer": "trigger",
-          "value": {
-            "days_ago": 5
-          }
-        },
-        {
-          "type": "launch",
-          "layer": "trigger",
-          "value": null
-        },
-        {
-          "type": "review_surge",
-          "layer": "trigger",
-          "value": {
-            "delta": 939
-          }
-        }
-      ],
-      "prediction": {
-        "known": true,
-        "cause_types": [
-          "sale",
-          "news",
-          "launch",
-          "review_surge"
-        ]
-      },
-      "confidence": "mid",
-      "score": {
-        "eff": 2.13,
-        "base": 1.77,
-        "boost": 0.2,
-        "boost_capped": false
-      },
-      "history": [
-        [
-          1784872800,
-          3107
-        ],
-        [
-          1784894400,
-          5715
-        ],
-        [
-          1784916000,
-          2455
-        ],
-        [
-          1784980800,
-          4346
-        ],
-        [
-          1785002400,
-          3198
-        ],
-        [
-          1785024000,
-          3857
-        ],
-        [
-          1785045600,
-          5842
-        ],
-        [
-          1785067200,
-          7521
-        ],
-        [
-          1785088800,
-          2848
-        ],
-        [
-          1785110400,
-          3287
-        ],
-        [
-          1785132000,
-          5410
-        ],
-        [
-          1785153600,
-          7651
-        ],
-        [
-          1785175200,
-          2857
-        ],
-        [
-          1785196800,
-          3315
-        ],
-        [
-          1785218400,
-          5207
-        ],
-        [
-          1785240000,
-          7923
-        ],
-        [
-          1785261600,
-          2838
-        ],
-        [
-          1785283200,
-          3571
-        ],
-        [
-          1785304800,
-          5330
-        ],
-        [
-          1785326400,
-          7832
-        ]
-      ],
-      "investigation": {
-        "queried": [
-          "sale",
-          "news",
-          "launch",
-          "free",
-          "review",
-          "jp_news",
-          "twitch"
-        ],
-        "results": {
-          "sale": {
-            "queried": true,
-            "hit": true
-          },
-          "news": {
-            "queried": true,
-            "hit": true
-          },
-          "launch": {
-            "queried": true,
-            "hit": true
-          },
-          "free": {
-            "queried": true,
-            "hit": false
-          },
-          "review": {
-            "queried": true,
-            "hit": true
-          },
-          "jp_news": {
-            "queried": true,
-            "hit": false
-          },
-          "twitch": {
-            "queried": true,
-            "hit": false
-          },
-          "web": {
-            "queried": false,
-            "hit": false,
-            "articles": 0,
-            "error": false
-          }
-        },
-        "unknown_reason": null
-      }
-    },
-    {
-      "rank": 13,
-      "appid": 1172470,
-      "name": "Apex Legends",
-      "detection": {
-        "current_ccu": 172612,
-        "recent_value": 204559,
-        "baseline": 86890,
-        "ratio": 2.4,
-        "robust_z": 2.0,
-        "n_points": 864,
-        "is_riser": false,
-        "is_launch": false
-      },
-      "genres": [
-        "Action",
-        "Adventure",
-        "Free To Play"
-      ],
-      "categories": [
-        "Multi-player",
-        "PvP",
-        "Online PvP",
-        "Co-op",
-        "Online Co-op",
-        "Steam Achievements"
-      ],
-      "signals": [
-        {
-          "type": "jp_news",
-          "layer": "trigger",
-          "value": null
-        }
-      ],
-      "prediction": {
-        "known": true,
-        "cause_types": [
-          "jp_news"
-        ]
-      },
-      "confidence": "high",
-      "score": {
-        "eff": 2.1,
-        "base": 2.04,
-        "boost": 0.03,
-        "boost_capped": false
-      },
-      "history": [
-        [
-          1784116800,
-          162915
-        ],
-        [
-          1784138400,
-          88280
-        ],
-        [
-          1784160000,
-          78404
-        ],
-        [
-          1784181600,
-          128309
-        ],
-        [
-          1784203200,
-          197285
-        ],
-        [
-          1784224800,
-          87822
-        ],
-        [
-          1784246400,
-          78597
-        ],
-        [
-          1784268000,
-          114470
-        ],
-        [
-          1784289600,
-          201223
-        ],
-        [
-          1784311200,
-          99745
-        ],
-        [
-          1784332800,
-          108106
-        ],
-        [
-          1784354400,
-          130737
-        ],
-        [
-          1784376000,
-          208799
-        ],
-        [
-          1784397600,
-          107271
-        ],
-        [
-          1784419200,
-          118425
-        ],
-        [
-          1784440800,
-          146217
-        ],
-        [
-          1784462400,
-          209001
-        ],
-        [
-          1784484000,
-          93918
-        ],
-        [
-          1784505600,
-          84628
-        ],
-        [
-          1784527200,
-          116360
-        ],
-        [
-          1784548800,
-          194863
-        ],
-        [
-          1784570400,
-          85174
-        ],
-        [
-          1784592000,
-          76223
-        ],
-        [
-          1784613600,
-          120528
-        ],
-        [
-          1784635200,
-          196758
-        ],
-        [
-          1784656800,
-          84466
-        ],
-        [
-          1784678400,
-          77511
-        ],
-        [
-          1784700000,
-          121067
-        ],
-        [
-          1784721600,
-          200154
-        ],
-        [
-          1784743200,
-          84033
-        ],
-        [
-          1784764800,
-          77837
-        ],
-        [
-          1784786400,
-          125147
-        ],
-        [
-          1784808000,
-          199829
-        ],
-        [
-          1784829600,
-          83366
-        ],
-        [
-          1784851200,
-          79220
-        ],
-        [
-          1784872800,
-          116698
-        ],
-        [
-          1784894400,
-          202894
-        ],
-        [
-          1784916000,
-          95620
-        ],
-        [
-          1784937600,
-          110580
-        ],
-        [
-          1784959200,
-          136798
-        ],
-        [
-          1784980800,
-          214120
-        ],
-        [
-          1785002400,
-          109036
-        ],
-        [
-          1785024000,
-          111650
-        ],
-        [
-          1785045600,
-          151104
-        ],
-        [
-          1785067200,
-          210055
-        ],
-        [
-          1785088800,
-          95530
-        ],
-        [
-          1785110400,
-          78558
-        ],
-        [
-          1785132000,
-          122366
-        ],
-        [
-          1785153600,
-          201525
-        ],
-        [
-          1785175200,
-          85243
-        ],
-        [
-          1785196800,
-          81368
-        ],
-        [
-          1785218400,
-          115184
-        ],
-        [
-          1785240000,
-          206079
-        ],
-        [
-          1785261600,
-          88092
-        ],
-        [
-          1785283200,
-          83747
-        ],
-        [
-          1785304800,
-          118042
-        ],
-        [
-          1785326400,
-          207870
-        ]
-      ],
-      "investigation": {
-        "queried": [
-          "sale",
-          "news",
-          "launch",
-          "free",
-          "review",
-          "jp_news",
-          "twitch"
-        ],
-        "results": {
-          "sale": {
-            "queried": true,
-            "hit": false
-          },
-          "news": {
-            "queried": true,
-            "hit": false
-          },
-          "launch": {
-            "queried": true,
-            "hit": false
-          },
-          "free": {
-            "queried": true,
-            "hit": false
-          },
-          "review": {
-            "queried": true,
-            "hit": false
-          },
-          "jp_news": {
-            "queried": true,
-            "hit": true
-          },
-          "twitch": {
-            "queried": true,
-            "hit": false
-          },
-          "web": {
-            "queried": false,
-            "hit": false,
-            "articles": 0,
-            "error": false
-          }
-        },
-        "unknown_reason": null
-      }
-    },
-    {
-      "rank": 14,
-      "appid": 1203220,
-      "name": "NARAKA: BLADEPOINT",
-      "detection": {
-        "current_ccu": 76406,
-        "recent_value": 95075,
-        "baseline": 35605,
-        "ratio": 2.7,
-        "robust_z": 1.5,
-        "n_points": 557,
-        "is_riser": false,
-        "is_launch": false
-      },
-      "genres": [
-        "Action",
-        "Adventure",
-        "Massively Multiplayer",
-        "Free To Play"
-      ],
-      "categories": [
-        "Multi-player",
-        "PvP",
-        "Online PvP",
-        "Steam Achievements",
-        "Steam Trading Cards",
-        "In-App Purchases"
-      ],
-      "signals": [],
-      "prediction": {
-        "known": false,
-        "cause_types": []
-      },
-      "confidence": "low",
-      "score": {
-        "eff": 2.06,
-        "base": 2.06,
-        "boost": 0,
-        "boost_capped": false
-      },
-      "history": [
-        [
-          1784116800,
-          69840
-        ],
-        [
-          1784138400,
-          22876
-        ],
-        [
-          1784527200,
-          58132
-        ],
-        [
-          1784548800,
-          97128
-        ],
-        [
-          1784570400,
-          23811
-        ],
-        [
-          1784592000,
-          36248
-        ],
-        [
-          1784613600,
-          64642
-        ],
-        [
-          1784635200,
-          97291
-        ],
-        [
-          1784656800,
-          22833
-        ],
-        [
-          1784678400,
-          36749
-        ],
-        [
-          1784700000,
-          65433
-        ],
-        [
-          1784721600,
-          99384
-        ],
-        [
-          1784743200,
-          23111
-        ],
-        [
-          1784764800,
-          38997
-        ],
-        [
-          1784786400,
-          67505
-        ],
-        [
-          1784808000,
-          99878
-        ],
-        [
-          1784829600,
-          22861
-        ],
-        [
-          1784851200,
-          41007
-        ],
-        [
-          1784872800,
-          65447
-        ],
-        [
-          1784894400,
-          98910
-        ],
-        [
-          1784916000,
-          26270
-        ],
-        [
-          1784937600,
-          48975
-        ],
-        [
-          1784959200,
-          67309
-        ],
-        [
-          1784980800,
-          98359
-        ],
-        [
-          1785002400,
-          31916
-        ],
-        [
-          1785024000,
-          49910
-        ],
-        [
-          1785045600,
-          68567
-        ],
-        [
-          1785067200,
-          96308
-        ],
-        [
-          1785088800,
-          24029
-        ],
-        [
-          1785110400,
-          36366
-        ],
-        [
-          1785132000,
-          63024
-        ],
-        [
-          1785153600,
-          96609
-        ],
-        [
-          1785175200,
-          22461
-        ],
-        [
-          1785196800,
-          36167
-        ],
-        [
-          1785218400,
-          58545
-        ],
-        [
-          1785240000,
-          97075
-        ],
-        [
-          1785261600,
-          21862
-        ],
-        [
-          1785283200,
-          36170
-        ],
-        [
-          1785304800,
-          60335
-        ],
-        [
-          1785326400,
-          95733
-        ]
-      ],
-      "investigation": {
-        "queried": [
-          "sale",
-          "news",
-          "launch",
-          "free",
-          "review",
-          "jp_news",
-          "twitch"
-        ],
-        "results": {
-          "sale": {
-            "queried": true,
-            "hit": false
-          },
-          "news": {
-            "queried": true,
-            "hit": false
-          },
-          "launch": {
-            "queried": true,
-            "hit": false
-          },
-          "free": {
-            "queried": true,
-            "hit": false
-          },
-          "review": {
-            "queried": true,
-            "hit": false
-          },
-          "jp_news": {
-            "queried": true,
-            "hit": false
-          },
-          "twitch": {
-            "queried": true,
-            "hit": false
-          },
-          "web": {
-            "queried": false,
-            "hit": false,
-            "articles": 0,
-            "error": true
-          }
-        },
-        "unknown_reason": "web_query_failed"
-      }
-    },
-    {
-      "rank": 15,
       "appid": 1568590,
       "name": "Goose Goose Duck",
       "detection": {
-        "current_ccu": 8882,
-        "recent_value": 8817,
+        "current_ccu": 4636,
+        "recent_value": 8795,
         "baseline": 3437,
         "ratio": 2.6,
         "robust_z": 1.5,
@@ -3462,8 +2727,8 @@
       },
       "confidence": "low",
       "score": {
-        "eff": 2.01,
-        "base": 2.01,
+        "eff": 2.0,
+        "base": 2.0,
         "boost": 0,
         "boost_capped": false
       },
@@ -3591,6 +2856,535 @@
         [
           1785326400,
           9130
+        ],
+        [
+          1785348000,
+          5347
+        ]
+      ],
+      "investigation": {
+        "queried": [
+          "sale",
+          "news",
+          "launch",
+          "free",
+          "review",
+          "jp_news",
+          "twitch",
+          "web"
+        ],
+        "results": {
+          "sale": {
+            "queried": true,
+            "hit": false
+          },
+          "news": {
+            "queried": true,
+            "hit": false
+          },
+          "launch": {
+            "queried": true,
+            "hit": false
+          },
+          "free": {
+            "queried": true,
+            "hit": false
+          },
+          "review": {
+            "queried": true,
+            "hit": false
+          },
+          "jp_news": {
+            "queried": true,
+            "hit": false
+          },
+          "twitch": {
+            "queried": true,
+            "hit": false
+          },
+          "web": {
+            "queried": true,
+            "hit": false,
+            "articles": 0,
+            "error": false
+          }
+        },
+        "unknown_reason": "investigated_all_negative"
+      }
+    },
+    {
+      "rank": 12,
+      "appid": 3683770,
+      "name": "奶茶店模拟器 - 重生之我在冰堡甜城当店长",
+      "detection": {
+        "current_ccu": 1761,
+        "recent_value": 7162,
+        "baseline": 3315,
+        "ratio": 2.2,
+        "robust_z": 1.1,
+        "n_points": 223,
+        "is_riser": false,
+        "is_launch": true
+      },
+      "genres": [
+        "Casual",
+        "RPG",
+        "Simulation"
+      ],
+      "categories": [
+        "Single-player",
+        "Multi-player",
+        "Co-op",
+        "Online Co-op",
+        "Steam Achievements",
+        "Camera Comfort"
+      ],
+      "signals": [
+        {
+          "type": "sale",
+          "layer": "trigger",
+          "value": {
+            "discount_percent": 35,
+            "is_best": true
+          }
+        },
+        {
+          "type": "news",
+          "layer": "trigger",
+          "value": {
+            "days_ago": 5
+          }
+        },
+        {
+          "type": "launch",
+          "layer": "trigger",
+          "value": null
+        },
+        {
+          "type": "review_surge",
+          "layer": "trigger",
+          "value": {
+            "delta": 939
+          }
+        }
+      ],
+      "prediction": {
+        "known": true,
+        "cause_types": [
+          "sale",
+          "news",
+          "launch",
+          "review_surge"
+        ]
+      },
+      "confidence": "mid",
+      "score": {
+        "eff": 1.96,
+        "base": 1.63,
+        "boost": 0.2,
+        "boost_capped": false
+      },
+      "history": [
+        [
+          1784872800,
+          3107
+        ],
+        [
+          1784894400,
+          5715
+        ],
+        [
+          1784916000,
+          2455
+        ],
+        [
+          1784980800,
+          4346
+        ],
+        [
+          1785002400,
+          3198
+        ],
+        [
+          1785024000,
+          3857
+        ],
+        [
+          1785045600,
+          5842
+        ],
+        [
+          1785067200,
+          7521
+        ],
+        [
+          1785088800,
+          2848
+        ],
+        [
+          1785110400,
+          3287
+        ],
+        [
+          1785132000,
+          5410
+        ],
+        [
+          1785153600,
+          7651
+        ],
+        [
+          1785175200,
+          2857
+        ],
+        [
+          1785196800,
+          3315
+        ],
+        [
+          1785218400,
+          5207
+        ],
+        [
+          1785240000,
+          7923
+        ],
+        [
+          1785261600,
+          2838
+        ],
+        [
+          1785283200,
+          3571
+        ],
+        [
+          1785304800,
+          5330
+        ],
+        [
+          1785326400,
+          7832
+        ],
+        [
+          1785348000,
+          2781
+        ]
+      ],
+      "investigation": {
+        "queried": [
+          "sale",
+          "news",
+          "launch",
+          "free",
+          "review",
+          "jp_news",
+          "twitch"
+        ],
+        "results": {
+          "sale": {
+            "queried": true,
+            "hit": true
+          },
+          "news": {
+            "queried": true,
+            "hit": true
+          },
+          "launch": {
+            "queried": true,
+            "hit": true
+          },
+          "free": {
+            "queried": true,
+            "hit": false
+          },
+          "review": {
+            "queried": true,
+            "hit": true
+          },
+          "jp_news": {
+            "queried": true,
+            "hit": false
+          },
+          "twitch": {
+            "queried": true,
+            "hit": false
+          },
+          "web": {
+            "queried": false,
+            "hit": false,
+            "articles": 0,
+            "error": false
+          }
+        },
+        "unknown_reason": null
+      }
+    },
+    {
+      "rank": 13,
+      "appid": 1431300,
+      "name": "SAND: Raiders of Sophie",
+      "detection": {
+        "current_ccu": 20813,
+        "recent_value": 20244,
+        "baseline": 9976,
+        "ratio": 2.0,
+        "robust_z": 2.6,
+        "n_points": 862,
+        "is_riser": false,
+        "is_launch": false
+      },
+      "genres": [
+        "Action",
+        "Adventure",
+        "Early Access"
+      ],
+      "categories": [
+        "Multi-player",
+        "PvP",
+        "Online PvP",
+        "Steam Achievements",
+        "Family Sharing"
+      ],
+      "signals": [],
+      "prediction": {
+        "known": false,
+        "cause_types": []
+      },
+      "confidence": "mid",
+      "score": {
+        "eff": 1.93,
+        "base": 1.93,
+        "boost": 0,
+        "boost_capped": false
+      },
+      "history": [
+        [
+          1784138400,
+          11816
+        ],
+        [
+          1784160000,
+          10898
+        ],
+        [
+          1784181600,
+          6972
+        ],
+        [
+          1784203200,
+          10491
+        ],
+        [
+          1784224800,
+          12174
+        ],
+        [
+          1784246400,
+          9975
+        ],
+        [
+          1784268000,
+          6894
+        ],
+        [
+          1784289600,
+          9978
+        ],
+        [
+          1784311200,
+          12030
+        ],
+        [
+          1784332800,
+          9737
+        ],
+        [
+          1784354400,
+          7772
+        ],
+        [
+          1784376000,
+          11558
+        ],
+        [
+          1784397600,
+          31826
+        ],
+        [
+          1784419200,
+          31692
+        ],
+        [
+          1784440800,
+          9821
+        ],
+        [
+          1784462400,
+          12938
+        ],
+        [
+          1784484000,
+          13275
+        ],
+        [
+          1784505600,
+          10654
+        ],
+        [
+          1784527200,
+          8109
+        ],
+        [
+          1784548800,
+          10824
+        ],
+        [
+          1784570400,
+          12369
+        ],
+        [
+          1784592000,
+          10727
+        ],
+        [
+          1784613600,
+          7976
+        ],
+        [
+          1784635200,
+          10130
+        ],
+        [
+          1784656800,
+          11442
+        ],
+        [
+          1784678400,
+          6064
+        ],
+        [
+          1784700000,
+          4706
+        ],
+        [
+          1784721600,
+          9042
+        ],
+        [
+          1784743200,
+          10521
+        ],
+        [
+          1784764800,
+          9437
+        ],
+        [
+          1784786400,
+          6757
+        ],
+        [
+          1784808000,
+          9716
+        ],
+        [
+          1784829600,
+          10869
+        ],
+        [
+          1784851200,
+          9425
+        ],
+        [
+          1784872800,
+          6738
+        ],
+        [
+          1784894400,
+          9494
+        ],
+        [
+          1784916000,
+          28482
+        ],
+        [
+          1784937600,
+          28700
+        ],
+        [
+          1784959200,
+          13432
+        ],
+        [
+          1784980800,
+          11884
+        ],
+        [
+          1785002400,
+          29305
+        ],
+        [
+          1785024000,
+          28501
+        ],
+        [
+          1785045600,
+          15364
+        ],
+        [
+          1785067200,
+          12766
+        ],
+        [
+          1785088800,
+          28488
+        ],
+        [
+          1785110400,
+          26665
+        ],
+        [
+          1785132000,
+          13814
+        ],
+        [
+          1785153600,
+          11236
+        ],
+        [
+          1785175200,
+          17230
+        ],
+        [
+          1785196800,
+          17409
+        ],
+        [
+          1785218400,
+          12270
+        ],
+        [
+          1785240000,
+          13717
+        ],
+        [
+          1785261600,
+          14335
+        ],
+        [
+          1785283200,
+          4955
+        ],
+        [
+          1785304800,
+          6980
+        ],
+        [
+          1785326400,
+          18674
+        ],
+        [
+          1785348000,
+          20813
         ]
       ],
       "investigation": {
@@ -3643,15 +3437,15 @@
       }
     },
     {
-      "rank": 16,
+      "rank": 14,
       "appid": 588650,
       "name": "Dead Cells",
       "detection": {
-        "current_ccu": 3256,
-        "recent_value": 3443,
+        "current_ccu": 2102,
+        "recent_value": 3285,
         "baseline": 1348,
-        "ratio": 2.6,
-        "robust_z": 48.4,
+        "ratio": 2.4,
+        "robust_z": 44.8,
         "n_points": 14,
         "is_riser": false,
         "is_launch": false
@@ -3687,8 +3481,8 @@
       },
       "confidence": "high",
       "score": {
-        "eff": 2.0,
-        "base": 1.91,
+        "eff": 1.93,
+        "base": 1.84,
         "boost": 0.05,
         "boost_capped": false
       },
@@ -3724,6 +3518,10 @@
         [
           1785326400,
           3449
+        ],
+        [
+          1785348000,
+          2261
         ]
       ],
       "investigation": {
@@ -3776,345 +3574,16 @@
       }
     },
     {
-      "rank": 17,
-      "appid": 578080,
-      "name": "PUBG: BATTLEGROUNDS",
-      "detection": {
-        "current_ccu": 631258,
-        "recent_value": 745916,
-        "baseline": 308610,
-        "ratio": 2.4,
-        "robust_z": 1.5,
-        "n_points": 864,
-        "is_riser": false,
-        "is_launch": false
-      },
-      "genres": [
-        "Action",
-        "Adventure",
-        "Massively Multiplayer",
-        "Free To Play"
-      ],
-      "categories": [
-        "Multi-player",
-        "PvP",
-        "Online PvP",
-        "Custom Volume Controls",
-        "Stereo Sound",
-        "Surround Sound"
-      ],
-      "signals": [
-        {
-          "type": "news",
-          "layer": "trigger",
-          "value": {
-            "days_ago": 5
-          }
-        }
-      ],
-      "prediction": {
-        "known": true,
-        "cause_types": [
-          "news"
-        ]
-      },
-      "confidence": "mid",
-      "score": {
-        "eff": 2.0,
-        "base": 1.9,
-        "boost": 0.05,
-        "boost_capped": false
-      },
-      "history": [
-        [
-          1784116800,
-          601551
-        ],
-        [
-          1784138400,
-          317687
-        ],
-        [
-          1784160000,
-          282786
-        ],
-        [
-          1784181600,
-          501681
-        ],
-        [
-          1784203200,
-          742963
-        ],
-        [
-          1784224800,
-          304644
-        ],
-        [
-          1784246400,
-          288837
-        ],
-        [
-          1784268000,
-          450211
-        ],
-        [
-          1784289600,
-          729594
-        ],
-        [
-          1784311200,
-          339123
-        ],
-        [
-          1784332800,
-          351197
-        ],
-        [
-          1784354400,
-          492523
-        ],
-        [
-          1784376000,
-          751076
-        ],
-        [
-          1784397600,
-          359747
-        ],
-        [
-          1784419200,
-          405293
-        ],
-        [
-          1784440800,
-          560181
-        ],
-        [
-          1784462400,
-          757574
-        ],
-        [
-          1784484000,
-          289411
-        ],
-        [
-          1784505600,
-          251922
-        ],
-        [
-          1784527200,
-          455688
-        ],
-        [
-          1784548800,
-          737776
-        ],
-        [
-          1784570400,
-          288942
-        ],
-        [
-          1784592000,
-          274788
-        ],
-        [
-          1784613600,
-          486777
-        ],
-        [
-          1784635200,
-          751695
-        ],
-        [
-          1784656800,
-          290389
-        ],
-        [
-          1784678400,
-          280238
-        ],
-        [
-          1784700000,
-          476103
-        ],
-        [
-          1784721600,
-          739131
-        ],
-        [
-          1784743200,
-          289749
-        ],
-        [
-          1784764800,
-          289787
-        ],
-        [
-          1784786400,
-          503815
-        ],
-        [
-          1784808000,
-          761868
-        ],
-        [
-          1784829600,
-          294208
-        ],
-        [
-          1784851200,
-          289913
-        ],
-        [
-          1784872800,
-          465975
-        ],
-        [
-          1784894400,
-          748145
-        ],
-        [
-          1784916000,
-          328479
-        ],
-        [
-          1784937600,
-          382980
-        ],
-        [
-          1784959200,
-          521813
-        ],
-        [
-          1784980800,
-          780842
-        ],
-        [
-          1785002400,
-          382431
-        ],
-        [
-          1785024000,
-          378544
-        ],
-        [
-          1785045600,
-          589003
-        ],
-        [
-          1785067200,
-          801941
-        ],
-        [
-          1785088800,
-          320626
-        ],
-        [
-          1785110400,
-          284168
-        ],
-        [
-          1785132000,
-          496205
-        ],
-        [
-          1785153600,
-          774984
-        ],
-        [
-          1785175200,
-          298923
-        ],
-        [
-          1785196800,
-          298193
-        ],
-        [
-          1785218400,
-          461231
-        ],
-        [
-          1785240000,
-          775963
-        ],
-        [
-          1785261600,
-          294399
-        ],
-        [
-          1785283200,
-          296227
-        ],
-        [
-          1785304800,
-          470999
-        ],
-        [
-          1785326400,
-          756398
-        ]
-      ],
-      "investigation": {
-        "queried": [
-          "sale",
-          "news",
-          "launch",
-          "free",
-          "review",
-          "jp_news",
-          "twitch"
-        ],
-        "results": {
-          "sale": {
-            "queried": true,
-            "hit": false
-          },
-          "news": {
-            "queried": true,
-            "hit": true
-          },
-          "launch": {
-            "queried": true,
-            "hit": false
-          },
-          "free": {
-            "queried": true,
-            "hit": false
-          },
-          "review": {
-            "queried": true,
-            "hit": false
-          },
-          "jp_news": {
-            "queried": true,
-            "hit": false
-          },
-          "twitch": {
-            "queried": true,
-            "hit": false
-          },
-          "web": {
-            "queried": false,
-            "hit": false,
-            "articles": 0,
-            "error": false
-          }
-        },
-        "unknown_reason": null
-      }
-    },
-    {
-      "rank": 18,
+      "rank": 15,
       "appid": 2183900,
       "name": "Warhammer 40,000: Space Marine 2",
       "detection": {
-        "current_ccu": 24151,
-        "recent_value": 24188,
-        "baseline": 12754,
+        "current_ccu": 23338,
+        "recent_value": 24169,
+        "baseline": 12736,
         "ratio": 1.9,
-        "robust_z": 2.4,
-        "n_points": 864,
+        "robust_z": 2.3,
+        "n_points": 862,
         "is_riser": false,
         "is_launch": false
       },
@@ -4157,19 +3626,15 @@
       },
       "confidence": "high",
       "score": {
-        "eff": 1.93,
-        "base": 1.76,
+        "eff": 1.92,
+        "base": 1.75,
         "boost": 0.1,
         "boost_capped": false
       },
       "history": [
         [
-          1784116800,
-          14787
-        ],
-        [
           1784138400,
-          14112
+          12496
         ],
         [
           1784160000,
@@ -4390,6 +3855,10 @@
         [
           1785326400,
           24705
+        ],
+        [
+          1785348000,
+          23898
         ]
       ],
       "investigation": {
@@ -4442,16 +3911,1942 @@
       }
     },
     {
+      "rank": 16,
+      "appid": 3224770,
+      "name": "Umamusume: Pretty Derby",
+      "detection": {
+        "current_ccu": 12871,
+        "recent_value": 15592,
+        "baseline": 7934,
+        "ratio": 2.0,
+        "robust_z": 2.4,
+        "n_points": 411,
+        "is_riser": false,
+        "is_launch": false
+      },
+      "genres": [],
+      "categories": [],
+      "signals": [
+        {
+          "type": "news",
+          "layer": "trigger",
+          "value": {
+            "days_ago": 6
+          }
+        }
+      ],
+      "prediction": {
+        "known": true,
+        "cause_types": [
+          "news"
+        ]
+      },
+      "confidence": "high",
+      "score": {
+        "eff": 1.91,
+        "base": 1.82,
+        "boost": 0.05,
+        "boost_capped": false
+      },
+      "history": [
+        [
+          1784354400,
+          5819
+        ],
+        [
+          1784376000,
+          10364
+        ],
+        [
+          1784397600,
+          9107
+        ],
+        [
+          1784419200,
+          7973
+        ],
+        [
+          1784440800,
+          6754
+        ],
+        [
+          1784462400,
+          10083
+        ],
+        [
+          1784484000,
+          8720
+        ],
+        [
+          1784505600,
+          6992
+        ],
+        [
+          1784527200,
+          5371
+        ],
+        [
+          1784548800,
+          9288
+        ],
+        [
+          1784570400,
+          11062
+        ],
+        [
+          1784592000,
+          8728
+        ],
+        [
+          1784613600,
+          5739
+        ],
+        [
+          1784635200,
+          9467
+        ],
+        [
+          1784656800,
+          7892
+        ],
+        [
+          1784678400,
+          7345
+        ],
+        [
+          1785045600,
+          8590
+        ],
+        [
+          1785067200,
+          16893
+        ],
+        [
+          1785088800,
+          14388
+        ],
+        [
+          1785110400,
+          11216
+        ],
+        [
+          1785132000,
+          8410
+        ],
+        [
+          1785153600,
+          17248
+        ],
+        [
+          1785175200,
+          15213
+        ],
+        [
+          1785196800,
+          15103
+        ],
+        [
+          1785218400,
+          10727
+        ],
+        [
+          1785240000,
+          18290
+        ],
+        [
+          1785261600,
+          15949
+        ],
+        [
+          1785283200,
+          12706
+        ],
+        [
+          1785304800,
+          9377
+        ],
+        [
+          1785326400,
+          15946
+        ],
+        [
+          1785348000,
+          13799
+        ]
+      ],
+      "investigation": {
+        "queried": [
+          "sale",
+          "news",
+          "launch",
+          "free",
+          "review",
+          "jp_news",
+          "twitch"
+        ],
+        "results": {
+          "sale": {
+            "queried": true,
+            "hit": false
+          },
+          "news": {
+            "queried": true,
+            "hit": true
+          },
+          "launch": {
+            "queried": true,
+            "hit": false
+          },
+          "free": {
+            "queried": true,
+            "hit": false
+          },
+          "review": {
+            "queried": true,
+            "hit": false
+          },
+          "jp_news": {
+            "queried": true,
+            "hit": false
+          },
+          "twitch": {
+            "queried": true,
+            "hit": false
+          },
+          "web": {
+            "queried": false,
+            "hit": false,
+            "articles": 0,
+            "error": false
+          }
+        },
+        "unknown_reason": null
+      }
+    },
+    {
+      "rank": 17,
+      "appid": 1172470,
+      "name": "Apex Legends",
+      "detection": {
+        "current_ccu": 71993,
+        "recent_value": 179932,
+        "baseline": 86890,
+        "ratio": 2.1,
+        "robust_z": 1.6,
+        "n_points": 862,
+        "is_riser": false,
+        "is_launch": false
+      },
+      "genres": [
+        "Action",
+        "Adventure",
+        "Free To Play"
+      ],
+      "categories": [
+        "Multi-player",
+        "PvP",
+        "Online PvP",
+        "Co-op",
+        "Online Co-op",
+        "Steam Achievements"
+      ],
+      "signals": [
+        {
+          "type": "jp_news",
+          "layer": "trigger",
+          "value": null
+        }
+      ],
+      "prediction": {
+        "known": true,
+        "cause_types": [
+          "jp_news"
+        ]
+      },
+      "confidence": "mid",
+      "score": {
+        "eff": 1.77,
+        "base": 1.72,
+        "boost": 0.03,
+        "boost_capped": false
+      },
+      "history": [
+        [
+          1784138400,
+          61035
+        ],
+        [
+          1784160000,
+          78404
+        ],
+        [
+          1784181600,
+          128309
+        ],
+        [
+          1784203200,
+          197285
+        ],
+        [
+          1784224800,
+          87822
+        ],
+        [
+          1784246400,
+          78597
+        ],
+        [
+          1784268000,
+          114470
+        ],
+        [
+          1784289600,
+          201223
+        ],
+        [
+          1784311200,
+          99745
+        ],
+        [
+          1784332800,
+          108106
+        ],
+        [
+          1784354400,
+          130737
+        ],
+        [
+          1784376000,
+          208799
+        ],
+        [
+          1784397600,
+          107271
+        ],
+        [
+          1784419200,
+          118425
+        ],
+        [
+          1784440800,
+          146217
+        ],
+        [
+          1784462400,
+          209001
+        ],
+        [
+          1784484000,
+          93918
+        ],
+        [
+          1784505600,
+          84628
+        ],
+        [
+          1784527200,
+          116360
+        ],
+        [
+          1784548800,
+          194863
+        ],
+        [
+          1784570400,
+          85174
+        ],
+        [
+          1784592000,
+          76223
+        ],
+        [
+          1784613600,
+          120528
+        ],
+        [
+          1784635200,
+          196758
+        ],
+        [
+          1784656800,
+          84466
+        ],
+        [
+          1784678400,
+          77511
+        ],
+        [
+          1784700000,
+          121067
+        ],
+        [
+          1784721600,
+          200154
+        ],
+        [
+          1784743200,
+          84033
+        ],
+        [
+          1784764800,
+          77837
+        ],
+        [
+          1784786400,
+          125147
+        ],
+        [
+          1784808000,
+          199829
+        ],
+        [
+          1784829600,
+          83366
+        ],
+        [
+          1784851200,
+          79220
+        ],
+        [
+          1784872800,
+          116698
+        ],
+        [
+          1784894400,
+          202894
+        ],
+        [
+          1784916000,
+          95620
+        ],
+        [
+          1784937600,
+          110580
+        ],
+        [
+          1784959200,
+          136798
+        ],
+        [
+          1784980800,
+          214120
+        ],
+        [
+          1785002400,
+          109036
+        ],
+        [
+          1785024000,
+          111650
+        ],
+        [
+          1785045600,
+          151104
+        ],
+        [
+          1785067200,
+          210055
+        ],
+        [
+          1785088800,
+          95530
+        ],
+        [
+          1785110400,
+          78558
+        ],
+        [
+          1785132000,
+          122366
+        ],
+        [
+          1785153600,
+          201525
+        ],
+        [
+          1785175200,
+          85243
+        ],
+        [
+          1785196800,
+          81368
+        ],
+        [
+          1785218400,
+          115184
+        ],
+        [
+          1785240000,
+          206079
+        ],
+        [
+          1785261600,
+          88092
+        ],
+        [
+          1785283200,
+          83747
+        ],
+        [
+          1785304800,
+          118042
+        ],
+        [
+          1785326400,
+          207870
+        ],
+        [
+          1785348000,
+          86054
+        ]
+      ],
+      "investigation": {
+        "queried": [
+          "sale",
+          "news",
+          "launch",
+          "free",
+          "review",
+          "jp_news",
+          "twitch"
+        ],
+        "results": {
+          "sale": {
+            "queried": true,
+            "hit": false
+          },
+          "news": {
+            "queried": true,
+            "hit": false
+          },
+          "launch": {
+            "queried": true,
+            "hit": false
+          },
+          "free": {
+            "queried": true,
+            "hit": false
+          },
+          "review": {
+            "queried": true,
+            "hit": false
+          },
+          "jp_news": {
+            "queried": true,
+            "hit": true
+          },
+          "twitch": {
+            "queried": true,
+            "hit": false
+          },
+          "web": {
+            "queried": false,
+            "hit": false,
+            "articles": 0,
+            "error": false
+          }
+        },
+        "unknown_reason": null
+      }
+    },
+    {
+      "rank": 18,
+      "appid": 578080,
+      "name": "PUBG: BATTLEGROUNDS",
+      "detection": {
+        "current_ccu": 223658,
+        "recent_value": 665489,
+        "baseline": 308380,
+        "ratio": 2.2,
+        "robust_z": 1.2,
+        "n_points": 862,
+        "is_riser": false,
+        "is_launch": false
+      },
+      "genres": [
+        "Action",
+        "Adventure",
+        "Massively Multiplayer",
+        "Free To Play"
+      ],
+      "categories": [
+        "Multi-player",
+        "PvP",
+        "Online PvP",
+        "Custom Volume Controls",
+        "Stereo Sound",
+        "Surround Sound"
+      ],
+      "signals": [
+        {
+          "type": "news",
+          "layer": "trigger",
+          "value": {
+            "days_ago": 5
+          }
+        }
+      ],
+      "prediction": {
+        "known": true,
+        "cause_types": [
+          "news"
+        ]
+      },
+      "confidence": "mid",
+      "score": {
+        "eff": 1.75,
+        "base": 1.66,
+        "boost": 0.05,
+        "boost_capped": false
+      },
+      "history": [
+        [
+          1784138400,
+          177705
+        ],
+        [
+          1784160000,
+          282786
+        ],
+        [
+          1784181600,
+          501681
+        ],
+        [
+          1784203200,
+          742963
+        ],
+        [
+          1784224800,
+          304644
+        ],
+        [
+          1784246400,
+          288837
+        ],
+        [
+          1784268000,
+          450211
+        ],
+        [
+          1784289600,
+          729594
+        ],
+        [
+          1784311200,
+          339123
+        ],
+        [
+          1784332800,
+          351197
+        ],
+        [
+          1784354400,
+          492523
+        ],
+        [
+          1784376000,
+          751076
+        ],
+        [
+          1784397600,
+          359747
+        ],
+        [
+          1784419200,
+          405293
+        ],
+        [
+          1784440800,
+          560181
+        ],
+        [
+          1784462400,
+          757574
+        ],
+        [
+          1784484000,
+          289411
+        ],
+        [
+          1784505600,
+          251922
+        ],
+        [
+          1784527200,
+          455688
+        ],
+        [
+          1784548800,
+          737776
+        ],
+        [
+          1784570400,
+          288942
+        ],
+        [
+          1784592000,
+          274788
+        ],
+        [
+          1784613600,
+          486777
+        ],
+        [
+          1784635200,
+          751695
+        ],
+        [
+          1784656800,
+          290389
+        ],
+        [
+          1784678400,
+          280238
+        ],
+        [
+          1784700000,
+          476103
+        ],
+        [
+          1784721600,
+          739131
+        ],
+        [
+          1784743200,
+          289749
+        ],
+        [
+          1784764800,
+          289787
+        ],
+        [
+          1784786400,
+          503815
+        ],
+        [
+          1784808000,
+          761868
+        ],
+        [
+          1784829600,
+          294208
+        ],
+        [
+          1784851200,
+          289913
+        ],
+        [
+          1784872800,
+          465975
+        ],
+        [
+          1784894400,
+          748145
+        ],
+        [
+          1784916000,
+          328479
+        ],
+        [
+          1784937600,
+          382980
+        ],
+        [
+          1784959200,
+          521813
+        ],
+        [
+          1784980800,
+          780842
+        ],
+        [
+          1785002400,
+          382431
+        ],
+        [
+          1785024000,
+          378544
+        ],
+        [
+          1785045600,
+          589003
+        ],
+        [
+          1785067200,
+          801941
+        ],
+        [
+          1785088800,
+          320626
+        ],
+        [
+          1785110400,
+          284168
+        ],
+        [
+          1785132000,
+          496205
+        ],
+        [
+          1785153600,
+          774984
+        ],
+        [
+          1785175200,
+          298923
+        ],
+        [
+          1785196800,
+          298193
+        ],
+        [
+          1785218400,
+          461231
+        ],
+        [
+          1785240000,
+          775963
+        ],
+        [
+          1785261600,
+          294399
+        ],
+        [
+          1785283200,
+          296227
+        ],
+        [
+          1785304800,
+          470999
+        ],
+        [
+          1785326400,
+          756398
+        ],
+        [
+          1785348000,
+          303117
+        ]
+      ],
+      "investigation": {
+        "queried": [
+          "sale",
+          "news",
+          "launch",
+          "free",
+          "review",
+          "jp_news",
+          "twitch"
+        ],
+        "results": {
+          "sale": {
+            "queried": true,
+            "hit": false
+          },
+          "news": {
+            "queried": true,
+            "hit": true
+          },
+          "launch": {
+            "queried": true,
+            "hit": false
+          },
+          "free": {
+            "queried": true,
+            "hit": false
+          },
+          "review": {
+            "queried": true,
+            "hit": false
+          },
+          "jp_news": {
+            "queried": true,
+            "hit": false
+          },
+          "twitch": {
+            "queried": true,
+            "hit": false
+          },
+          "web": {
+            "queried": false,
+            "hit": false,
+            "articles": 0,
+            "error": false
+          }
+        },
+        "unknown_reason": null
+      }
+    },
+    {
       "rank": 19,
+      "appid": 2717220,
+      "name": "雀魂 -じゃんたま-",
+      "detection": {
+        "current_ccu": 746,
+        "recent_value": 746,
+        "baseline": 350,
+        "ratio": 2.1,
+        "robust_z": 1.0,
+        "n_points": 336,
+        "is_riser": false,
+        "is_launch": true
+      },
+      "genres": [
+        "Casual",
+        "RPG",
+        "Strategy"
+      ],
+      "categories": [
+        "Multi-player",
+        "PvP",
+        "Online PvP",
+        "Cross-Platform Multiplayer",
+        "In-App Purchases",
+        "Family Sharing"
+      ],
+      "signals": [
+        {
+          "type": "launch",
+          "layer": "trigger",
+          "value": null
+        },
+        {
+          "type": "jp_news",
+          "layer": "trigger",
+          "value": null
+        }
+      ],
+      "prediction": {
+        "known": true,
+        "cause_types": [
+          "launch",
+          "jp_news"
+        ]
+      },
+      "confidence": "mid",
+      "score": {
+        "eff": 1.72,
+        "base": 1.59,
+        "boost": 0.08,
+        "boost_capped": false
+      },
+      "history": [
+        [
+          1784527200,
+          326
+        ],
+        [
+          1784548800,
+          658
+        ],
+        [
+          1784570400,
+          291
+        ],
+        [
+          1784592000,
+          368
+        ],
+        [
+          1784613600,
+          816
+        ],
+        [
+          1784635200,
+          1055
+        ],
+        [
+          1784656800,
+          364
+        ],
+        [
+          1784678400,
+          87
+        ],
+        [
+          1784700000,
+          894
+        ],
+        [
+          1784721600,
+          1015
+        ],
+        [
+          1784743200,
+          339
+        ],
+        [
+          1784764800,
+          383
+        ],
+        [
+          1784786400,
+          741
+        ],
+        [
+          1784808000,
+          930
+        ],
+        [
+          1784829600,
+          291
+        ],
+        [
+          1784851200,
+          330
+        ],
+        [
+          1784872800,
+          630
+        ],
+        [
+          1784894400,
+          861
+        ],
+        [
+          1784916000,
+          388
+        ],
+        [
+          1784937600,
+          495
+        ],
+        [
+          1784959200,
+          704
+        ],
+        [
+          1784980800,
+          888
+        ]
+      ],
+      "investigation": {
+        "queried": [
+          "sale",
+          "news",
+          "launch",
+          "free",
+          "review",
+          "jp_news",
+          "twitch"
+        ],
+        "results": {
+          "sale": {
+            "queried": true,
+            "hit": false
+          },
+          "news": {
+            "queried": true,
+            "hit": false
+          },
+          "launch": {
+            "queried": true,
+            "hit": true
+          },
+          "free": {
+            "queried": true,
+            "hit": false
+          },
+          "review": {
+            "queried": true,
+            "hit": false
+          },
+          "jp_news": {
+            "queried": true,
+            "hit": true
+          },
+          "twitch": {
+            "queried": true,
+            "hit": false
+          },
+          "web": {
+            "queried": false,
+            "hit": false,
+            "articles": 0,
+            "error": false
+          }
+        },
+        "unknown_reason": null
+      }
+    },
+    {
+      "rank": 20,
+      "appid": 1677280,
+      "name": "Company of Heroes 3",
+      "detection": {
+        "current_ccu": 6248,
+        "recent_value": 6845,
+        "baseline": 3570,
+        "ratio": 1.9,
+        "robust_z": 1.7,
+        "n_points": 856,
+        "is_riser": false,
+        "is_launch": false
+      },
+      "genres": [
+        "Action",
+        "Strategy"
+      ],
+      "categories": [
+        "Single-player",
+        "Multi-player",
+        "PvP",
+        "Online PvP",
+        "Co-op",
+        "Online Co-op"
+      ],
+      "signals": [
+        {
+          "type": "sale",
+          "layer": "trigger",
+          "value": {
+            "discount_percent": 60,
+            "is_best": true
+          }
+        }
+      ],
+      "prediction": {
+        "known": true,
+        "cause_types": [
+          "sale"
+        ]
+      },
+      "confidence": "mid",
+      "score": {
+        "eff": 1.71,
+        "base": 1.63,
+        "boost": 0.05,
+        "boost_capped": false
+      },
+      "history": [
+        [
+          1784138400,
+          2914
+        ],
+        [
+          1784160000,
+          2585
+        ],
+        [
+          1784181600,
+          4101
+        ],
+        [
+          1784203200,
+          5554
+        ],
+        [
+          1784224800,
+          4020
+        ],
+        [
+          1784246400,
+          2655
+        ],
+        [
+          1784268000,
+          4206
+        ],
+        [
+          1784289600,
+          6036
+        ],
+        [
+          1784311200,
+          4330
+        ],
+        [
+          1784332800,
+          3669
+        ],
+        [
+          1784354400,
+          5041
+        ],
+        [
+          1784376000,
+          6574
+        ],
+        [
+          1784397600,
+          4730
+        ],
+        [
+          1784419200,
+          3948
+        ],
+        [
+          1784440800,
+          5388
+        ],
+        [
+          1784462400,
+          6758
+        ],
+        [
+          1784484000,
+          4491
+        ],
+        [
+          1784505600,
+          2451
+        ],
+        [
+          1784527200,
+          3973
+        ],
+        [
+          1784548800,
+          5551
+        ],
+        [
+          1784570400,
+          4031
+        ],
+        [
+          1784592000,
+          2600
+        ],
+        [
+          1784613600,
+          4095
+        ],
+        [
+          1784635200,
+          5814
+        ],
+        [
+          1784656800,
+          3988
+        ],
+        [
+          1784678400,
+          2496
+        ],
+        [
+          1784700000,
+          4159
+        ],
+        [
+          1784721600,
+          5728
+        ],
+        [
+          1784743200,
+          3959
+        ],
+        [
+          1784764800,
+          2497
+        ],
+        [
+          1784786400,
+          4189
+        ],
+        [
+          1784808000,
+          5866
+        ],
+        [
+          1784829600,
+          3973
+        ],
+        [
+          1784851200,
+          2490
+        ],
+        [
+          1784872800,
+          4375
+        ],
+        [
+          1784894400,
+          6174
+        ],
+        [
+          1784916000,
+          4370
+        ],
+        [
+          1784937600,
+          3783
+        ],
+        [
+          1784959200,
+          5243
+        ],
+        [
+          1784980800,
+          6833
+        ],
+        [
+          1785002400,
+          4692
+        ],
+        [
+          1785024000,
+          4078
+        ],
+        [
+          1785045600,
+          5913
+        ],
+        [
+          1785067200,
+          7373
+        ],
+        [
+          1785088800,
+          5116
+        ],
+        [
+          1785110400,
+          2814
+        ],
+        [
+          1785132000,
+          4651
+        ],
+        [
+          1785153600,
+          6520
+        ],
+        [
+          1785175200,
+          4489
+        ],
+        [
+          1785196800,
+          2808
+        ],
+        [
+          1785218400,
+          4348
+        ],
+        [
+          1785240000,
+          6317
+        ],
+        [
+          1785261600,
+          4177
+        ],
+        [
+          1785283200,
+          2715
+        ],
+        [
+          1785304800,
+          4377
+        ],
+        [
+          1785326400,
+          6835
+        ],
+        [
+          1785348000,
+          6903
+        ]
+      ],
+      "investigation": {
+        "queried": [
+          "sale",
+          "news",
+          "launch",
+          "free",
+          "review",
+          "jp_news",
+          "twitch"
+        ],
+        "results": {
+          "sale": {
+            "queried": true,
+            "hit": true
+          },
+          "news": {
+            "queried": true,
+            "hit": false
+          },
+          "launch": {
+            "queried": true,
+            "hit": false
+          },
+          "free": {
+            "queried": true,
+            "hit": false
+          },
+          "review": {
+            "queried": true,
+            "hit": false
+          },
+          "jp_news": {
+            "queried": true,
+            "hit": false
+          },
+          "twitch": {
+            "queried": true,
+            "hit": false
+          },
+          "web": {
+            "queried": false,
+            "hit": false,
+            "articles": 0,
+            "error": false
+          }
+        },
+        "unknown_reason": null
+      }
+    },
+    {
+      "rank": 21,
+      "appid": 323190,
+      "name": "Frostpunk",
+      "detection": {
+        "current_ccu": 2268,
+        "recent_value": 2956,
+        "baseline": 1431,
+        "ratio": 2.1,
+        "robust_z": 4.8,
+        "n_points": 14,
+        "is_riser": false,
+        "is_launch": false
+      },
+      "genres": [
+        "Simulation",
+        "Strategy"
+      ],
+      "categories": [
+        "Single-player",
+        "Steam Achievements",
+        "Steam Trading Cards",
+        "Steam Cloud",
+        "Remote Play on Phone",
+        "Remote Play on Tablet"
+      ],
+      "signals": [
+        {
+          "type": "sale",
+          "layer": "trigger",
+          "value": {
+            "discount_percent": 85,
+            "is_best": false
+          }
+        }
+      ],
+      "prediction": {
+        "known": true,
+        "cause_types": [
+          "sale"
+        ]
+      },
+      "confidence": "high",
+      "score": {
+        "eff": 1.7,
+        "base": 1.62,
+        "boost": 0.05,
+        "boost_capped": false
+      },
+      "history": [
+        [
+          1784440800,
+          2525
+        ],
+        [
+          1784505600,
+          1181
+        ],
+        [
+          1784872800,
+          2146
+        ],
+        [
+          1784916000,
+          1480
+        ],
+        [
+          1784937600,
+          1547
+        ],
+        [
+          1785304800,
+          2335
+        ],
+        [
+          1785326400,
+          3035
+        ],
+        [
+          1785348000,
+          2373
+        ]
+      ],
+      "investigation": {
+        "queried": [
+          "sale",
+          "news",
+          "launch",
+          "free",
+          "review",
+          "jp_news",
+          "twitch"
+        ],
+        "results": {
+          "sale": {
+            "queried": true,
+            "hit": true
+          },
+          "news": {
+            "queried": true,
+            "hit": false
+          },
+          "launch": {
+            "queried": true,
+            "hit": false
+          },
+          "free": {
+            "queried": true,
+            "hit": false
+          },
+          "review": {
+            "queried": true,
+            "hit": false
+          },
+          "jp_news": {
+            "queried": true,
+            "hit": false
+          },
+          "twitch": {
+            "queried": true,
+            "hit": false
+          },
+          "web": {
+            "queried": false,
+            "hit": false,
+            "articles": 0,
+            "error": false
+          }
+        },
+        "unknown_reason": null
+      }
+    },
+    {
+      "rank": 22,
+      "appid": 4887360,
+      "name": "erdetspill",
+      "detection": {
+        "current_ccu": 135,
+        "recent_value": 140,
+        "baseline": 62,
+        "ratio": 2.3,
+        "robust_z": 0.6,
+        "n_points": 57,
+        "is_riser": false,
+        "is_launch": true
+      },
+      "genres": [
+        "Action",
+        "Adventure",
+        "Casual",
+        "Indie",
+        "Free To Play"
+      ],
+      "categories": [
+        "Single-player",
+        "Steam Achievements",
+        "Custom Volume Controls",
+        "Stereo Sound",
+        "Family Sharing"
+      ],
+      "signals": [
+        {
+          "type": "news",
+          "layer": "trigger",
+          "value": {
+            "days_ago": 2
+          }
+        },
+        {
+          "type": "launch",
+          "layer": "trigger",
+          "value": null
+        },
+        {
+          "type": "review_surge",
+          "layer": "trigger",
+          "value": {
+            "delta": 473
+          }
+        }
+      ],
+      "prediction": {
+        "known": true,
+        "cause_types": [
+          "news",
+          "launch",
+          "review_surge"
+        ]
+      },
+      "confidence": "mid",
+      "score": {
+        "eff": 1.69,
+        "base": 1.47,
+        "boost": 0.15,
+        "boost_capped": false
+      },
+      "history": [
+        [
+          1785153600,
+          161
+        ],
+        [
+          1785175200,
+          69
+        ],
+        [
+          1785196800,
+          63
+        ],
+        [
+          1785218400,
+          100
+        ],
+        [
+          1785240000,
+          187
+        ],
+        [
+          1785261600,
+          187
+        ],
+        [
+          1785283200,
+          59
+        ],
+        [
+          1785304800,
+          78
+        ],
+        [
+          1785326400,
+          147
+        ],
+        [
+          1785348000,
+          138
+        ]
+      ],
+      "investigation": {
+        "queried": [
+          "sale",
+          "news",
+          "launch",
+          "free",
+          "review",
+          "jp_news",
+          "twitch"
+        ],
+        "results": {
+          "sale": {
+            "queried": true,
+            "hit": false
+          },
+          "news": {
+            "queried": true,
+            "hit": true
+          },
+          "launch": {
+            "queried": true,
+            "hit": true
+          },
+          "free": {
+            "queried": true,
+            "hit": false
+          },
+          "review": {
+            "queried": true,
+            "hit": true
+          },
+          "jp_news": {
+            "queried": true,
+            "hit": false
+          },
+          "twitch": {
+            "queried": true,
+            "hit": false
+          },
+          "web": {
+            "queried": false,
+            "hit": false,
+            "articles": 0,
+            "error": false
+          }
+        },
+        "unknown_reason": null
+      }
+    },
+    {
+      "rank": 23,
+      "appid": 1203220,
+      "name": "NARAKA: BLADEPOINT",
+      "detection": {
+        "current_ccu": 13104,
+        "recent_value": 79207,
+        "baseline": 35745,
+        "ratio": 2.2,
+        "robust_z": 1.1,
+        "n_points": 555,
+        "is_riser": false,
+        "is_launch": false
+      },
+      "genres": [
+        "Action",
+        "Adventure",
+        "Massively Multiplayer",
+        "Free To Play"
+      ],
+      "categories": [
+        "Multi-player",
+        "PvP",
+        "Online PvP",
+        "Steam Achievements",
+        "Steam Trading Cards",
+        "In-App Purchases"
+      ],
+      "signals": [],
+      "prediction": {
+        "known": false,
+        "cause_types": []
+      },
+      "confidence": "low",
+      "score": {
+        "eff": 1.66,
+        "base": 1.66,
+        "boost": 0,
+        "boost_capped": false
+      },
+      "history": [
+        [
+          1784138400,
+          12478
+        ],
+        [
+          1784527200,
+          58132
+        ],
+        [
+          1784548800,
+          97128
+        ],
+        [
+          1784570400,
+          23811
+        ],
+        [
+          1784592000,
+          36248
+        ],
+        [
+          1784613600,
+          64642
+        ],
+        [
+          1784635200,
+          97291
+        ],
+        [
+          1784656800,
+          22833
+        ],
+        [
+          1784678400,
+          36749
+        ],
+        [
+          1784700000,
+          65433
+        ],
+        [
+          1784721600,
+          99384
+        ],
+        [
+          1784743200,
+          23111
+        ],
+        [
+          1784764800,
+          38997
+        ],
+        [
+          1784786400,
+          67505
+        ],
+        [
+          1784808000,
+          99878
+        ],
+        [
+          1784829600,
+          22861
+        ],
+        [
+          1784851200,
+          41007
+        ],
+        [
+          1784872800,
+          65447
+        ],
+        [
+          1784894400,
+          98910
+        ],
+        [
+          1784916000,
+          26270
+        ],
+        [
+          1784937600,
+          48975
+        ],
+        [
+          1784959200,
+          67309
+        ],
+        [
+          1784980800,
+          98359
+        ],
+        [
+          1785002400,
+          31916
+        ],
+        [
+          1785024000,
+          49910
+        ],
+        [
+          1785045600,
+          68567
+        ],
+        [
+          1785067200,
+          96308
+        ],
+        [
+          1785088800,
+          24029
+        ],
+        [
+          1785110400,
+          36366
+        ],
+        [
+          1785132000,
+          63024
+        ],
+        [
+          1785153600,
+          96609
+        ],
+        [
+          1785175200,
+          22461
+        ],
+        [
+          1785196800,
+          36167
+        ],
+        [
+          1785218400,
+          58545
+        ],
+        [
+          1785240000,
+          97075
+        ],
+        [
+          1785261600,
+          21862
+        ],
+        [
+          1785283200,
+          36170
+        ],
+        [
+          1785304800,
+          60335
+        ],
+        [
+          1785326400,
+          95733
+        ],
+        [
+          1785348000,
+          22530
+        ]
+      ],
+      "investigation": {
+        "queried": [
+          "sale",
+          "news",
+          "launch",
+          "free",
+          "review",
+          "jp_news",
+          "twitch"
+        ],
+        "results": {
+          "sale": {
+            "queried": true,
+            "hit": false
+          },
+          "news": {
+            "queried": true,
+            "hit": false
+          },
+          "launch": {
+            "queried": true,
+            "hit": false
+          },
+          "free": {
+            "queried": true,
+            "hit": false
+          },
+          "review": {
+            "queried": true,
+            "hit": false
+          },
+          "jp_news": {
+            "queried": true,
+            "hit": false
+          },
+          "twitch": {
+            "queried": true,
+            "hit": false
+          },
+          "web": {
+            "queried": false,
+            "hit": false,
+            "articles": 0,
+            "error": true
+          }
+        },
+        "unknown_reason": "web_query_failed"
+      }
+    },
+    {
+      "rank": 24,
       "appid": 1446780,
       "name": "MONSTER HUNTER RISE",
       "detection": {
-        "current_ccu": 11583,
-        "recent_value": 13160,
+        "current_ccu": 3955,
+        "recent_value": 11876,
         "baseline": 6180,
-        "ratio": 2.1,
-        "robust_z": 1.6,
-        "n_points": 864,
+        "ratio": 1.9,
+        "robust_z": 1.3,
+        "n_points": 862,
         "is_riser": false,
         "is_launch": false
       },
@@ -4484,19 +5879,15 @@
       },
       "confidence": "mid",
       "score": {
-        "eff": 1.83,
-        "base": 1.74,
+        "eff": 1.62,
+        "base": 1.54,
         "boost": 0.05,
         "boost_capped": false
       },
       "history": [
         [
-          1784116800,
-          11266
-        ],
-        [
           1784138400,
-          5101
+          3434
         ],
         [
           1784160000,
@@ -4717,6 +6108,10 @@
         [
           1785326400,
           13438
+        ],
+        [
+          1785348000,
+          5088
         ]
       ],
       "investigation": {
@@ -4769,333 +6164,16 @@
       }
     },
     {
-      "rank": 20,
-      "appid": 2622380,
-      "name": "ELDEN RING NIGHTREIGN",
-      "detection": {
-        "current_ccu": 25804,
-        "recent_value": 30644,
-        "baseline": 14452,
-        "ratio": 2.1,
-        "robust_z": 1.8,
-        "n_points": 864,
-        "is_riser": false,
-        "is_launch": false
-      },
-      "genres": [
-        "Action",
-        "RPG"
-      ],
-      "categories": [
-        "Single-player",
-        "Multi-player",
-        "Co-op",
-        "Online Co-op",
-        "Steam Achievements",
-        "Full controller support"
-      ],
-      "signals": [],
-      "prediction": {
-        "known": false,
-        "cause_types": []
-      },
-      "confidence": "low",
-      "score": {
-        "eff": 1.8,
-        "base": 1.8,
-        "boost": 0,
-        "boost_capped": false
-      },
-      "history": [
-        [
-          1784116800,
-          25311
-        ],
-        [
-          1784138400,
-          14249
-        ],
-        [
-          1784160000,
-          13380
-        ],
-        [
-          1784181600,
-          20807
-        ],
-        [
-          1784203200,
-          31852
-        ],
-        [
-          1784224800,
-          14624
-        ],
-        [
-          1784246400,
-          13773
-        ],
-        [
-          1784268000,
-          19124
-        ],
-        [
-          1784289600,
-          33675
-        ],
-        [
-          1784311200,
-          17613
-        ],
-        [
-          1784332800,
-          20694
-        ],
-        [
-          1784354400,
-          23060
-        ],
-        [
-          1784376000,
-          35828
-        ],
-        [
-          1784397600,
-          19296
-        ],
-        [
-          1784419200,
-          22698
-        ],
-        [
-          1784440800,
-          25919
-        ],
-        [
-          1784462400,
-          35866
-        ],
-        [
-          1784484000,
-          17161
-        ],
-        [
-          1784505600,
-          17014
-        ],
-        [
-          1784527200,
-          20410
-        ],
-        [
-          1784548800,
-          32495
-        ],
-        [
-          1784570400,
-          14442
-        ],
-        [
-          1784592000,
-          13412
-        ],
-        [
-          1784613600,
-          20178
-        ],
-        [
-          1784635200,
-          32468
-        ],
-        [
-          1784656800,
-          14239
-        ],
-        [
-          1784678400,
-          13337
-        ],
-        [
-          1784700000,
-          20147
-        ],
-        [
-          1784721600,
-          32463
-        ],
-        [
-          1784743200,
-          13613
-        ],
-        [
-          1784764800,
-          13199
-        ],
-        [
-          1784786400,
-          20234
-        ],
-        [
-          1784808000,
-          32237
-        ],
-        [
-          1784829600,
-          13611
-        ],
-        [
-          1784851200,
-          13262
-        ],
-        [
-          1784872800,
-          18517
-        ],
-        [
-          1784894400,
-          33857
-        ],
-        [
-          1784916000,
-          16219
-        ],
-        [
-          1784937600,
-          20217
-        ],
-        [
-          1784959200,
-          22943
-        ],
-        [
-          1784980800,
-          35640
-        ],
-        [
-          1785002400,
-          18841
-        ],
-        [
-          1785024000,
-          21320
-        ],
-        [
-          1785045600,
-          25760
-        ],
-        [
-          1785067200,
-          34188
-        ],
-        [
-          1785088800,
-          15811
-        ],
-        [
-          1785110400,
-          13135
-        ],
-        [
-          1785132000,
-          19868
-        ],
-        [
-          1785153600,
-          31951
-        ],
-        [
-          1785175200,
-          14131
-        ],
-        [
-          1785196800,
-          13706
-        ],
-        [
-          1785218400,
-          18399
-        ],
-        [
-          1785240000,
-          32311
-        ],
-        [
-          1785261600,
-          13733
-        ],
-        [
-          1785283200,
-          13225
-        ],
-        [
-          1785304800,
-          18197
-        ],
-        [
-          1785326400,
-          31027
-        ]
-      ],
-      "investigation": {
-        "queried": [
-          "sale",
-          "news",
-          "launch",
-          "free",
-          "review",
-          "jp_news",
-          "twitch"
-        ],
-        "results": {
-          "sale": {
-            "queried": true,
-            "hit": false
-          },
-          "news": {
-            "queried": true,
-            "hit": false
-          },
-          "launch": {
-            "queried": true,
-            "hit": false
-          },
-          "free": {
-            "queried": true,
-            "hit": false
-          },
-          "review": {
-            "queried": true,
-            "hit": false
-          },
-          "jp_news": {
-            "queried": true,
-            "hit": false
-          },
-          "twitch": {
-            "queried": true,
-            "hit": false
-          },
-          "web": {
-            "queried": false,
-            "hit": false,
-            "articles": 0,
-            "error": true
-          }
-        },
-        "unknown_reason": "web_query_failed"
-      }
-    },
-    {
-      "rank": 21,
+      "rank": 25,
       "appid": 1364780,
       "name": "Street Fighter™ 6",
       "detection": {
-        "current_ccu": 24722,
-        "recent_value": 28532,
+        "current_ccu": 8081,
+        "recent_value": 25523,
         "baseline": 14002,
-        "ratio": 2.0,
-        "robust_z": 1.2,
-        "n_points": 864,
+        "ratio": 1.8,
+        "robust_z": 1.0,
+        "n_points": 862,
         "is_riser": false,
         "is_launch": false
       },
@@ -5135,19 +6213,15 @@
       },
       "confidence": "mid",
       "score": {
-        "eff": 1.76,
-        "base": 1.6,
+        "eff": 1.57,
+        "base": 1.43,
         "boost": 0.1,
         "boost_capped": false
       },
       "history": [
         [
-          1784116800,
-          24557
-        ],
-        [
           1784138400,
-          11085
+          7836
         ],
         [
           1784160000,
@@ -5368,6 +6442,10 @@
         [
           1785326400,
           28768
+        ],
+        [
+          1785348000,
+          10951
         ]
       ],
       "investigation": {
@@ -5408,970 +6486,6 @@
           "twitch": {
             "queried": true,
             "hit": true
-          },
-          "web": {
-            "queried": false,
-            "hit": false,
-            "articles": 0,
-            "error": false
-          }
-        },
-        "unknown_reason": null
-      }
-    },
-    {
-      "rank": 22,
-      "appid": 2717220,
-      "name": "雀魂 -じゃんたま-",
-      "detection": {
-        "current_ccu": 746,
-        "recent_value": 746,
-        "baseline": 350,
-        "ratio": 2.1,
-        "robust_z": 1.0,
-        "n_points": 336,
-        "is_riser": false,
-        "is_launch": true
-      },
-      "genres": [
-        "Casual",
-        "RPG",
-        "Strategy"
-      ],
-      "categories": [
-        "Multi-player",
-        "PvP",
-        "Online PvP",
-        "Cross-Platform Multiplayer",
-        "In-App Purchases",
-        "Family Sharing"
-      ],
-      "signals": [
-        {
-          "type": "launch",
-          "layer": "trigger",
-          "value": null
-        },
-        {
-          "type": "jp_news",
-          "layer": "trigger",
-          "value": null
-        }
-      ],
-      "prediction": {
-        "known": true,
-        "cause_types": [
-          "launch",
-          "jp_news"
-        ]
-      },
-      "confidence": "mid",
-      "score": {
-        "eff": 1.72,
-        "base": 1.59,
-        "boost": 0.08,
-        "boost_capped": false
-      },
-      "history": [
-        [
-          1784527200,
-          326
-        ],
-        [
-          1784548800,
-          658
-        ],
-        [
-          1784570400,
-          291
-        ],
-        [
-          1784592000,
-          368
-        ],
-        [
-          1784613600,
-          816
-        ],
-        [
-          1784635200,
-          1055
-        ],
-        [
-          1784656800,
-          364
-        ],
-        [
-          1784678400,
-          87
-        ],
-        [
-          1784700000,
-          894
-        ],
-        [
-          1784721600,
-          1015
-        ],
-        [
-          1784743200,
-          339
-        ],
-        [
-          1784764800,
-          383
-        ],
-        [
-          1784786400,
-          741
-        ],
-        [
-          1784808000,
-          930
-        ],
-        [
-          1784829600,
-          291
-        ],
-        [
-          1784851200,
-          330
-        ],
-        [
-          1784872800,
-          630
-        ],
-        [
-          1784894400,
-          861
-        ],
-        [
-          1784916000,
-          388
-        ],
-        [
-          1784937600,
-          495
-        ],
-        [
-          1784959200,
-          704
-        ],
-        [
-          1784980800,
-          888
-        ]
-      ],
-      "investigation": {
-        "queried": [
-          "sale",
-          "news",
-          "launch",
-          "free",
-          "review",
-          "jp_news",
-          "twitch"
-        ],
-        "results": {
-          "sale": {
-            "queried": true,
-            "hit": false
-          },
-          "news": {
-            "queried": true,
-            "hit": false
-          },
-          "launch": {
-            "queried": true,
-            "hit": true
-          },
-          "free": {
-            "queried": true,
-            "hit": false
-          },
-          "review": {
-            "queried": true,
-            "hit": false
-          },
-          "jp_news": {
-            "queried": true,
-            "hit": true
-          },
-          "twitch": {
-            "queried": true,
-            "hit": false
-          },
-          "web": {
-            "queried": false,
-            "hit": false,
-            "articles": 0,
-            "error": false
-          }
-        },
-        "unknown_reason": null
-      }
-    },
-    {
-      "rank": 23,
-      "appid": 323190,
-      "name": "Frostpunk",
-      "detection": {
-        "current_ccu": 2946,
-        "recent_value": 2997,
-        "baseline": 1431,
-        "ratio": 2.1,
-        "robust_z": 5.0,
-        "n_points": 14,
-        "is_riser": false,
-        "is_launch": false
-      },
-      "genres": [
-        "Simulation",
-        "Strategy"
-      ],
-      "categories": [
-        "Single-player",
-        "Steam Achievements",
-        "Steam Trading Cards",
-        "Steam Cloud",
-        "Remote Play on Phone",
-        "Remote Play on Tablet"
-      ],
-      "signals": [
-        {
-          "type": "sale",
-          "layer": "trigger",
-          "value": {
-            "discount_percent": 85,
-            "is_best": false
-          }
-        }
-      ],
-      "prediction": {
-        "known": true,
-        "cause_types": [
-          "sale"
-        ]
-      },
-      "confidence": "high",
-      "score": {
-        "eff": 1.72,
-        "base": 1.64,
-        "boost": 0.05,
-        "boost_capped": false
-      },
-      "history": [
-        [
-          1784440800,
-          2525
-        ],
-        [
-          1784505600,
-          1181
-        ],
-        [
-          1784872800,
-          2146
-        ],
-        [
-          1784916000,
-          1480
-        ],
-        [
-          1784937600,
-          1547
-        ],
-        [
-          1785304800,
-          2335
-        ],
-        [
-          1785326400,
-          3035
-        ]
-      ],
-      "investigation": {
-        "queried": [
-          "sale",
-          "news",
-          "launch",
-          "free",
-          "review",
-          "jp_news",
-          "twitch"
-        ],
-        "results": {
-          "sale": {
-            "queried": true,
-            "hit": true
-          },
-          "news": {
-            "queried": true,
-            "hit": false
-          },
-          "launch": {
-            "queried": true,
-            "hit": false
-          },
-          "free": {
-            "queried": true,
-            "hit": false
-          },
-          "review": {
-            "queried": true,
-            "hit": false
-          },
-          "jp_news": {
-            "queried": true,
-            "hit": false
-          },
-          "twitch": {
-            "queried": true,
-            "hit": false
-          },
-          "web": {
-            "queried": false,
-            "hit": false,
-            "articles": 0,
-            "error": false
-          }
-        },
-        "unknown_reason": null
-      }
-    },
-    {
-      "rank": 24,
-      "appid": 1426210,
-      "name": "It Takes Two",
-      "detection": {
-        "current_ccu": 11546,
-        "recent_value": 13933,
-        "baseline": 6165,
-        "ratio": 2.3,
-        "robust_z": 1.2,
-        "n_points": 846,
-        "is_riser": false,
-        "is_launch": false
-      },
-      "genres": [
-        "Action",
-        "Adventure"
-      ],
-      "categories": [
-        "Multi-player",
-        "Co-op",
-        "Online Co-op",
-        "Shared/Split Screen Co-op",
-        "Shared/Split Screen",
-        "Steam Achievements"
-      ],
-      "signals": [],
-      "prediction": {
-        "known": false,
-        "cause_types": []
-      },
-      "confidence": "low",
-      "score": {
-        "eff": 1.71,
-        "base": 1.71,
-        "boost": 0,
-        "boost_capped": false
-      },
-      "history": [
-        [
-          1784116800,
-          13680
-        ],
-        [
-          1784138400,
-          6157
-        ],
-        [
-          1784160000,
-          5548
-        ],
-        [
-          1784181600,
-          9875
-        ],
-        [
-          1784203200,
-          16628
-        ],
-        [
-          1784224800,
-          5984
-        ],
-        [
-          1784246400,
-          5591
-        ],
-        [
-          1784268000,
-          9381
-        ],
-        [
-          1784289600,
-          17535
-        ],
-        [
-          1784311200,
-          6709
-        ],
-        [
-          1784332800,
-          7516
-        ],
-        [
-          1784354400,
-          12715
-        ],
-        [
-          1784376000,
-          19178
-        ],
-        [
-          1784397600,
-          7873
-        ],
-        [
-          1784419200,
-          8702
-        ],
-        [
-          1784440800,
-          14403
-        ],
-        [
-          1784462400,
-          18618
-        ],
-        [
-          1784484000,
-          6649
-        ],
-        [
-          1784505600,
-          5097
-        ],
-        [
-          1784527200,
-          8944
-        ],
-        [
-          1784548800,
-          16427
-        ],
-        [
-          1784570400,
-          5621
-        ],
-        [
-          1784592000,
-          5072
-        ],
-        [
-          1784613600,
-          9085
-        ],
-        [
-          1784635200,
-          16046
-        ],
-        [
-          1784656800,
-          5532
-        ],
-        [
-          1784678400,
-          5190
-        ],
-        [
-          1784700000,
-          8967
-        ],
-        [
-          1784721600,
-          15754
-        ],
-        [
-          1784743200,
-          5382
-        ],
-        [
-          1784764800,
-          5147
-        ],
-        [
-          1784786400,
-          8649
-        ],
-        [
-          1784808000,
-          15130
-        ],
-        [
-          1784829600,
-          5351
-        ],
-        [
-          1784851200,
-          4970
-        ],
-        [
-          1784872800,
-          8474
-        ],
-        [
-          1784894400,
-          16046
-        ],
-        [
-          1784916000,
-          5600
-        ],
-        [
-          1784937600,
-          7133
-        ],
-        [
-          1784959200,
-          11493
-        ],
-        [
-          1784980800,
-          17928
-        ],
-        [
-          1785002400,
-          7194
-        ],
-        [
-          1785024000,
-          7251
-        ],
-        [
-          1785045600,
-          13771
-        ],
-        [
-          1785067200,
-          17683
-        ],
-        [
-          1785088800,
-          6464
-        ],
-        [
-          1785110400,
-          4825
-        ],
-        [
-          1785132000,
-          8506
-        ],
-        [
-          1785153600,
-          15226
-        ],
-        [
-          1785175200,
-          5288
-        ],
-        [
-          1785196800,
-          4808
-        ],
-        [
-          1785218400,
-          8143
-        ],
-        [
-          1785240000,
-          14939
-        ],
-        [
-          1785261600,
-          5010
-        ],
-        [
-          1785283200,
-          4749
-        ],
-        [
-          1785304800,
-          7786
-        ],
-        [
-          1785326400,
-          14240
-        ]
-      ],
-      "investigation": {
-        "queried": [
-          "sale",
-          "news",
-          "launch",
-          "free",
-          "review",
-          "jp_news",
-          "twitch"
-        ],
-        "results": {
-          "sale": {
-            "queried": true,
-            "hit": false
-          },
-          "news": {
-            "queried": true,
-            "hit": false
-          },
-          "launch": {
-            "queried": true,
-            "hit": false
-          },
-          "free": {
-            "queried": true,
-            "hit": false
-          },
-          "review": {
-            "queried": true,
-            "hit": false
-          },
-          "jp_news": {
-            "queried": true,
-            "hit": false
-          },
-          "twitch": {
-            "queried": true,
-            "hit": false
-          },
-          "web": {
-            "queried": false,
-            "hit": false,
-            "articles": 0,
-            "error": true
-          }
-        },
-        "unknown_reason": "web_query_failed"
-      }
-    },
-    {
-      "rank": 25,
-      "appid": 582010,
-      "name": "Monster Hunter: World",
-      "detection": {
-        "current_ccu": 25934,
-        "recent_value": 28762,
-        "baseline": 14836,
-        "ratio": 1.9,
-        "robust_z": 1.4,
-        "n_points": 864,
-        "is_riser": false,
-        "is_launch": false
-      },
-      "genres": [
-        "Action"
-      ],
-      "categories": [
-        "Single-player",
-        "Multi-player",
-        "Co-op",
-        "Steam Achievements",
-        "Steam Trading Cards",
-        "Adjustable Text Size"
-      ],
-      "signals": [
-        {
-          "type": "sale",
-          "layer": "trigger",
-          "value": {
-            "discount_percent": 74,
-            "is_best": true
-          }
-        }
-      ],
-      "prediction": {
-        "known": true,
-        "cause_types": [
-          "sale"
-        ]
-      },
-      "confidence": "mid",
-      "score": {
-        "eff": 1.67,
-        "base": 1.59,
-        "boost": 0.05,
-        "boost_capped": false
-      },
-      "history": [
-        [
-          1784116800,
-          25511
-        ],
-        [
-          1784138400,
-          12209
-        ],
-        [
-          1784160000,
-          13907
-        ],
-        [
-          1784181600,
-          19649
-        ],
-        [
-          1784203200,
-          28222
-        ],
-        [
-          1784224800,
-          12678
-        ],
-        [
-          1784246400,
-          14030
-        ],
-        [
-          1784268000,
-          17363
-        ],
-        [
-          1784289600,
-          27636
-        ],
-        [
-          1784311200,
-          13698
-        ],
-        [
-          1784332800,
-          17295
-        ],
-        [
-          1784354400,
-          19858
-        ],
-        [
-          1784376000,
-          28768
-        ],
-        [
-          1784397600,
-          14848
-        ],
-        [
-          1784419200,
-          19264
-        ],
-        [
-          1784440800,
-          22174
-        ],
-        [
-          1784462400,
-          29097
-        ],
-        [
-          1784484000,
-          12558
-        ],
-        [
-          1784505600,
-          13972
-        ],
-        [
-          1784527200,
-          17671
-        ],
-        [
-          1784548800,
-          27559
-        ],
-        [
-          1784570400,
-          11696
-        ],
-        [
-          1784592000,
-          13714
-        ],
-        [
-          1784613600,
-          18693
-        ],
-        [
-          1784635200,
-          28313
-        ],
-        [
-          1784656800,
-          11922
-        ],
-        [
-          1784678400,
-          14130
-        ],
-        [
-          1784700000,
-          19349
-        ],
-        [
-          1784721600,
-          28799
-        ],
-        [
-          1784743200,
-          12169
-        ],
-        [
-          1784764800,
-          14345
-        ],
-        [
-          1784786400,
-          19313
-        ],
-        [
-          1784808000,
-          28443
-        ],
-        [
-          1784829600,
-          12242
-        ],
-        [
-          1784851200,
-          14336
-        ],
-        [
-          1784872800,
-          19015
-        ],
-        [
-          1784894400,
-          28937
-        ],
-        [
-          1784916000,
-          13283
-        ],
-        [
-          1784937600,
-          18576
-        ],
-        [
-          1784959200,
-          21316
-        ],
-        [
-          1784980800,
-          30608
-        ],
-        [
-          1785002400,
-          16160
-        ],
-        [
-          1785024000,
-          19801
-        ],
-        [
-          1785045600,
-          23940
-        ],
-        [
-          1785067200,
-          31556
-        ],
-        [
-          1785088800,
-          14592
-        ],
-        [
-          1785110400,
-          15143
-        ],
-        [
-          1785132000,
-          20373
-        ],
-        [
-          1785153600,
-          29794
-        ],
-        [
-          1785175200,
-          12864
-        ],
-        [
-          1785196800,
-          15498
-        ],
-        [
-          1785218400,
-          19199
-        ],
-        [
-          1785240000,
-          30422
-        ],
-        [
-          1785261600,
-          12682
-        ],
-        [
-          1785283200,
-          15099
-        ],
-        [
-          1785304800,
-          18972
-        ],
-        [
-          1785326400,
-          29057
-        ]
-      ],
-      "investigation": {
-        "queried": [
-          "sale",
-          "news",
-          "launch",
-          "free",
-          "review",
-          "jp_news",
-          "twitch"
-        ],
-        "results": {
-          "sale": {
-            "queried": true,
-            "hit": true
-          },
-          "news": {
-            "queried": true,
-            "hit": false
-          },
-          "launch": {
-            "queried": true,
-            "hit": false
-          },
-          "free": {
-            "queried": true,
-            "hit": false
-          },
-          "review": {
-            "queried": true,
-            "hit": false
-          },
-          "jp_news": {
-            "queried": true,
-            "hit": false
-          },
-          "twitch": {
-            "queried": true,
-            "hit": false
           },
           "web": {
             "queried": false,
@@ -6388,12 +6502,12 @@
       "appid": 518790,
       "name": "theHunter: Call of the Wild™",
       "detection": {
-        "current_ccu": 6313,
-        "recent_value": 6531,
-        "baseline": 3854,
+        "current_ccu": 4688,
+        "recent_value": 6357,
+        "baseline": 3852,
         "ratio": 1.7,
-        "robust_z": 1.7,
-        "n_points": 864,
+        "robust_z": 1.5,
+        "n_points": 862,
         "is_riser": false,
         "is_launch": false
       },
@@ -6436,19 +6550,15 @@
       },
       "confidence": "mid",
       "score": {
-        "eff": 1.63,
-        "base": 1.48,
+        "eff": 1.57,
+        "base": 1.42,
         "boost": 0.1,
         "boost_capped": false
       },
       "history": [
         [
-          1784116800,
-          5749
-        ],
-        [
           1784138400,
-          4666
+          3790
         ],
         [
           1784160000,
@@ -6669,6 +6779,10 @@
         [
           1785326400,
           6549
+        ],
+        [
+          1785348000,
+          5032
         ]
       ],
       "investigation": {
@@ -6722,21 +6836,20 @@
     },
     {
       "rank": 27,
-      "appid": 2246340,
-      "name": "Monster Hunter Wilds",
+      "appid": 2622380,
+      "name": "ELDEN RING NIGHTREIGN",
       "detection": {
-        "current_ccu": 21355,
-        "recent_value": 23950,
-        "baseline": 13184,
-        "ratio": 1.8,
-        "robust_z": 1.5,
-        "n_points": 864,
+        "current_ccu": 11496,
+        "recent_value": 27160,
+        "baseline": 14462,
+        "ratio": 1.9,
+        "robust_z": 1.4,
+        "n_points": 862,
         "is_riser": false,
         "is_launch": false
       },
       "genres": [
         "Action",
-        "Adventure",
         "RPG"
       ],
       "categories": [
@@ -6744,15 +6857,530 @@
         "Multi-player",
         "Co-op",
         "Online Co-op",
-        "Cross-Platform Multiplayer",
-        "Steam Achievements"
+        "Steam Achievements",
+        "Full controller support"
+      ],
+      "signals": [],
+      "prediction": {
+        "known": false,
+        "cause_types": []
+      },
+      "confidence": "low",
+      "score": {
+        "eff": 1.55,
+        "base": 1.55,
+        "boost": 0,
+        "boost_capped": false
+      },
+      "history": [
+        [
+          1784138400,
+          10799
+        ],
+        [
+          1784160000,
+          13380
+        ],
+        [
+          1784181600,
+          20807
+        ],
+        [
+          1784203200,
+          31852
+        ],
+        [
+          1784224800,
+          14624
+        ],
+        [
+          1784246400,
+          13773
+        ],
+        [
+          1784268000,
+          19124
+        ],
+        [
+          1784289600,
+          33675
+        ],
+        [
+          1784311200,
+          17613
+        ],
+        [
+          1784332800,
+          20694
+        ],
+        [
+          1784354400,
+          23060
+        ],
+        [
+          1784376000,
+          35828
+        ],
+        [
+          1784397600,
+          19296
+        ],
+        [
+          1784419200,
+          22698
+        ],
+        [
+          1784440800,
+          25919
+        ],
+        [
+          1784462400,
+          35866
+        ],
+        [
+          1784484000,
+          17161
+        ],
+        [
+          1784505600,
+          17014
+        ],
+        [
+          1784527200,
+          20410
+        ],
+        [
+          1784548800,
+          32495
+        ],
+        [
+          1784570400,
+          14442
+        ],
+        [
+          1784592000,
+          13412
+        ],
+        [
+          1784613600,
+          20178
+        ],
+        [
+          1784635200,
+          32468
+        ],
+        [
+          1784656800,
+          14239
+        ],
+        [
+          1784678400,
+          13337
+        ],
+        [
+          1784700000,
+          20147
+        ],
+        [
+          1784721600,
+          32463
+        ],
+        [
+          1784743200,
+          13613
+        ],
+        [
+          1784764800,
+          13199
+        ],
+        [
+          1784786400,
+          20234
+        ],
+        [
+          1784808000,
+          32237
+        ],
+        [
+          1784829600,
+          13611
+        ],
+        [
+          1784851200,
+          13262
+        ],
+        [
+          1784872800,
+          18517
+        ],
+        [
+          1784894400,
+          33857
+        ],
+        [
+          1784916000,
+          16219
+        ],
+        [
+          1784937600,
+          20217
+        ],
+        [
+          1784959200,
+          22943
+        ],
+        [
+          1784980800,
+          35640
+        ],
+        [
+          1785002400,
+          18841
+        ],
+        [
+          1785024000,
+          21320
+        ],
+        [
+          1785045600,
+          25760
+        ],
+        [
+          1785067200,
+          34188
+        ],
+        [
+          1785088800,
+          15811
+        ],
+        [
+          1785110400,
+          13135
+        ],
+        [
+          1785132000,
+          19868
+        ],
+        [
+          1785153600,
+          31951
+        ],
+        [
+          1785175200,
+          14131
+        ],
+        [
+          1785196800,
+          13706
+        ],
+        [
+          1785218400,
+          18399
+        ],
+        [
+          1785240000,
+          32311
+        ],
+        [
+          1785261600,
+          13733
+        ],
+        [
+          1785283200,
+          13225
+        ],
+        [
+          1785304800,
+          18197
+        ],
+        [
+          1785326400,
+          31027
+        ],
+        [
+          1785348000,
+          13234
+        ]
+      ],
+      "investigation": {
+        "queried": [
+          "sale",
+          "news",
+          "launch",
+          "free",
+          "review",
+          "jp_news",
+          "twitch"
+        ],
+        "results": {
+          "sale": {
+            "queried": true,
+            "hit": false
+          },
+          "news": {
+            "queried": true,
+            "hit": false
+          },
+          "launch": {
+            "queried": true,
+            "hit": false
+          },
+          "free": {
+            "queried": true,
+            "hit": false
+          },
+          "review": {
+            "queried": true,
+            "hit": false
+          },
+          "jp_news": {
+            "queried": true,
+            "hit": false
+          },
+          "twitch": {
+            "queried": true,
+            "hit": false
+          },
+          "web": {
+            "queried": false,
+            "hit": false,
+            "articles": 0,
+            "error": true
+          }
+        },
+        "unknown_reason": "web_query_failed"
+      }
+    },
+    {
+      "rank": 28,
+      "appid": 4530780,
+      "name": "The Hust Banhmi | Bánh Mì Bách Khoa",
+      "detection": {
+        "current_ccu": 183,
+        "recent_value": 183,
+        "baseline": 96,
+        "ratio": 1.9,
+        "robust_z": 1.0,
+        "n_points": 395,
+        "is_riser": false,
+        "is_launch": true
+      },
+      "genres": [
+        "Casual",
+        "Indie",
+        "Simulation"
+      ],
+      "categories": [
+        "Single-player",
+        "Steam Achievements",
+        "Family Sharing"
+      ],
+      "signals": [
+        {
+          "type": "launch",
+          "layer": "trigger",
+          "value": null
+        }
+      ],
+      "prediction": {
+        "known": true,
+        "cause_types": [
+          "launch"
+        ]
+      },
+      "confidence": "mid",
+      "score": {
+        "eff": 1.54,
+        "base": 1.46,
+        "boost": 0.05,
+        "boost_capped": false
+      },
+      "history": [
+        [
+          1784440800,
+          51
+        ],
+        [
+          1784462400,
+          188
+        ],
+        [
+          1784484000,
+          122
+        ],
+        [
+          1784505600,
+          71
+        ],
+        [
+          1784527200,
+          110
+        ],
+        [
+          1784548800,
+          347
+        ],
+        [
+          1784570400,
+          163
+        ],
+        [
+          1784592000,
+          114
+        ],
+        [
+          1784613600,
+          138
+        ],
+        [
+          1784635200,
+          366
+        ],
+        [
+          1784656800,
+          177
+        ],
+        [
+          1784678400,
+          117
+        ],
+        [
+          1784700000,
+          143
+        ],
+        [
+          1784721600,
+          359
+        ],
+        [
+          1784743200,
+          156
+        ],
+        [
+          1784764800,
+          134
+        ],
+        [
+          1784786400,
+          135
+        ],
+        [
+          1784808000,
+          304
+        ],
+        [
+          1784829600,
+          127
+        ],
+        [
+          1784851200,
+          95
+        ],
+        [
+          1784872800,
+          119
+        ],
+        [
+          1784894400,
+          256
+        ],
+        [
+          1784916000,
+          117
+        ],
+        [
+          1784937600,
+          93
+        ],
+        [
+          1784959200,
+          116
+        ],
+        [
+          1784980800,
+          192
+        ]
+      ],
+      "investigation": {
+        "queried": [
+          "sale",
+          "news",
+          "launch",
+          "free",
+          "review",
+          "jp_news",
+          "twitch"
+        ],
+        "results": {
+          "sale": {
+            "queried": true,
+            "hit": false
+          },
+          "news": {
+            "queried": true,
+            "hit": false
+          },
+          "launch": {
+            "queried": true,
+            "hit": true
+          },
+          "free": {
+            "queried": true,
+            "hit": false
+          },
+          "review": {
+            "queried": true,
+            "hit": false
+          },
+          "jp_news": {
+            "queried": true,
+            "hit": false
+          },
+          "twitch": {
+            "queried": true,
+            "hit": false
+          },
+          "web": {
+            "queried": false,
+            "hit": false,
+            "articles": 0,
+            "error": false
+          }
+        },
+        "unknown_reason": null
+      }
+    },
+    {
+      "rank": 29,
+      "appid": 582010,
+      "name": "Monster Hunter: World",
+      "detection": {
+        "current_ccu": 9246,
+        "recent_value": 26471,
+        "baseline": 14849,
+        "ratio": 1.8,
+        "robust_z": 1.2,
+        "n_points": 862,
+        "is_riser": false,
+        "is_launch": false
+      },
+      "genres": [
+        "Action"
+      ],
+      "categories": [
+        "Single-player",
+        "Multi-player",
+        "Co-op",
+        "Steam Achievements",
+        "Steam Trading Cards",
+        "Adjustable Text Size"
       ],
       "signals": [
         {
           "type": "sale",
           "layer": "trigger",
           "value": {
-            "discount_percent": 58,
+            "discount_percent": 74,
             "is_best": true
           }
         }
@@ -6765,239 +7393,239 @@
       },
       "confidence": "mid",
       "score": {
-        "eff": 1.61,
-        "base": 1.53,
+        "eff": 1.52,
+        "base": 1.45,
         "boost": 0.05,
         "boost_capped": false
       },
       "history": [
         [
-          1784116800,
-          22743
-        ],
-        [
           1784138400,
-          13546
+          7954
         ],
         [
           1784160000,
-          12144
+          13907
         ],
         [
           1784181600,
-          17781
+          19649
         ],
         [
           1784203200,
-          25511
+          28222
         ],
         [
           1784224800,
-          13477
+          12678
         ],
         [
           1784246400,
-          12371
+          14030
         ],
         [
           1784268000,
-          16257
+          17363
         ],
         [
           1784289600,
-          26018
+          27636
         ],
         [
           1784311200,
-          15442
+          13698
         ],
         [
           1784332800,
-          17518
+          17295
         ],
         [
           1784354400,
-          20106
+          19858
         ],
         [
           1784376000,
-          28498
+          28768
         ],
         [
           1784397600,
-          17675
+          14848
         ],
         [
           1784419200,
-          20316
+          19264
         ],
         [
           1784440800,
-          22114
+          22174
         ],
         [
           1784462400,
-          28765
+          29097
         ],
         [
           1784484000,
-          15736
+          12558
         ],
         [
           1784505600,
-          14175
+          13972
         ],
         [
           1784527200,
-          17353
+          17671
         ],
         [
           1784548800,
-          24895
+          27559
         ],
         [
           1784570400,
-          12611
+          11696
         ],
         [
           1784592000,
-          11972
+          13714
         ],
         [
           1784613600,
-          17196
+          18693
         ],
         [
           1784635200,
-          25371
+          28313
         ],
         [
           1784656800,
-          12839
+          11922
         ],
         [
           1784678400,
-          12322
+          14130
         ],
         [
           1784700000,
-          17380
+          19349
         ],
         [
           1784721600,
-          25404
+          28799
         ],
         [
           1784743200,
-          12693
+          12169
         ],
         [
           1784764800,
-          12002
+          14345
         ],
         [
           1784786400,
-          17084
+          19313
         ],
         [
           1784808000,
-          24635
+          28443
         ],
         [
           1784829600,
-          12692
+          12242
         ],
         [
           1784851200,
-          12159
+          14336
         ],
         [
           1784872800,
-          16560
+          19015
         ],
         [
           1784894400,
-          25074
+          28937
         ],
         [
           1784916000,
-          14294
+          13283
         ],
         [
           1784937600,
-          17633
+          18576
         ],
         [
           1784959200,
-          19974
+          21316
         ],
         [
           1784980800,
-          28164
+          30608
         ],
         [
           1785002400,
-          17666
+          16160
         ],
         [
           1785024000,
-          20172
+          19801
         ],
         [
           1785045600,
-          22297
+          23940
         ],
         [
           1785067200,
-          28420
+          31556
         ],
         [
           1785088800,
-          15894
+          14592
         ],
         [
           1785110400,
-          12692
+          15143
         ],
         [
           1785132000,
-          17941
+          20373
         ],
         [
           1785153600,
-          25650
+          29794
         ],
         [
           1785175200,
-          13792
+          12864
         ],
         [
           1785196800,
-          12551
+          15498
         ],
         [
           1785218400,
-          16760
+          19199
         ],
         [
           1785240000,
-          25592
+          30422
         ],
         [
           1785261600,
-          13379
+          12682
         ],
         [
           1785283200,
-          12173
+          15099
         ],
         [
           1785304800,
-          16209
+          18972
         ],
         [
           1785326400,
-          24157
+          29057
+        ],
+        [
+          1785348000,
+          12104
         ]
       ],
       "investigation": {
@@ -7050,16 +7678,16 @@
       }
     },
     {
-      "rank": 28,
+      "rank": 30,
       "appid": 594650,
       "name": "Hunt: Showdown 1896",
       "detection": {
-        "current_ccu": 23083,
-        "recent_value": 24848,
-        "baseline": 14392,
-        "ratio": 1.7,
-        "robust_z": 1.0,
-        "n_points": 864,
+        "current_ccu": 19980,
+        "recent_value": 23414,
+        "baseline": 14380,
+        "ratio": 1.6,
+        "robust_z": 0.9,
+        "n_points": 862,
         "is_riser": false,
         "is_launch": false
       },
@@ -7106,19 +7734,15 @@
       },
       "confidence": "mid",
       "score": {
-        "eff": 1.59,
-        "base": 1.38,
+        "eff": 1.51,
+        "base": 1.31,
         "boost": 0.15,
         "boost_capped": false
       },
       "history": [
         [
-          1784116800,
-          22936
-        ],
-        [
           1784138400,
-          20357
+          16435
         ],
         [
           1784160000,
@@ -7339,6 +7963,10 @@
         [
           1785326400,
           25085
+        ],
+        [
+          1785348000,
+          20850
         ]
       ],
       "investigation": {
@@ -7379,664 +8007,6 @@
           "twitch": {
             "queried": true,
             "hit": true
-          },
-          "web": {
-            "queried": false,
-            "hit": false,
-            "articles": 0,
-            "error": false
-          }
-        },
-        "unknown_reason": null
-      }
-    },
-    {
-      "rank": 29,
-      "appid": 1677280,
-      "name": "Company of Heroes 3",
-      "detection": {
-        "current_ccu": 5817,
-        "recent_value": 6279,
-        "baseline": 3540,
-        "ratio": 1.8,
-        "robust_z": 1.4,
-        "n_points": 858,
-        "is_riser": false,
-        "is_launch": false
-      },
-      "genres": [
-        "Action",
-        "Strategy"
-      ],
-      "categories": [
-        "Single-player",
-        "Multi-player",
-        "PvP",
-        "Online PvP",
-        "Co-op",
-        "Online Co-op"
-      ],
-      "signals": [
-        {
-          "type": "sale",
-          "layer": "trigger",
-          "value": {
-            "discount_percent": 60,
-            "is_best": true
-          }
-        }
-      ],
-      "prediction": {
-        "known": true,
-        "cause_types": [
-          "sale"
-        ]
-      },
-      "confidence": "mid",
-      "score": {
-        "eff": 1.56,
-        "base": 1.48,
-        "boost": 0.05,
-        "boost_capped": false
-      },
-      "history": [
-        [
-          1784116800,
-          5032
-        ],
-        [
-          1784138400,
-          3919
-        ],
-        [
-          1784160000,
-          2585
-        ],
-        [
-          1784181600,
-          4101
-        ],
-        [
-          1784203200,
-          5554
-        ],
-        [
-          1784224800,
-          4020
-        ],
-        [
-          1784246400,
-          2655
-        ],
-        [
-          1784268000,
-          4206
-        ],
-        [
-          1784289600,
-          6036
-        ],
-        [
-          1784311200,
-          4330
-        ],
-        [
-          1784332800,
-          3669
-        ],
-        [
-          1784354400,
-          5041
-        ],
-        [
-          1784376000,
-          6574
-        ],
-        [
-          1784397600,
-          4730
-        ],
-        [
-          1784419200,
-          3948
-        ],
-        [
-          1784440800,
-          5388
-        ],
-        [
-          1784462400,
-          6758
-        ],
-        [
-          1784484000,
-          4491
-        ],
-        [
-          1784505600,
-          2451
-        ],
-        [
-          1784527200,
-          3973
-        ],
-        [
-          1784548800,
-          5551
-        ],
-        [
-          1784570400,
-          4031
-        ],
-        [
-          1784592000,
-          2600
-        ],
-        [
-          1784613600,
-          4095
-        ],
-        [
-          1784635200,
-          5814
-        ],
-        [
-          1784656800,
-          3988
-        ],
-        [
-          1784678400,
-          2496
-        ],
-        [
-          1784700000,
-          4159
-        ],
-        [
-          1784721600,
-          5728
-        ],
-        [
-          1784743200,
-          3959
-        ],
-        [
-          1784764800,
-          2497
-        ],
-        [
-          1784786400,
-          4189
-        ],
-        [
-          1784808000,
-          5866
-        ],
-        [
-          1784829600,
-          3973
-        ],
-        [
-          1784851200,
-          2490
-        ],
-        [
-          1784872800,
-          4375
-        ],
-        [
-          1784894400,
-          6174
-        ],
-        [
-          1784916000,
-          4370
-        ],
-        [
-          1784937600,
-          3783
-        ],
-        [
-          1784959200,
-          5243
-        ],
-        [
-          1784980800,
-          6833
-        ],
-        [
-          1785002400,
-          4692
-        ],
-        [
-          1785024000,
-          4078
-        ],
-        [
-          1785045600,
-          5913
-        ],
-        [
-          1785067200,
-          7373
-        ],
-        [
-          1785088800,
-          5116
-        ],
-        [
-          1785110400,
-          2814
-        ],
-        [
-          1785132000,
-          4651
-        ],
-        [
-          1785153600,
-          6520
-        ],
-        [
-          1785175200,
-          4489
-        ],
-        [
-          1785196800,
-          2808
-        ],
-        [
-          1785218400,
-          4348
-        ],
-        [
-          1785240000,
-          6317
-        ],
-        [
-          1785261600,
-          4177
-        ],
-        [
-          1785283200,
-          2715
-        ],
-        [
-          1785304800,
-          4377
-        ],
-        [
-          1785326400,
-          6395
-        ]
-      ],
-      "investigation": {
-        "queried": [
-          "sale",
-          "news",
-          "launch",
-          "free",
-          "review",
-          "jp_news",
-          "twitch"
-        ],
-        "results": {
-          "sale": {
-            "queried": true,
-            "hit": true
-          },
-          "news": {
-            "queried": true,
-            "hit": false
-          },
-          "launch": {
-            "queried": true,
-            "hit": false
-          },
-          "free": {
-            "queried": true,
-            "hit": false
-          },
-          "review": {
-            "queried": true,
-            "hit": false
-          },
-          "jp_news": {
-            "queried": true,
-            "hit": false
-          },
-          "twitch": {
-            "queried": true,
-            "hit": false
-          },
-          "web": {
-            "queried": false,
-            "hit": false,
-            "articles": 0,
-            "error": false
-          }
-        },
-        "unknown_reason": null
-      }
-    },
-    {
-      "rank": 30,
-      "appid": 815370,
-      "name": "Green Hell",
-      "detection": {
-        "current_ccu": 6576,
-        "recent_value": 7022,
-        "baseline": 3978,
-        "ratio": 1.8,
-        "robust_z": 1.4,
-        "n_points": 858,
-        "is_riser": false,
-        "is_launch": false
-      },
-      "genres": [
-        "Action",
-        "Adventure",
-        "Indie",
-        "Simulation"
-      ],
-      "categories": [
-        "Single-player",
-        "Multi-player",
-        "Co-op",
-        "Online Co-op",
-        "Steam Achievements",
-        "Steam Trading Cards"
-      ],
-      "signals": [
-        {
-          "type": "sale",
-          "layer": "trigger",
-          "value": {
-            "discount_percent": 85,
-            "is_best": false
-          }
-        }
-      ],
-      "prediction": {
-        "known": true,
-        "cause_types": [
-          "sale"
-        ]
-      },
-      "confidence": "mid",
-      "score": {
-        "eff": 1.54,
-        "base": 1.47,
-        "boost": 0.05,
-        "boost_capped": false
-      },
-      "history": [
-        [
-          1784116800,
-          6258
-        ],
-        [
-          1784138400,
-          4075
-        ],
-        [
-          1784160000,
-          3186
-        ],
-        [
-          1784181600,
-          4628
-        ],
-        [
-          1784203200,
-          6859
-        ],
-        [
-          1784224800,
-          4141
-        ],
-        [
-          1784246400,
-          3223
-        ],
-        [
-          1784268000,
-          4256
-        ],
-        [
-          1784289600,
-          6850
-        ],
-        [
-          1784311200,
-          4456
-        ],
-        [
-          1784332800,
-          3876
-        ],
-        [
-          1784354400,
-          5107
-        ],
-        [
-          1784376000,
-          7604
-        ],
-        [
-          1784397600,
-          4950
-        ],
-        [
-          1784419200,
-          4460
-        ],
-        [
-          1784440800,
-          5954
-        ],
-        [
-          1784462400,
-          8136
-        ],
-        [
-          1784484000,
-          4841
-        ],
-        [
-          1784505600,
-          3403
-        ],
-        [
-          1784527200,
-          4442
-        ],
-        [
-          1784548800,
-          7446
-        ],
-        [
-          1784570400,
-          4383
-        ],
-        [
-          1784592000,
-          3306
-        ],
-        [
-          1784613600,
-          4763
-        ],
-        [
-          1784635200,
-          7625
-        ],
-        [
-          1784656800,
-          4538
-        ],
-        [
-          1784678400,
-          3536
-        ],
-        [
-          1784700000,
-          4756
-        ],
-        [
-          1784721600,
-          7814
-        ],
-        [
-          1784743200,
-          4256
-        ],
-        [
-          1784764800,
-          3734
-        ],
-        [
-          1784786400,
-          4872
-        ],
-        [
-          1784808000,
-          7648
-        ],
-        [
-          1784829600,
-          4328
-        ],
-        [
-          1784851200,
-          3617
-        ],
-        [
-          1784872800,
-          4728
-        ],
-        [
-          1784894400,
-          7477
-        ],
-        [
-          1784916000,
-          4375
-        ],
-        [
-          1784937600,
-          4102
-        ],
-        [
-          1784959200,
-          5357
-        ],
-        [
-          1784980800,
-          7811
-        ],
-        [
-          1785002400,
-          5159
-        ],
-        [
-          1785024000,
-          4052
-        ],
-        [
-          1785045600,
-          5798
-        ],
-        [
-          1785067200,
-          7830
-        ],
-        [
-          1785088800,
-          5070
-        ],
-        [
-          1785110400,
-          3267
-        ],
-        [
-          1785132000,
-          4441
-        ],
-        [
-          1785153600,
-          7011
-        ],
-        [
-          1785175200,
-          4227
-        ],
-        [
-          1785196800,
-          3455
-        ],
-        [
-          1785218400,
-          4471
-        ],
-        [
-          1785240000,
-          7219
-        ],
-        [
-          1785261600,
-          4202
-        ],
-        [
-          1785283200,
-          3502
-        ],
-        [
-          1785304800,
-          4461
-        ],
-        [
-          1785326400,
-          7085
-        ]
-      ],
-      "investigation": {
-        "queried": [
-          "sale",
-          "news",
-          "launch",
-          "free",
-          "review",
-          "jp_news",
-          "twitch"
-        ],
-        "results": {
-          "sale": {
-            "queried": true,
-            "hit": true
-          },
-          "news": {
-            "queried": true,
-            "hit": false
-          },
-          "launch": {
-            "queried": true,
-            "hit": false
-          },
-          "free": {
-            "queried": true,
-            "hit": false
-          },
-          "review": {
-            "queried": true,
-            "hit": false
-          },
-          "jp_news": {
-            "queried": true,
-            "hit": false
-          },
-          "twitch": {
-            "queried": true,
-            "hit": false
           },
           "web": {
             "queried": false,
