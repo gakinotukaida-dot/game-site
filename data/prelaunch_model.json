@@ -2,7 +2,7 @@
   "view": "prelaunch_model",
   "schema": "prelaunch_model_v1",
   "note": "羽根予想モデル（自社実績で較正したスコアカード）。跳ね確率は log-odds 合算＝解釈可能・材料が薄いほど基準確率に寄る。強さ指標 top_decile_lift は 70/30 ホールドアウトの out-of-sample。readiness=collecting の間は控えめ運用。",
-  "generated_at": "2026-08-02T06:46:20.897740+00:00",
+  "generated_at": "2026-08-02T17:15:56.488914+00:00",
   "params": {
     "lookback_days": 180,
     "outcome_days": 14,
@@ -36,8 +36,8 @@
     },
     "twitch_peak": {
       "none": -0.01797,
-      "mid": 1.39574,
-      "high": 1.39574
+      "high": 1.39574,
+      "mid": 1.39574
     },
     "streamers": {
       "none": -0.00894,
@@ -52,9 +52,9 @@
       "none": 0.0
     },
     "web_views": {
-      "none": -0.03979,
-      "mid": 0.8347,
-      "low": -0.14482,
+      "none": -0.0415,
+      "mid": 0.67071,
+      "low": -0.02724,
       "high": 1.89424
     },
     "web_reach": {
@@ -63,26 +63,31 @@
     "dev_best_peak": {
       "none": -0.2831,
       "low": 0.304,
-      "high": 1.53703,
-      "mid": 2.79772
+      "mid": 2.79772,
+      "high": 1.53703
     },
     "dev_best_reviews": {
       "none": -0.29424,
-      "low": -0.44421,
-      "high": 1.83301
+      "high": 1.83301,
+      "low": -0.44421
     },
     "is_free": {
       "paid": 0.07508,
       "free": -0.40305
     },
     "genre": {
-      "warm": -0.49926,
-      "hot": 0.47994,
       "cold": -1.23409,
+      "hot": 0.47994,
+      "warm": -0.49926,
       "na": -1.56456
     }
   },
   "genre_rates": {
+    "Casual": {
+      "n": 1244,
+      "hits": 31,
+      "rate": 0.02502
+    },
     "Indie": {
       "n": 1930,
       "hits": 60,
@@ -93,35 +98,20 @@
       "hits": 21,
       "rate": 0.02875
     },
-    "Early Access": {
-      "n": 408,
-      "hits": 22,
-      "rate": 0.05368
-    },
     "Action": {
       "n": 833,
       "hits": 60,
       "rate": 0.07174
-    },
-    "Simulation": {
-      "n": 857,
-      "hits": 47,
-      "rate": 0.05472
-    },
-    "Casual": {
-      "n": 1244,
-      "hits": 31,
-      "rate": 0.02502
     },
     "Adventure": {
       "n": 835,
       "hits": 46,
       "rate": 0.05496
     },
-    "Sports": {
-      "n": 108,
-      "hits": 8,
-      "rate": 0.0718
+    "Early Access": {
+      "n": 408,
+      "hits": 22,
+      "rate": 0.05368
     },
     "Free To Play": {
       "n": 406,
@@ -133,15 +123,25 @@
       "hits": 48,
       "rate": 0.08333
     },
-    "Massively Multiplayer": {
-      "n": 83,
-      "hits": 9,
-      "rate": 0.10252
-    },
     "Racing": {
       "n": 44,
       "hits": 0,
       "rate": 0.00633
+    },
+    "Simulation": {
+      "n": 857,
+      "hits": 47,
+      "rate": 0.05472
+    },
+    "Sports": {
+      "n": 108,
+      "hits": 8,
+      "rate": 0.0718
+    },
+    "Massively Multiplayer": {
+      "n": 83,
+      "hits": 9,
+      "rate": 0.10252
     },
     "Utilities": {
       "n": 10,
@@ -152,6 +152,16 @@
       "n": 2,
       "hits": 0,
       "rate": 0.03292
+    },
+    "Design & Illustration": {
+      "n": 3,
+      "hits": 0,
+      "rate": 0.02992
+    },
+    "Game Development": {
+      "n": 1,
+      "hits": 0,
+      "rate": 0.03657
     },
     "Animation & Modeling": {
       "n": 3,
@@ -167,25 +177,15 @@
       "n": 2,
       "hits": 0,
       "rate": 0.03292
-    },
-    "Design & Illustration": {
-      "n": 3,
-      "hits": 0,
-      "rate": 0.02992
-    },
-    "Game Development": {
-      "n": 1,
-      "hits": 0,
-      "rate": 0.03657
     }
   },
   "validation_oos": {
     "eval_n": 789,
     "eval_base": 0.04309,
-    "top_decile_rate": 0.21795,
-    "top_decile_lift": 5.06,
-    "mean_prob_hit": 0.21712,
-    "mean_prob_miss": 0.02964
+    "top_decile_rate": 0.20513,
+    "top_decile_lift": 4.76,
+    "mean_prob_hit": 0.21452,
+    "mean_prob_miss": 0.0296
   },
   "feature_report": {
     "demo_ccu": {
@@ -284,22 +284,22 @@
         "woe": 1.89424
       },
       "low": {
-        "n": 85,
-        "hits": 3,
-        "rate": 0.0353,
-        "woe": -0.14482
+        "n": 100,
+        "hits": 4,
+        "rate": 0.04,
+        "woe": -0.02724
       },
       "mid": {
-        "n": 29,
+        "n": 35,
         "hits": 3,
-        "rate": 0.1034,
-        "woe": 0.8347
+        "rate": 0.0857,
+        "woe": 0.67071
       },
       "none": {
-        "n": 2601,
-        "hits": 103,
-        "rate": 0.0396,
-        "woe": -0.03979
+        "n": 2580,
+        "hits": 102,
+        "rate": 0.0395,
+        "woe": -0.0415
       }
     },
     "web_reach": {
