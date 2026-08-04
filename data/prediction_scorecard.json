@@ -2,7 +2,7 @@
   "view": "prediction_scorecard",
   "schema": "prediction_scorecard_v1",
   "note": "羽根予想の答え合わせ（as-of・リーク無し）。holdout=過去を70/30分割しtrainだけで学習しtestを採点（honestなバックテスト）。live=発売前に記録した予測→発売後の結果（最も硬い真のout-of-sample・日々増える）。calibration は「◯%と予測した群が実際に何%跳ねたか」＝予測と実測が近いほど信頼できる。",
-  "generated_at": "2026-08-03T09:25:57.415040+00:00",
+  "generated_at": "2026-08-04T08:23:21.537608+00:00",
   "params": {
     "lookback_days": 180,
     "outcome_days": 14,
@@ -18,18 +18,18 @@
     ]
   },
   "holdout": {
-    "n_pairs": 2740,
-    "train_n": 1948,
-    "test_n": 792,
+    "n_pairs": 2763,
+    "train_n": 1963,
+    "test_n": 800,
     "ready": true,
     "metrics": {
-      "n": 792,
+      "n": 800,
       "hits": 34,
-      "base_rate": 0.04293,
-      "top_decile_n": 79,
-      "top_decile_rate": 0.18987,
-      "top_decile_lift": 4.42,
-      "brier": 0.03879,
+      "base_rate": 0.0425,
+      "top_decile_n": 80,
+      "top_decile_rate": 0.1875,
+      "top_decile_lift": 4.41,
+      "brier": 0.03799,
       "high_conf_n": 47,
       "high_conf_rate": 0.25532
     },
@@ -39,45 +39,45 @@
           0.0,
           0.02
         ],
-        "n": 524,
-        "pred_mean": 0.0069,
-        "actual_rate": 0.0115
+        "n": 528,
+        "pred_mean": 0.0071,
+        "actual_rate": 0.0114
       },
       {
         "range": [
           0.02,
           0.05
         ],
-        "n": 147,
-        "pred_mean": 0.0274,
-        "actual_rate": 0.0544
+        "n": 148,
+        "pred_mean": 0.029,
+        "actual_rate": 0.0541
       },
       {
         "range": [
           0.05,
           0.1
         ],
-        "n": 73,
-        "pred_mean": 0.0684,
-        "actual_rate": 0.1096
+        "n": 77,
+        "pred_mean": 0.0722,
+        "actual_rate": 0.1039
       },
       {
         "range": [
           0.1,
           0.2
         ],
-        "n": 18,
-        "pred_mean": 0.1572,
-        "actual_rate": 0.1111
+        "n": 16,
+        "pred_mean": 0.161,
+        "actual_rate": 0.0625
       },
       {
         "range": [
           0.2,
           0.4
         ],
-        "n": 12,
-        "pred_mean": 0.3398,
-        "actual_rate": 0.25
+        "n": 13,
+        "pred_mean": 0.3298,
+        "actual_rate": 0.3077
       },
       {
         "range": [
@@ -85,7 +85,7 @@
           1.0
         ],
         "n": 18,
-        "pred_mean": 0.693,
+        "pred_mean": 0.6894,
         "actual_rate": 0.3889
       }
     ],
@@ -94,7 +94,7 @@
         "appid": 2936290,
         "name": "The Life and Suffering of Prince Jerian",
         "release": "2026-07-20",
-        "pred": 0.9931,
+        "pred": 0.9933,
         "hit": true,
         "launch_peak": 1775
       },
@@ -102,15 +102,23 @@
         "appid": 3751950,
         "name": "Assassin's Creed Black Flag Resynced",
         "release": "2026-07-09",
-        "pred": 0.9782,
+        "pred": 0.9881,
         "hit": true,
         "launch_peak": 104679
+      },
+      {
+        "appid": 3276050,
+        "name": "SpaceCraft",
+        "release": "2026-06-11",
+        "pred": 0.945,
+        "hit": true,
+        "launch_peak": 7685
       },
       {
         "appid": 1454370,
         "name": "STARSEEKER: Astroneer Expeditions",
         "release": "2026-06-11",
-        "pred": 0.9428,
+        "pred": 0.945,
         "hit": false,
         "launch_peak": 701
       },
@@ -118,23 +126,15 @@
         "appid": 2417470,
         "name": "Beastro",
         "release": "2026-06-11",
-        "pred": 0.9428,
+        "pred": 0.945,
         "hit": false,
         "launch_peak": 657
-      },
-      {
-        "appid": 3276050,
-        "name": "SpaceCraft",
-        "release": "2026-06-11",
-        "pred": 0.9428,
-        "hit": true,
-        "launch_peak": 7685
       },
       {
         "appid": 4134600,
         "name": "EverRail",
         "release": "2026-07-20",
-        "pred": 0.93,
+        "pred": 0.9314,
         "hit": false,
         "launch_peak": 353
       },
@@ -142,7 +142,7 @@
         "appid": 2819470,
         "name": "Aquapark Tycoon",
         "release": "2026-07-22",
-        "pred": 0.6789,
+        "pred": 0.6771,
         "hit": false,
         "launch_peak": 432
       },
@@ -150,7 +150,7 @@
         "appid": 3760100,
         "name": "8 Ball by Pokerist",
         "release": "2026-06-16",
-        "pred": 0.6233,
+        "pred": 0.6258,
         "hit": false,
         "launch_peak": 167
       },
@@ -158,7 +158,7 @@
         "appid": 3590290,
         "name": "DIVE or DIE - Children of Rain",
         "release": "2026-07-21",
-        "pred": 0.6116,
+        "pred": 0.6163,
         "hit": true,
         "launch_peak": 1368
       },
@@ -166,7 +166,7 @@
         "appid": 2377930,
         "name": "Destiny of Immortal",
         "release": "2026-07-07",
-        "pred": 0.605,
+        "pred": 0.6122,
         "hit": true,
         "launch_peak": 8306
       },
@@ -174,7 +174,7 @@
         "appid": 2805850,
         "name": "Atre: Dominance Wars",
         "release": "2026-06-08",
-        "pred": 0.605,
+        "pred": 0.6122,
         "hit": false,
         "launch_peak": 23
       },
@@ -182,7 +182,7 @@
         "appid": 2211170,
         "name": "Unrailed 2: Back on Track",
         "release": "2026-06-11",
-        "pred": 0.605,
+        "pred": 0.6122,
         "hit": true,
         "launch_peak": 1140
       },
@@ -190,7 +190,7 @@
         "appid": 4144680,
         "name": "DEAD OR ALIVE 6 Last Round",
         "release": "2026-06-24",
-        "pred": 0.5774,
+        "pred": 0.55,
         "hit": false,
         "launch_peak": 642
       },
@@ -198,17 +198,17 @@
         "appid": 4540230,
         "name": "Road To Glory",
         "release": "2026-06-23",
-        "pred": 0.5105,
+        "pred": 0.4836,
         "hit": false,
         "launch_peak": 3
       },
       {
-        "appid": 3642850,
-        "name": "North Hunt",
-        "release": "2026-07-13",
-        "pred": 0.5105,
-        "hit": false,
-        "launch_peak": 11
+        "appid": 4323990,
+        "name": "EMPULSE",
+        "release": "2026-06-24",
+        "pred": 0.4836,
+        "hit": true,
+        "launch_peak": 2843
       }
     ]
   },
@@ -219,11 +219,11 @@
         "hits": 0
       },
       "pending": {
-        "n": 1828,
+        "n": 1934,
         "hits": 0
       }
     },
-    "pending": 1828,
+    "pending": 1934,
     "settling": 1,
     "resolved": 0,
     "metrics": {},
