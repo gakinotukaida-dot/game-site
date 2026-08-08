@@ -668,8 +668,8 @@ const DUMMY={
 const BLURB={
   1:{ja:"いま観測している同時接続プレイヤー数（多い順）。各行はSteam公式の観測値です。",
      en:"Current concurrent players (most first). Each row is an official Steam observation."},
-  2:{ja:"順位ではなく、その作品が“ふだんの自分”と比べてどれだけ動いたか。×N ＝ 直近6時間のピークが、平常（過去14日の中央値）のおよそ N 倍。推定きっかけつき。",
-     en:"Not a ranking — how much each game moved vs its own usual. ×N = the recent 6h peak ≈ N× the usual (14-day median). With an estimated trigger."},
+  2:{ja:"順位ではなく、その作品が“ふだんの自分”と比べてどれだけ動いたか。×N ＝ 直近6時間の高いほう（上位10%）が、平常（過去14日の中央値）のおよそ N 倍。推定きっかけつき。",
+     en:"Not a ranking — how much each game moved vs its own usual. ×N = the recent 6h high (90th percentile) ≈ N× the usual (14-day median). With an estimated trigger."},
   L:{ja:"発売から日が浅く、いま動いている作品（now_ccu 上位内・実データ）。全ゲーム対象は new-games エクスポート後。",
      en:"Recently released and moving now (within top now_ccu · real data). Full coverage after the new-games export."},
   3:{ja:"発売前のゲームが“発売直後にどれだけ跳ねるか”を予測します。体験版の遊ばれ具合・配信の注目・告知・開発元の実績などを自社データで較正した跳ね確率。予測は外れることがあります。",
@@ -1276,7 +1276,7 @@ function whyPicked(o){
   // 数字を捏造せず分子ごと文から外す（now を代わりに置くと ×N と噛み合わない）。
   const recb=(o.rec!=null)?`<b>${nf.format(o.rec)}</b>`:null;
   const growth=recb
-    ?L(`直近6時間のピーク ${recb} が、平常（過去14日の中央値）${baseb} のおよそ ${rx}`,`Recent 6h peak ${recb} vs the usual (14-day median) ${baseb} — about ${rx}`)
+    ?L(`直近6時間の高いほう（上位10%） ${recb} が、平常（過去14日の中央値）${baseb} のおよそ ${rx}`,`Recent 6h high (90th percentile) ${recb} vs the usual (14-day median) ${baseb} — about ${rx}`)
     :L(`平常（過去14日の中央値）${baseb} のおよそ ${rx}`,`About ${rx} the usual (14-day median) ${baseb}`);
   return `<div class="why">`
     +`<div class="whyrow"><span class="wk">${L("伸び","Growth")}</span><span class="wv">${growth}</span></div>`
