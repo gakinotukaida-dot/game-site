@@ -916,8 +916,10 @@ function viewItems(view){
       const pChips=[relChip,predChip,cfChip].filter(Boolean).concat(factChips);
       const sChips=rawS.concat(genreS);
       // L0（一覧）の2行目は先頭3つ＋「+N」に畳む（view02/L と同じ畳み方）。畳んだ残りは詳細ページの「見立て」で全部見える。
-      const allChips=pChips.concat(sChips);
-      const tagsRow=allChips.slice(0,3).join("")+(allChips.length>3?`<span class="chip more">+${allChips.length-3}</span>`:"");
+      // 行の並びは 発売日 → 押し上げ要因 → 跳ね予想・確度 → 生シグナル／ジャンル。要因（▲）を先に見せて、
+      // 予想%は主指標（右の数字）で既に出ているぶん後ろに回す。詳細ページ側（tagsP）の並びは変えない。
+      const rowChips=[relChip].concat(factChips).concat([predChip,cfChip].filter(Boolean)).concat(sChips);
+      const tagsRow=rowChips.slice(0,3).join("")+(rowChips.length>3?`<span class="chip more">+${rowChips.length-3}</span>`:"");
       // 発売前は観測履歴が無いのが普通：あれば折れ線、無ければ跳ね予想の強さ（主指標の色と同じ pct/40 の尺度）を伸びバーで。
       const nc=ncByApp[g.appid], ncd=nc&&nc.detail;
       const spark=sparkline(ncd&&ncd.history,(ncd&&ncd.stats&&ncd.stats.baseline));
