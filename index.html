@@ -780,7 +780,11 @@ function coverImg(appid){ if(!appid||!imgOn) return ""; return `<a class="coverl
 // ★display:none で待つ方式（coverImg）は loading="lazy" と併用できない。display:none の画像は
 // 位置が決まらないため遅延読み込みが発火せず、onload が来ない＝永久に出ないというデッドロックになる（実測）。
 // そこで枠は最初から場所を取り（opacity:0）、読めたら不透明に、読めなければ枠ごと消す。
-function coverThumb(appid){ if(!appid||!imgOn) return ""; return `<span class="coverthumb"><img class="cover" loading="lazy" src="${coverUrl(appid)}" alt="" onload="this.style.opacity='1';" onerror="var a=this.closest('.coverthumb'); if(a) a.remove();"></span>`; }
+// ★さらに loading="lazy" 自体を外した（0808-0915-24）。opacity:0 にしても本番では1枚も発火せず、
+// 16/17行が complete:false / currentSrc:null ＝取りに行ってすらいなかった（404ではない）。
+// 同じ <img> でも eager なら読める・new Image() でも読める＝URLもCSPも位置も正常。根本原因は未特定。
+// ⑥で初期表示が17行に畳まれている今なら eager でも17〜20枚なので、まず1属性を消して様子を見る。
+function coverThumb(appid){ if(!appid||!imgOn) return ""; return `<span class="coverthumb"><img class="cover" src="${coverUrl(appid)}" alt="" onload="this.style.opacity='1';" onerror="var a=this.closest('.coverthumb'); if(a) a.remove();"></span>`; }
 function titleCell(name){ return `<span class="title titlelink detailtrigger">${esc(name)}</span>`; }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 // URLはスキームを許可リスト（http/https/mailto）に制限。javascript: 等は無効化＝XSS/リダイレクト封じ。
