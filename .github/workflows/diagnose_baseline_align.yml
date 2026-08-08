@@ -1,0 +1,46 @@
+# 平常値の時刻整合(A′)の診断実行 ── BASELINE_DIAG=1 で view02 v2 を回し、現行×と新×を並べてログに出す
+# 置き場所: .github/workflows/diagnose_baseline_align.yml
+# 役割: 「いつもより ×N」が24時間周期をそのまま拾っている件（実在の欠陥）への第2手 A′ の、本番投入前の分布確認。
+#       A′＝同じ時計時刻の窓の日次p90を日ごとに出し、その中央値を平常値にする（分子と分母を同じ統計量に揃える）。
+#       現行平常/新平常・現行×/新× ・使えた日数（狭い窓/広い窓）・順位の入れ替わり・クエリ実行時間を印字するだけ。
+# 運用（diagnose_timing_align.yml と同じ型・2026-07-16 決定・docs/investigation_design.md）:
+#   別の時間帯の回で最低2回、手動で実行する（1回では時刻依存が減ったかを判定できない）。
+#     1回目＝「山」の回（12-18Z）／2回目＝「谷」の回（00-06Z＝09:00〜15:00 JST）。
+#   谷の回は 11:00〜13:00 JST が切り分けやすい（10:18 の view02_rank_v2 と 13:45 の export_upcoming を避ける）。
+#   分布を見て MIN_BASE_DAYS と新しいしきい値を確定 → フェーズ2の設計へ。
+# フェーズ1でやらないこと: 採用の分岐／「時間帯をそろえられませんでした」の印／今日の窓に観測が無い行の扱い／
+#       しきい値 1.3 の再設定／案C（市場全体で割る）。ここは計算して並べるだけ。
+# 守る線: DBは読み取り専用（SELECTのみ）。OUT_PATH=/tmp のためリポジトリに一切書かない＝本番 view02_rising.json 無影響。
+#         コミットなし・ログのみ。手動実行のみ（workflow_dispatch）。
+#         BASELINE_DIAG を外せば本番の挙動は1ビットも変わらない（既定 0）。戻し方＝この yml を削除するだけ。
+name: diagnose baseline align (read-only)
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read   # チェックアウトのみ（書き込み不要＝コミットしない）
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install "psycopg2-binary>=2.9"
+      - name: Run view02 v2 with BASELINE_DIAG=1（ログのみ・コミットなし）
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # Twitch鍵が無ければ B1 は自動スキップ（本体と同じ）
+          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
+          TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
+          # ここが診断の本体：A′ を追加計算して印字するだけ（採用の分岐は入っていない）
+          BASELINE_DIAG: "1"
+          MIN_BASE_DAYS: "5"        # 同じ時計時刻の窓に観測がある「日数」の下限（点数ではない）
+          ALIGN_WIDEN_MULT: "2"     # 日数が足りないとき窓を広げる倍率（6h→12h）
+          # 出力はリポジトリ外へ（本番データ無影響）
+          OUT_PATH: "/tmp/view02_rising_baseline_diag.json"
+        run: python scripts/view02_rank_v2.py
