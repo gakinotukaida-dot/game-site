@@ -28,6 +28,9 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           # NEWS_DAYS: "30"
           # LIMIT: "200"
+          # ⑰ 付随物（DLC・サントラ・壁紙…）の除外。既定は "game" のみ通す（app_type IS NULL は常に通す）。
+          # app_type の実値がログの「app_type 分布」と食い違ったらここで直す。"" にすると除外そのものが無効。
+          # UPCOMING_APP_TYPES: "game"
         run: python scripts/export_upcoming.py
       - name: Commit JSON（変更があるときだけ）
         run: |
