@@ -99,6 +99,9 @@
   .meta{min-width:0}
   .metaImg{display:flex;gap:10px;align-items:center}
   .coverlink{flex-shrink:0;line-height:0}
+  /* ⑪ 一覧行のサムネ枠。読めるまでは透明で場所だけ確保（遅延読み込みのため）、読めなければ枠ごと消える。 */
+  .coverthumb{flex-shrink:0;line-height:0}
+  .coverthumb .cover{opacity:0;transition:opacity .18s}
   .cover{width:84px;height:39px;object-fit:cover;border-radius:5px;flex-shrink:0;border:1px solid var(--line);display:block;filter:saturate(.9)}
   .metatext{min-width:0}
   .titlelink{color:inherit;text-decoration:none}
@@ -769,7 +772,15 @@ function favBtn(key){ const on=favs.has(key); return `<button class="fav" aria-p
 // imgOn=false で一括オフ（守る線＝オーナーの kill-switch）。取得失敗（未配置/遮断）は onerror で静かに畳む。
 // 表示は「読み込めたら出す」方式：初期は非表示、onload で表示、onerror/未配置は要素ごと除去。
 // → 失敗・遅延時に空の枠が残らず、画像なし時は現行のテキストのみと同じ静かな見た目になる。
-function coverImg(appid){ if(!appid||!imgOn) return ""; return `<a class="coverlink" href="https://store.steampowered.com/app/${appid}/" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true" style="display:none"><img class="cover" src="https://cdn.cloudflare.steamstatic.com/steam/apps/${appid}/header.jpg" alt="" onload="var a=this.closest('.coverlink'); if(a) a.style.display='';" onerror="var a=this.closest('.coverlink'); if(a) a.remove();"></a>`; }
+function coverUrl(appid){ return `https://cdn.cloudflare.steamstatic.com/steam/apps/${appid}/header.jpg`; }   // 参照先は1か所に（ヒーロー・一覧・詳細・probe で共通）
+function coverImg(appid){ if(!appid||!imgOn) return ""; return `<a class="coverlink" href="https://store.steampowered.com/app/${appid}/" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true" style="display:none"><img class="cover" src="${coverUrl(appid)}" alt="" onload="var a=this.closest('.coverlink'); if(a) a.style.display='';" onerror="var a=this.closest('.coverlink'); if(a) a.remove();"></a>`; }
+// ⑪ 一覧行のサムネイル。行そのものが「詳細を開くボタン」なので、ここだけはリンクにしない
+// （リンクにすると1クリックで Steam が別タブに開き、同時に詳細ページも開く＝二重動作になる）。
+// 出す・出さないの制御は coverImg と同じ imgOn。取得できない作品は onerror で枠ごと消えるので行は崩れない。
+// ★display:none で待つ方式（coverImg）は loading="lazy" と併用できない。display:none の画像は
+// 位置が決まらないため遅延読み込みが発火せず、onload が来ない＝永久に出ないというデッドロックになる（実測）。
+// そこで枠は最初から場所を取り（opacity:0）、読めたら不透明に、読めなければ枠ごと消す。
+function coverThumb(appid){ if(!appid||!imgOn) return ""; return `<span class="coverthumb"><img class="cover" loading="lazy" src="${coverUrl(appid)}" alt="" onload="this.style.opacity='1';" onerror="var a=this.closest('.coverthumb'); if(a) a.remove();"></span>`; }
 function titleCell(name){ return `<span class="title titlelink detailtrigger">${esc(name)}</span>`; }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 // URLはスキームを許可リスト（http/https/mailto）に制限。javascript: 等は無効化＝XSS/リダイレクト封じ。
@@ -829,7 +840,7 @@ function rowHtml(o){
   return `<li class="row2 ${favs.has(o.key)?'faved':''}" data-detail="${o.i}" role="button" tabindex="0" aria-label="${esc(o.title)}（${L("詳しく","details")}）" style="animation-delay:${o.i*30}ms">
       <div class="r2rank">${rank}</div>
       ${favBtn(o.key)}
-      <div class="r2body"><div class="r2main"><div class="r2top">${titleCell(o.title)}<span class="metric r2primary">${o.primary||o.metric||""}</span></div>${sub}</div><span class="rowchev" aria-hidden="true">›</span></div>
+      <div class="r2body">${coverThumb(o.appid)}<div class="r2main"><div class="r2top">${titleCell(o.title)}<span class="metric r2primary">${o.primary||o.metric||""}</span></div>${sub}</div><span class="rowchev" aria-hidden="true">›</span></div>
     </li>`; }
 
 // ダミー件数を増やして「もっと見る」を体験できるようにする（mk(k) で k 番目の仮データを作る）。
@@ -1405,7 +1416,7 @@ async function firstWithCover(list){
   for(const x of list.slice(0,5)){
     const ok=await new Promise(r=>{ const i=new Image();
       i.onload=()=>r(true); i.onerror=()=>r(false);
-      i.src=`https://cdn.cloudflare.steamstatic.com/steam/apps/${x.a}/header.jpg`; });
+      i.src=coverUrl(x.a); });
     if(ok) return x;
   }
   return list[0]||null;
