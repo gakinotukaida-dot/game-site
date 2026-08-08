@@ -22,6 +22,7 @@ import psycopg2
 
 import prelaunch_features as F
 from _filters import not_adult
+from _market import fetch_market, market_of
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 OUT_PATH = os.environ.get("OUT_PATH") or "data/upcoming.json"
@@ -167,6 +168,10 @@ def compute_rows(conn, limit=None):
         cur.execute(build_query(web_ok), {"limit": fetch_limit})
         cols = [d[0] for d in cur.description]
         recs = cur.fetchall()
+        # ⑨-a：価格・割引・レビュー好評率。発売前なので多くは未取得（＝None）だが、
+        # 予約価格やセール、体験版のレビューが付いている作品はここで拾える。
+        _ai = cols.index("appid") if "appid" in cols else None
+        mkt = fetch_market(cur, [r[_ai] for r in recs]) if _ai is not None else {}
 
     model = _load_model()
     base = (model.get("base_rate") if model else None) or 0.03
@@ -237,6 +242,9 @@ def compute_rows(conn, limit=None):
             "web_reach": _iv(d.get("web_reach")),     # 言語版Wikipediaの数（Wikidata・最新）
             "is_free": bool(d.get("is_free")),
             "genres": genres,
+            # ⑨-a：未取得は None（0円・好評率0% と読めてはいけない＝0802E-05）。
+            "price": market_of(mkt, d.get("appid"))["price"],
+            "review": market_of(mkt, d.get("appid"))["review"],
         })
         if len(rows) >= eff_limit:   # 発売済みを除いた“発売前のみ”で LIMIT 件に達したら打ち切り
             break

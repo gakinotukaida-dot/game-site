@@ -24,6 +24,7 @@ from datetime import datetime
 import psycopg2
 
 from _filters import not_adult
+from _market import fetch_market, market_of
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 OUT_PATH = os.environ.get("OUT_PATH") or "data/new_rising.json"
@@ -172,6 +173,9 @@ def _build_detail(it):
             "n_points": st.get("n_points", 0),
         },
         "history": it.get("_history") or [],
+        # ⑨-a：価格・レビュー。未取得は None（0円・好評率0% と読めてはいけない＝0802E-05）。
+        "price": (it.get("_market") or {}).get("price"),
+        "review": (it.get("_market") or {}).get("review"),
     }
 
 
@@ -194,6 +198,10 @@ def main():
                 s = stats_by.get(it["appid"], {})
                 it["_stats"] = s.get("stats") or {}
                 it["_history"] = s.get("history") or []
+            # ⑨-a：価格・割引・レビュー好評率（読み取りのみ・取れなくても本体は止めない）。
+            mkt = fetch_market(cur, appids)
+            for it in items:
+                it["_market"] = market_of(mkt, it["appid"])
     finally:
         conn.close()
 

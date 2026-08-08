@@ -802,6 +802,28 @@ function sparkline(hist, baseline){
 }
 const LAUNCH_WINDOW=400; // B1デモ：発売からこの日数内を「新着」とみなす（本番P2は release_date 14日・全ゲーム対象）
 // L1（深掘り1段目）：JSONの detail から「ジャンル（補助タグ）」と「詳しく開示」を組む。detail 無し（フォールバック/未到達）は準備中表示。
+// ⑨-a 価格・割引・レビュー好評率のチップ。★未取得（null）は「出さない」＝「0円」「好評率0%」と読めてはいけない（0802E-05）。
+// 金額は Steam の price_overview そのまま＝最小単位（cc=jp なので JPY・×100）。表示側で 100 で割る。
+function fmtMoney(v, cur){
+  if(v==null) return null;
+  try{ return new Intl.NumberFormat(lang==="en"?"en-US":"ja-JP",{style:"currency",currency:cur||"JPY",maximumFractionDigits:0}).format(v/100); }
+  catch(e){ return String(Math.round(v/100)); }   // 未知の通貨コードでも落とさない
+}
+function priceChips(d){
+  const p=d&&d.price; if(!p) return [];           // 未取得＝何も言わない
+  const out=[], f=fmtMoney(p.final,p.currency), disc=p.discount_percent||0;
+  if(p.final===0) out.push(`<span class="chip c-free">${L("無料","Free")}</span>`);
+  else if(f) out.push(`<span class="chip ${disc>0?"c-sale":""}">${esc(f)}${disc>0?`<span class="cval">${disc}%OFF</span>`:""}</span>`);
+  return out;
+}
+function reviewChips(d){
+  const r=d&&d.review; if(!r||r.pct==null) return [];   // 総数0/未取得は出さない
+  return [`<span class="chip c-review">${L("好評 "+r.pct+"%","Positive "+r.pct+"%")}<span class="cval">${nf.format(r.total)}${L("件","")}</span></span>`];
+}
+// ⑨-a ここ（ビュー02「今の人数」／04「新着で伸び」の行）には価格・レビューを足していない。
+// この2ビューはチップを畳んでいない＝足すと必ず可視枠に出る（実測：1280pxで行高 84→103px）。
+// 指示は「可視枠ではなく +N の中と詳細ページにまず出す」なので、ここは詳細ページ側だけに出す。
+// 可視枠に入れるかは、畳みを入れるかどうかと合わせて「見てから」判断する。
 function l1Secondary(d){
   const g=(d&&Array.isArray(d.genres))?d.genres:[];
   if(!g.length) return "";  // 無いときは出さない（「準備中」で行を汚さない）
@@ -813,13 +835,24 @@ function detailBodyReal(d){
   const pub=(d.publishers||[]).map(esc).join("、");
   const samePub = pub && pub!==dev;            // 開発元＝販売元(インディーに多い)なら販売元行は省く
   const cats=(d.categories||[]).map(t=>`<span class="chip">${esc(t)}</span>`).join("");
-  const hasAny = dev || pub || cats || d.release || (d.dlc_count>0) || (d.siblings&&d.siblings.length) || d.website;
+  const pr=d.price, rv=d.review;
+  const hasAny = dev || pub || cats || d.release || (d.dlc_count>0) || (d.siblings&&d.siblings.length) || d.website || pr || rv;
   if(!hasAny) return "";                        // appdetails未到達＝中身なし（rowDetailが「準備中」を出す）
   let rows="";
   if(dev) rows+=`<span class="dk">${L("開発元","Developer")}</span><span class="dv">${dev}</span>`;
   if(samePub) rows+=`<span class="dk">${L("販売元","Publisher")}</span><span class="dv">${pub}</span>`;
   rows+=`<span class="dk">${L("発売日","Release")}</span><span class="dv">${d.release?esc(d.release):"—"}</span>`;
   rows+=`<span class="dk">DLC</span><span class="dv">${d.dlc_count>0?L(`あり（${d.dlc_count}）`,`Yes (${d.dlc_count})`):L("なし","None")}</span>`;
+  // ⑨-a 価格・レビュー。★未取得（null）は行ごと出さない。「—」でも「0円」でもなく、黙っているのが正しい（0802E-05）。
+  if(pr){
+    const f=fmtMoney(pr.final,pr.currency), i=fmtMoney(pr.initial,pr.currency), dc=pr.discount_percent||0;
+    const body = (pr.final===0) ? L("無料","Free")
+      : (f ? esc(f)+(dc>0?` <span class="cval">${dc}%OFF</span>`+(i?` <span class="sibnote" style="display:inline">${L("定価 ","was ")}${esc(i)}</span>`:""):"") : "—");
+    rows+=`<span class="dk">${L("価格","Price")}</span><span class="dv">${body}</span>`;
+  }
+  if(rv && rv.pct!=null){
+    rows+=`<span class="dk">${L("レビュー","Reviews")}</span><span class="dv">${L("好評 "+rv.pct+"%","Positive "+rv.pct+"%")}<span class="cval">${nf.format(rv.total)}${L("件","")}</span></span>`;
+  }
   if(cats) rows+=`<span class="dk">${L("カテゴリ","Categories")}</span><span class="dv tags">${cats}</span>`;
   if(d.siblings && d.siblings.length){          // L2：同じ開発元の他作品（名前＝ストアリンク）
     const sib=d.siblings.map(s=>`<a href="https://store.steampowered.com/app/${s.appid}/" target="_blank" rel="noopener noreferrer">${esc(s.name)}</a>`).join("、");
@@ -975,6 +1008,8 @@ function viewItems(view){
       if(g.web_views) rawS.push(`<span class="chip">${L("世界の閲覧 "+nf.format(g.web_views),"Global views "+nf.format(g.web_views))}</span>`);
       if(g.web_reach) rawS.push(`<span class="chip">${L("言語版Wiki "+nf.format(g.web_reach),"Lang wikis "+nf.format(g.web_reach))}</span>`);
       if(g.dev_best_peak) rawS.push(`<span class="chip">${L("開発元ベスト "+nf.format(g.dev_best_peak)+"人","Dev best "+nf.format(g.dev_best_peak))}</span>`);
+      // ⑨-a 発売前は多くが未取得（＝出ない）。予約価格やセール、体験版のレビューが付いていれば出る。
+      priceChips(g).concat(reviewChips(g)).forEach(c=>rawS.push(c));
       const genreS=(g.genres&&g.genres.length)?g.genres.map(t=>`<span class="chip">${esc(genreLabel(t))}</span>`):[];
       const relChip=`<span class="chip ic">${ICON.cal}${known?(L("発売予定 ","Releases ")+esc(relTxt)):esc(relTxt)}</span>`;
       const pChips=[relChip,predChip,cfChip].filter(Boolean).concat(factChips);
