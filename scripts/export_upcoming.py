@@ -1,5 +1,5 @@
 """
-表示用エクスポート（候補4「これから来そう」＝発売前・羽根予想つき）── 2026-07-07 / v3
+表示用エクスポート（候補4「これから来そう」＝発売前・羽根予想つき）── 2026-08-08 / v4
 ================================================================
 役割：Neon を「読むだけ」で発売前ゲームを拾い、**羽根予想（跳ね確率）** を付けて data/upcoming.json に書き出す。
 
@@ -8,6 +8,11 @@
   使うシグナル（すべて自前観測・ToUクリーン・as-of）：
     体験版CCU / Twitch視聴者 / 配信者数 / 告知数 / 開発元の実績(過去最高CCU・最大レビュー) / ジャンル命中率 / 無料か
   → prelaunch_features.py に定義を集約（学習と推論で同一）。
+
+v4（⑱＋⑨-b）：各行に header_image（サムネの正しいURL・string/null）と has_japanese（true/false/null の三値）を追加。
+  どちらも appdetails_sweep が収集済みの列を読むだけ＝新規収集ゼロ。
+  ★supported_languages（原文）は出さない：`English<strong>*</strong>, …` と外部由来のHTMLタグを含み、
+    表示側（index.html）は文字列連結でHTMLを組む。表示に要るのは真偽値だけ＝危ない形を最初から作らない。
 
 線：DBは読み取り専用（SELECTのみ）。書き込みは data/upcoming.json 1ファイルのみ・毎回上書き＝可逆。新規収集ゼロ。
     著作物は載せない（ジャンル語・appid・数値のみ）。モデルが無ければ確率は出さず従来の期待度に自動フォールバック。
@@ -74,7 +79,25 @@ GROUP BY 1 ORDER BY 2 DESC
 """
 
 
-def build_query(web_ok):
+# ⑱／⑨-b で games に足した列（appdetails_sweep が ADD COLUMN IF NOT EXISTS する）。
+# 収集より先に export だけが動く順序でも落とさないよう、あるかどうかを1回だけ確かめて無ければ NULL を出す。
+# ★ `F.web_mentions_exists` と同じ考え方：読み取り専用のこちらから足せない以上、無い前提でも動く形にする。
+OPTIONAL_COLS = ("header_image", "has_japanese")
+
+
+def optional_cols(cur):
+    """games に実在する OPTIONAL_COLS の集合を返す（読み取りのみ）。"""
+    cur.execute("SELECT column_name FROM information_schema.columns "
+                "WHERE table_name = 'games' AND column_name = ANY(%(cols)s)",
+                {"cols": list(OPTIONAL_COLS)})
+    return {r[0] for r in cur.fetchall()}
+
+
+def build_query(web_ok, cols=()):
+    # 無い列は NULL::型 で出す＝行の形（キーの並び）は列の有無で変わらない。
+    extra = ",\n  ".join(
+        (f"g.{c}" if c in cols else f"NULL::{t} AS {c}")
+        for c, t in (("header_image", "text"), ("has_japanese", "boolean")))
     return f"""
 WITH {F.cte_prelude()},
 self_up AS (
@@ -82,6 +105,7 @@ self_up AS (
 ),
 {F.dev_best_cte('self_up', 'now()')}
 SELECT g.appid, g.name, g.release_date, g.release_date_text, g.genres, g.coming_soon,
+  {extra},
   {F.feature_sql(asof='now()', web_ok=web_ok)},
   db.dev_best_peak, db.dev_best_reviews
 FROM games g
@@ -184,6 +208,20 @@ def _iv(v):
     return int(v) if v is not None else None
 
 
+def _sz(v):
+    """文字列列を JSON 用に：空文字は None に寄せる（「取れていない」と「空」を混ぜない＝0802E-05）。"""
+    if v is None:
+        return None
+    s = str(v).strip()
+    return s or None
+
+
+def _tri(v):
+    """三値（true/false/null）をそのまま通す。★bool() で潰さない：
+    None（未取得＝まだ調べていない）と False（調べた結果そうでない）は別物（0802E-05）。"""
+    return None if v is None else bool(v)
+
+
 def compute_rows(conn, limit=None):
     """発売前ゲームを読み、各作品の羽根予想（spike_prob/expect/conf/factors…）を付けた行リストを返す。
     ※ 予測の“単一の源”：これを export（表示）と prediction_log（記録）の両方が使う＝表示と記録の値が必ず一致（skew防止）。
@@ -196,7 +234,8 @@ def compute_rows(conn, limit=None):
         cur.execute("SELECT now()::date")   # SQL の now()::date と同一基準の“今日”（発売済み判定に使う）
         today = cur.fetchone()[0]
         web_ok = F.web_mentions_exists(cur)   # web_mentions が無ければ web_* は NULL（無影響）
-        cur.execute(build_query(web_ok), {"limit": fetch_limit, "app_types": APP_TYPES})
+        ocols = optional_cols(cur)            # ⑱/⑨-b の列（未収集の環境では無いこともある）
+        cur.execute(build_query(web_ok, ocols), {"limit": fetch_limit, "app_types": APP_TYPES})
         cols = [d[0] for d in cur.description]
         recs = cur.fetchall()
         # ⑨-a：価格・割引・レビュー好評率。発売前なので多くは未取得（＝None）だが、
@@ -272,6 +311,14 @@ def compute_rows(conn, limit=None):
             "web_views": _iv(d.get("web_views")),     # 全言語版Wikipediaの直近ページビュー合計（実閲覧・最新）
             "web_reach": _iv(d.get("web_reach")),     # 言語版Wikipediaの数（Wikidata・最新）
             "is_free": bool(d.get("is_free")),
+            # ⑱ サムネの正しいURL（appdetails 由来）。新Steamは …/store_item_assets/…/{40桁ハッシュ}/header.jpg に
+            #   画像を置き、ハッシュは推測できない＝表示側の組み立てURLでは当たらない。未取得は null（表示側は組み立てに落ちる）。
+            "header_image": _sz(d.get("header_image")),
+            # ⑨-b 日本語対応（true/false/null の三値）。★null＝まだ調べていない。false と混ぜない。
+            #   原文 supported_languages は **出さない**：`English<strong>*</strong>, …` と外部由来のHTMLタグを含み、
+            #   index.html は文字列連結でHTMLを組む（coverThumb 等）＝表示経路に外部HTMLが流れ込む形を最初から作らない。
+            #   表示に要るのは真偽値だけ。原文は DB 側に残っている（捨てていない）。
+            "has_japanese": _tri(d.get("has_japanese")),
             "genres": genres,
             # ⑨-a：未取得は None（0円・好評率0% と読めてはいけない＝0802E-05）。
             "price": market_of(mkt, d.get("appid"))["price"],
@@ -305,7 +352,7 @@ def main():
 
     payload = {
         "view": "upcoming",
-        "schema": "upcoming_v3",
+        "schema": "upcoming_v4",   # v4＝各行に header_image（string/null）と has_japanese（true/false/null）を追加
         "source": "games(coming_soon/release_date) + 実測シグナル(体験版/Twitch/告知/開発元実績/ジャンル) + prelaunch_model",
         "note": ("発売前の羽根予想。spike_prob=跳ね確率＝自社実績で較正したモデルの出力（参考・外れうる）。"
                  "モデルが無い場合は expect のみ（実測シグナルの有無）。"
@@ -342,6 +389,15 @@ def main():
     n_news = sum(1 for r in rows if r["has_news"])
     n_high = sum(1 for r in rows if r["expect"] == "high")
     n_nogenre = sum(1 for r in rows if not r["genres"])
+    # ⑱／⑨-b の充足率。★必ず母数（書き出した行数）と並べて出す：件数だけでは「少ない」のか
+    #   「母数が小さい」のか読めない。収集はローテーション中なので、少ないこと自体は出力側の不合格ではない。
+    n_img = sum(1 for r in rows if r["header_image"])
+    ja_t = sum(1 for r in rows if r["has_japanese"] is True)
+    ja_f = sum(1 for r in rows if r["has_japanese"] is False)
+    ja_n = sum(1 for r in rows if r["has_japanese"] is None)
+    img_pct = f"（{100.0 * n_img / len(rows):.1f}%）" if rows else ""
+    print(f"header_image 非null {n_img} 件／{len(rows)}{img_pct}")
+    print(f"has_japanese true {ja_t} / false {ja_f} / null {ja_n}（母数 {len(rows)}）")
     print(f"書き出し: {OUT_PATH}（{len(rows)} 件・発売前・ジャンル無し {n_nogenre} 件）"
           f" model={'あり('+str(model.get('readiness'))+')' if model else 'なし'}"
           f" 期待度高 {n_high} / 最近告知 {n_news}")

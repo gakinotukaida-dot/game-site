@@ -780,7 +780,36 @@ function favBtn(key){ const on=favs.has(key); return `<button class="fav" aria-p
 // imgOn=false で一括オフ（守る線＝オーナーの kill-switch）。取得失敗（未配置/遮断）は onerror で静かに畳む。
 // 表示は「読み込めたら出す」方式：初期は非表示、onload で表示、onerror/未配置は要素ごと除去。
 // → 失敗・遅延時に空の枠が残らず、画像なし時は現行のテキストのみと同じ静かな見た目になる。
-function coverUrl(appid){ return `https://cdn.cloudflare.steamstatic.com/steam/apps/${appid}/header.jpg`; }   // 参照先は1か所に（ヒーロー・一覧・詳細・probe で共通）
+// ⑱ サムネの正しいURL。新しいSteamは …/store_item_assets/steam/apps/{appid}/{40桁ハッシュ}/header.jpg に
+// 画像を置き、ハッシュは推測できない＝下の「組み立てURL」では当たらない。appdetails の header_image が唯一の手段で、
+// それを収集→export（upcoming.json の各行 header_image）→ここ、と運んできた。
+// ★呼び出し側は1行も変えない：coverUrl(appid) の引数も戻り値の形もそのまま。ここで appid→URL の表を先に見るだけ。
+//   → ヒーロー(coverImg)・一覧(coverThumb)・詳細(showDetail)・firstWithCover の4か所が同時に恩恵を受ける。
+// ★組み立てURLは消さない：今日17行中4行はそれで出ていた。優先順は header_image → 組み立て → 空枠（⑫案A）。
+const COVER_BY_APP=Object.create(null);   // appid → header_image（表に無ければ従来どおり組み立てる）
+// 外部（DB由来）のURLを <img src> に入れる前に、スキームとホストをこちら側で確かめる。
+// CSPは最後の砦だが、通ったか落とされたかはページから見えない＝ここで弾いて組み立てURLに落とす方が静かに壊れない。
+// ★許可するのは CSP の img-src に既に入っているドメインだけ＝CSPは1文字も広げない（広げるのは安全側の線を外す作業）。
+function coverHostOk(u){
+  try{
+    const x=new URL(String(u), location.href);
+    if(x.protocol!=="https:") return false;
+    return /(^|\.)steamstatic\.com$/.test(x.hostname) || /(^|\.)akamaihd\.net$/.test(x.hostname);
+  }catch(e){ return false; }
+}
+// upcoming.json を読んだ時点で表を1つ作る。想定外のホストは黙って捨てず件数をコンソールに残す
+// （＝「CSPに足すべきか」を後から実データで判断できるようにする。足す判断はここではしない）。
+function setCoverMap(rows){
+  let ok=0, ng=0; const bad=[];
+  (rows||[]).forEach(r=>{
+    if(!r || r.appid==null || !r.header_image) return;
+    if(coverHostOk(r.header_image)){ COVER_BY_APP[r.appid]=String(r.header_image); ok++; }
+    else { ng++; if(bad.length<3) bad.push(String(r.header_image).slice(0,120)); }
+  });
+  if(ng) console.warn("header_image: 許可ホスト外のため無視 "+ng+"件（組み立てURLに落とす）例: "+bad.join(" / "));
+  return {ok:ok,ng:ng};
+}
+function coverUrl(appid){ return COVER_BY_APP[appid] || `https://cdn.cloudflare.steamstatic.com/steam/apps/${appid}/header.jpg`; }   // 参照先は1か所に（ヒーロー・一覧・詳細・probe で共通）
 function coverImg(appid){ if(!appid||!imgOn) return ""; return `<a class="coverlink" href="https://store.steampowered.com/app/${appid}/" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true" style="display:none"><img class="cover" src="${coverUrl(appid)}" alt="" onload="var a=this.closest('.coverlink'); if(a) a.style.display='';" onerror="var a=this.closest('.coverlink'); if(a) a.remove();"></a>`; }
 // ⑪ 一覧行のサムネイル。行そのものが「詳細を開くボタン」なので、ここだけはリンクにしない
 // （リンクにすると1クリックで Steam が別タブに開き、同時に詳細ページも開く＝二重動作になる）。
@@ -1039,6 +1068,14 @@ function viewItems(view){
       if(g.dev_best_peak) rawS.push(`<span class="chip">${L("開発元ベスト "+nf.format(g.dev_best_peak)+"人","Dev best "+nf.format(g.dev_best_peak))}</span>`);
       // ⑨-a 発売前は多くが未取得（＝出ない）。予約価格やセール、体験版のレビューが付いていれば出る。
       priceChips(g).concat(reviewChips(g)).forEach(c=>rawS.push(c));
+      // ⑨-b 日本語対応。★三値をそのまま3通りの見え方にする：
+      //   true → 「日本語」／ false → 「日本語の記載なし」（断定しない書き方。発売前は後から追加されうる）／
+      //   null（未取得＝まだ調べていない）→ 何も出さない。
+      //   ★null の行に否定のチップを出さないこと（「調べていない」を「非対応」と読ませるのは嘘＝③で直したのと同じ誤り）。
+      //   ⑨-a と同じ置き場所（可視枠ではなく +N の中と詳細ページ）＝行の見た目と行高は変えない。
+      //   可視枠に上げるかは、実データで見てから判断する。
+      if(g.has_japanese===true) rawS.push(`<span class="chip c-jp">${L("日本語","Japanese")}</span>`);
+      else if(g.has_japanese===false) rawS.push(`<span class="chip tagmuted">${L("日本語の記載なし","No Japanese listed")}</span>`);
       const genreS=(g.genres&&g.genres.length)?g.genres.map(t=>`<span class="chip">${esc(genreLabel(t))}</span>`):[];
       const relChip=`<span class="chip ic">${ICON.cal}${known?(L("発売予定 ","Releases ")+esc(relTxt)):esc(relTxt)}</span>`;
       const pChips=[relChip,predChip,cfChip].filter(Boolean).concat(factChips);
@@ -1662,7 +1699,7 @@ loadRising();  // 02「いつもより伸び」を最新 view02_rising で上書
 loadFree();    // 無料配布レンズ（あれば表示・無ければ隠す）
 // B1'/B2：全ゲーム対象エクスポート（あれば view L/3 を差し替え・無ければ現状フォールバック）
 async function loadNewRising(){ try{ const r=await fetch("./data/new_rising.json?cb="+Date.now(),{cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); if(d&&Array.isArray(d.rows)&&d.rows.length){ REAL_L=d.rows; rebuildCatalog(); const ld=((d.params&&d.params.launch_days)||14); NOTE.L={cls:"",txt:{ja:"実データ：発売から日が浅く自己比で伸びている作品（全ゲーム対象・release_date "+ld+"日）。早期・低確信は明示。",en:"Real data: recently released titles rising vs their own usual (all games · release_date "+ld+"d). Early/low-confidence is marked."}}; if(current==="L"){buildGenreChips();render("L");} } }catch(e){} }
-async function loadUpcoming(){ try{ const r=await fetch("./data/upcoming.json?cb="+Date.now(),{cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); if(d&&Array.isArray(d.rows)&&d.rows.length){ REAL_UP=d.rows; rebuildCatalog(); UP_MODEL=d.model||null; let jt,et; if(UP_MODEL){ const np=UP_MODEL.n_pairs||0; const lift=(UP_MODEL.validation_oos&&UP_MODEL.validation_oos.top_decile_lift)||null; const val=UP_MODEL.readiness==="validated"; jt="実データ：跳ね予想＝発売直後の跳ね確率。自社実績 "+nf.format(np)+"件で較正"+(lift?("・上位ほど跳ねやすさ ×"+lift):"")+"（"+(val?"検証済み":"検証中")+"）。予測は外れることがあります。"; et="Real data: spike prediction = probability of a launch spike. Calibrated on "+nf.format(np)+" of our own cases"+(lift?(" · top picks spike ×"+lift):"")+" ("+(val?"validated":"in validation")+"). Predictions can be wrong."; } else { const nh=d.rows.filter(x=>x&&(x.demo_ccu||x.has_news)).length; jt="実データ：発売前リスト。期待度は実測シグナル（体験版CCU・告知）から（"+nh+"件にシグナルあり）。予測モデルの生成待ち。"; et="Real data: pre-release list from measured signals (demo CCU, news; "+nh+" with a signal). Awaiting the prediction model."; } NOTE[3]={cls:"",txt:{ja:jt,en:et}}; } UP_STATE="ok"; if(current==="3"){render("3");} }catch(e){ UP_STATE="failed"; if(current==="3"){render("3");} } }
+async function loadUpcoming(){ try{ const r=await fetch("./data/upcoming.json?cb="+Date.now(),{cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); if(d&&Array.isArray(d.rows)&&d.rows.length){ REAL_UP=d.rows; setCoverMap(d.rows); rebuildCatalog(); UP_MODEL=d.model||null; let jt,et; if(UP_MODEL){ const np=UP_MODEL.n_pairs||0; const lift=(UP_MODEL.validation_oos&&UP_MODEL.validation_oos.top_decile_lift)||null; const val=UP_MODEL.readiness==="validated"; jt="実データ：跳ね予想＝発売直後の跳ね確率。自社実績 "+nf.format(np)+"件で較正"+(lift?("・上位ほど跳ねやすさ ×"+lift):"")+"（"+(val?"検証済み":"検証中")+"）。予測は外れることがあります。"; et="Real data: spike prediction = probability of a launch spike. Calibrated on "+nf.format(np)+" of our own cases"+(lift?(" · top picks spike ×"+lift):"")+" ("+(val?"validated":"in validation")+"). Predictions can be wrong."; } else { const nh=d.rows.filter(x=>x&&(x.demo_ccu||x.has_news)).length; jt="実データ：発売前リスト。期待度は実測シグナル（体験版CCU・告知）から（"+nh+"件にシグナルあり）。予測モデルの生成待ち。"; et="Real data: pre-release list from measured signals (demo CCU, news; "+nh+" with a signal). Awaiting the prediction model."; } NOTE[3]={cls:"",txt:{ja:jt,en:et}}; } UP_STATE="ok"; if(current==="3"){render("3");} }catch(e){ UP_STATE="failed"; if(current==="3"){render("3");} } }
 // ③ 跳ね予想の答え合わせ（的中率スコアカード）：as-of・リーク無しの成績を view3 に添える
 // 初期は折りたたみ（summary だけ表示）。開閉状態は端末内に記憶する（データ好きは常に開いておける）。
 const SC_KEY="radar_scorecard_open_v1";
