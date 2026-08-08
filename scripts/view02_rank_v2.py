@@ -112,6 +112,14 @@ CAUSE_LOOKBACK_DAYS = float(os.environ.get("CAUSE_LOOKBACK_DAYS") or "3")    # �
 CAUSE_LAG_DAYS      = float(os.environ.get("CAUSE_LAG_DAYS")      or "1")    # 伸びの後どれだけ遅れを許すか
 CAUSE_MISALIGN_MULT = float(os.environ.get("CAUSE_MISALIGN_MULT") or "0.4")  # 非整合(併発)シグナルのboost倍率
 # B1 しきい値（暫定）
+# ── 平常値の時刻整合（A′）診断・フェーズ1 ─────────────────────────────────────
+# 既定 OFF（BASELINE_DIAG=0）＝本番の挙動・出力JSON・ログは1ビットも変わらない。
+# ON のときだけ「同じ時計時刻の窓の日次p90 → その中央値」を*別クエリで*計算し、現行×と新×を並べて印字する。
+# 採用の分岐（どちらを使うか）はフェーズ1では入れない＝ここは計算して見せるだけ。
+BASELINE_DIAG = (os.environ.get("BASELINE_DIAG") or "0").strip().lower() in ("1", "true", "yes", "on")
+MIN_BASE_DAYS = int(os.environ.get("MIN_BASE_DAYS") or "5")       # 窓に観測がある「日数」の下限（点数ではない）
+ALIGN_WIDEN_MULT = float(os.environ.get("ALIGN_WIDEN_MULT") or "2")  # 日数が足りないとき窓を広げる倍率
+# B1 しきい値（暫定）
 B1_FEW_CH    = int(os.environ.get("B1_FEW_CH")    or "10")   # 「少数配信」の上限
 B1_CONC_REF  = float(os.environ.get("B1_CONC_REF") or "300") # 視聴/配信 の基準（集中度）
 B1_VPC_REF   = float(os.environ.get("B1_VPC_REF")  or "0.3") # 視聴/CCU の基準（配信注目）
@@ -538,12 +546,205 @@ def fetch_history(cur, ids):
     return out
 
 
+# ---------- 平常値の時刻整合（A′）診断・フェーズ1 ----------
+# 【値が渡る経路の全ホップ】（0808-2225-17 の再発防止）
+#   ① SQL の SELECT（Q_BASELINE_DIAG / Q_RECENT_OBS_DIAG）
+#   ② カーソル→dict化（fetch_baseline_diag の戻り値 diag_by / recent_obs）
+#   ③ rows 組み立ての後、TOP_N で切る前の全候補を diag_rows として保持（main）
+#   ④ 印字ブロック（baseline_diag_report）
+# 本番の base CTE（Q_MAIN）には触れない＝この2本は BASELINE_DIAG=1 のときだけ実行される別クエリ。
+#
+# 「同じ時計時刻の窓」＝ now から遡った経過秒を 86400 の余りで見る。余りが align_secs 未満なら
+# 「その日の同じ時計時刻の窓の中」。日付をまたぐ窓（例 23:00→05:00）も自動で正しく扱える。
+# 対象は過去のみ（recorded_at < now）なので差は常に正＝mod の符号を気にしなくてよい。
+# gap_days / base_days の除外は本番 base CTE と同一＝分子（今日の窓）と分母は点を共有しない。
+Q_BASELINE_DIAG = """
+WITH day_q AS (
+  SELECT appid,
+         ((extract(epoch FROM now())::bigint - extract(epoch FROM recorded_at)::bigint) / 86400) AS d_ago,
+         percentile_cont(%(recent_q)s) WITHIN GROUP (ORDER BY player_count) AS q
+  FROM player_counts
+  WHERE appid = ANY(%(appids)s)
+    AND recorded_at <  now() - make_interval(days => %(gap_days)s)
+    AND recorded_at >= now() - make_interval(days => %(base_days)s)
+    AND mod((extract(epoch FROM now())::bigint - extract(epoch FROM recorded_at)::bigint), 86400)
+        < %(align_secs)s
+  GROUP BY appid, d_ago
+)
+SELECT appid,
+       percentile_cont(0.5)  WITHIN GROUP (ORDER BY q) AS baseline_hm,
+       percentile_cont(0.25) WITHIN GROUP (ORDER BY q) AS q1_hm,
+       percentile_cont(0.75) WITHIN GROUP (ORDER BY q) AS q3_hm,
+       count(*) AS n_days
+FROM day_q
+GROUP BY appid;
+"""
+
+# 「今日の窓に観測が1点も無い作品」を数えるためだけの照会（数えるだけ・挙動は変えない）。
+# 本番は COALESCE(recent_q, current_ccu) で最大で数日前の1点に落ちるが、その件数が未測定だった（0808-2225-08）。
+Q_RECENT_OBS_DIAG = """
+SELECT appid, count(*) AS n_obs
+FROM player_counts
+WHERE appid = ANY(%(appids)s)
+  AND recorded_at >= now() - make_interval(hours => %(recent_h)s)
+GROUP BY appid;
+"""
+
+
+def fetch_baseline_diag(cur, ids):
+    """A′ の平常値を「狭い窓」「広い窓」の2系統で1回ずつ計算する（診断専用・SELECTのみ）。
+    返り値: (diag_by, recent_obs, elapsed_sec)
+      diag_by   : {appid: {"narrow": {...}, "wide": {...}}}（各々 baseline/q1/q3/n_days）
+      recent_obs: {appid: 直近 RECENT_HOURS の観測点数}（載っていない appid ＝ 今日の窓に観測ゼロ）
+      elapsed_sec: 追加クエリ3本の合計実行時間（10分超なら本番投入前に索引の検討が要る＝それ自体が成果）"""
+    if not ids:
+        return {}, {}, 0.0
+    narrow_secs = RECENT_HOURS * 3600
+    wide_secs = int(round(narrow_secs * ALIGN_WIDEN_MULT))
+    t0 = time.time()
+    diag_by = {}
+    for key, align_secs in (("narrow", narrow_secs), ("wide", wide_secs)):
+        cur.execute(Q_BASELINE_DIAG, {"appids": list(ids), "recent_q": RECENT_Q,
+                                      "gap_days": GAP_DAYS, "base_days": BASE_DAYS,
+                                      "align_secs": align_secs})
+        for appid, baseline, q1, q3, n_days in cur.fetchall():
+            slot = diag_by.setdefault(int(appid), {})
+            slot[key] = {"baseline": None if baseline is None else float(baseline),
+                         "q1": None if q1 is None else float(q1),
+                         "q3": None if q3 is None else float(q3),
+                         "n_days": int(n_days), "align_secs": align_secs}
+    cur.execute(Q_RECENT_OBS_DIAG, {"appids": list(ids), "recent_h": RECENT_HOURS})
+    recent_obs = {int(appid): int(n) for appid, n in cur.fetchall()}
+    return diag_by, recent_obs, time.time() - t0
+
+
+def _diag_score(r, slot):
+    """平常値だけを A′ に差し替えたときの (倍率, robust_z, eff) を返す。差し替えるのは分母1点のみ
+    ＝分子（recent_value）・shrink の n_points・boost は現行のまま＝順位の差が平常値の定義だけに帰属する
+    （0802D-27「同時に2つ動かさない」）。計算不能なら (None, None, None)。"""
+    if not slot or not slot.get("baseline"):
+        return None, None, None
+    baseline = slot["baseline"]
+    rv = r["recent_value"]
+    if rv is None:
+        return None, None, None
+    raw = float(rv) / baseline
+    spread = None
+    if slot.get("q1") is not None and slot.get("q3") is not None:
+        spread = slot["q3"] - slot["q1"]
+    z = ((float(rv) - baseline) / spread) if spread else None
+    return raw, z, base_score(shrunk(raw, r["n_points"]), z) * (1 + r["boost"])
+
+
+def _adopted_slot(d):
+    """段階的フォールバック（0808-2310-03）を診断の順位付けにだけ適用する。
+    狭い窓で日数が足りれば narrow、足りなければ wide、それも足りなければ None（＝現行に落ちる）。
+    ※フェーズ1では本番の採用分岐は入れない。ここは「A′ の順位」を出すための印字用の選択。"""
+    for key in ("narrow", "wide"):
+        slot = (d or {}).get(key)
+        if slot and slot.get("baseline") and slot["n_days"] >= MIN_BASE_DAYS:
+            return key, slot
+    return None, None
+
+
+def _pctl(vals, p):
+    """昇順ソート済み配列の分位点（線形補間なしの最近傍・診断印字用）。"""
+    if not vals:
+        return None
+    i = int(round((len(vals) - 1) * p))
+    return vals[i]
+
+
+def baseline_diag_report(rows_all, diag_by, recent_obs, elapsed):
+    """現行方式と A′ を1行ずつ並べ、最後に分布・件数・実行時間を印字する（ログのみ・JSONには出さない）。"""
+    L = []
+    narrow_secs = RECENT_HOURS * 3600
+    wide_secs = int(round(narrow_secs * ALIGN_WIDEN_MULT))
+    L.append("")
+    L.append("=" * 88)
+    L.append("平常値の時刻整合（A′）診断・フェーズ1 ── 計算して並べるだけ／本番の挙動と出力JSONは無変更")
+    L.append(f"  狭い窓={narrow_secs/3600:.1f}h / 広い窓={wide_secs/3600:.1f}h（×{ALIGN_WIDEN_MULT}）"
+             f" / 日数の下限 MIN_BASE_DAYS={MIN_BASE_DAYS} / 平常窓={BASE_DAYS}日・除外={GAP_DAYS}日"
+             f" / 分子=直近{RECENT_HOURS}h p{int(RECENT_Q*100)}（現行と同一）")
+    L.append("  A′＝同じ時計時刻の窓の日次p90を日ごとに出し、その中央値を平常値にする（分子と分母を同じ統計量に揃える）")
+    L.append("  ※「×」は公開JSONの detection.ratio と同じ生の倍率（上の総合順表の『倍率』は shrink 後なので一致しない）")
+    L.append("  ※「採用」＝順位付けに使った窓（narrow/wide/現行）。段階的フォールバックは印字のためだけに適用している")
+
+    # ③→④：現行順（eff）と A′ 順（平常値だけ差し替えた eff）を、TOP_N で切る前の全候補で付け直す。
+    rank_now = {int(r["appid"]): i for i, r in enumerate(rows_all, 1)}
+    calc = {}
+    for r in rows_all:
+        appid = int(r["appid"])
+        d = diag_by.get(appid) or {}
+        src, slot = _adopted_slot(d)
+        raw_n, _, _ = _diag_score(r, d.get("narrow"))
+        raw_w, _, _ = _diag_score(r, d.get("wide"))
+        raw_a, _, eff_a = _diag_score(r, slot)
+        calc[appid] = {"src": src, "raw_narrow": raw_n, "raw_wide": raw_w,
+                       "raw_adopted": raw_a,
+                       # A′ で計算できない行は現行の eff のまま並べる（＝落とさない・順位を捏造しない）
+                       "eff_adopted": r["eff"] if eff_a is None else eff_a}
+    order = sorted(rows_all, key=lambda x: calc[int(x["appid"])]["eff_adopted"], reverse=True)
+    rank_hm = {int(r["appid"]): i for i, r in enumerate(order, 1)}
+
+    L.append("")
+    L.append("  name                        直近   平常  ×現行 | 平常(狭)  日数  ×狭 | 平常(広)  日数  ×広 | 順位 現→A′ 採用")
+    for r in rows_all:
+        appid = int(r["appid"])
+        d = diag_by.get(appid) or {}
+        c = calc[appid]
+        nm = (r["name"] or str(appid))[:26].ljust(26)
+
+        def _n(v, fmt="{:.0f}"):
+            return "—" if v is None else fmt.format(v)
+
+        nw, wd = d.get("narrow") or {}, d.get("wide") or {}
+        mark = "*" if not recent_obs.get(appid) else " "   # * ＝ 今日の窓に観測が1点も無い（分子が古い1点に落ちている）
+        L.append(
+            f"  {nm}{mark}{_n(r['recent_value']).rjust(6)} {_n(r['baseline']).rjust(6)} "
+            f"{_n(r['raw_ratio'], '{:.2f}').rjust(5)} | "
+            f"{_n(nw.get('baseline')).rjust(8)} {str(nw.get('n_days', '—')).rjust(5)} "
+            f"{_n(c['raw_narrow'], '{:.2f}').rjust(5)} | "
+            f"{_n(wd.get('baseline')).rjust(8)} {str(wd.get('n_days', '—')).rjust(5)} "
+            f"{_n(c['raw_wide'], '{:.2f}').rjust(5)} | "
+            f"{str(rank_now[appid]).rjust(4)}→{str(rank_hm[appid]).rjust(3)} {c['src'] or '現行'}")
+
+    # ── 集計行 ──
+    now_ratios = sorted(r["raw_ratio"] for r in rows_all if r["raw_ratio"] is not None)
+    hm_ratios = sorted(c["raw_adopted"] for c in calc.values() if c["raw_adopted"] is not None)
+    n_all = len(rows_all)
+    L.append("")
+    for tag, vals in (("現行", now_ratios), ("A′  ", hm_ratios)):
+        if not vals:
+            L.append(f"  倍率の分布（{tag}）: 計算できた行なし")
+            continue
+        up = sum(1 for v in vals if v >= 1.3)
+        L.append(f"  倍率の分布（{tag}）: p10={_pctl(vals,0.10):.2f} p25={_pctl(vals,0.25):.2f} "
+                 f"中央={_pctl(vals,0.50):.2f} p75={_pctl(vals,0.75):.2f} p90={_pctl(vals,0.90):.2f}"
+                 f" ／ ×1.3以上 {up}/{len(vals)}（{up/len(vals)*100:.0f}%）")
+    short_n = sum(1 for r in rows_all
+                  if ((diag_by.get(int(r["appid"])) or {}).get("narrow") or {}).get("n_days", 0) < MIN_BASE_DAYS)
+    short_w = sum(1 for r in rows_all
+                  if ((diag_by.get(int(r["appid"])) or {}).get("wide") or {}).get("n_days", 0) < MIN_BASE_DAYS)
+    fb = sum(1 for c in calc.values() if c["src"] is None)
+    no_recent = sum(1 for r in rows_all if not recent_obs.get(int(r["appid"])))
+    L.append(f"  日数不足（n_days < {MIN_BASE_DAYS}）: 狭い窓 {short_n}/{n_all} ／ 広い窓 {short_w}/{n_all}"
+             f" ／ どちらも満たさず現行に落ちた行 {fb}/{n_all}")
+    L.append(f"  今日の窓（直近{RECENT_HOURS}h）に観測が1点も無い作品: {no_recent}/{n_all}"
+             f"（上の表の * 印。数えるだけ＝挙動は変えていない）")
+    L.append(f"  追加クエリの実行時間: {elapsed:.1f}秒"
+             + ("（★10分超＝本番投入前に索引の検討が要る）" if elapsed > 600 else ""))
+    L.append("  ※フェーズ1では採用の分岐・印・しきい値の再設定は入れていない（0808-2310-09）。")
+    return L
+
+
 def main():
     print("=" * 88)
     print("view02 v2（A＋B1・読み取り専用・Twitch保存なし）")
     print(f"A: recent=直近{RECENT_HOURS}h p{int(RECENT_Q*100)} / 有意性ソフト(Z_REF={Z_REF},floor={SIG_FLOOR}) "
           f"/ riser=dense整合(mult={RISER_MULT}) / boost上限={BOOST_CAP}")
     print("=" * 88)
+    diag_by, diag_recent_obs, diag_secs = {}, {}, 0.0   # 診断（既定OFF＝空のまま使われない）
     conn = psycopg2.connect(DATABASE_URL)
     try:
         conn.set_session(readonly=True, autocommit=True)
@@ -557,6 +758,8 @@ def main():
             ids = [r["appid"] for r in cand]
             sale, news, free, revd, rev_surge_ids, jpnews = cause_sets(cur, ids)
             hist_by = fetch_history(cur, ids)   # 折れ線グラフ用の観測履歴（候補分をまとめて取得）
+            if BASELINE_DIAG:   # 診断（フェーズ1）：本番経路とは別の追加クエリ。既定OFFならここは走らない。
+                diag_by, diag_recent_obs, diag_secs = fetch_baseline_diag(cur, ids)
     finally:
         conn.close()
 
@@ -692,6 +895,7 @@ def main():
         rows.append(r)
 
     rows.sort(key=lambda x: x["eff"], reverse=True)
+    diag_rows = list(rows) if BASELINE_DIAG else []   # 診断用：TOP_N で切る前の全候補（順位の入れ替わりを見るため）
     rows = rows[:TOP_N]
 
     print(f"\n総合順（eff＝有意性ソフト×上限付きブースト）上位 {len(rows)} 件：")
@@ -723,6 +927,9 @@ def main():
         print(f"  窓: LOOKBACK={CAUSE_LOOKBACK_DAYS}日 / LAG={CAUSE_LAG_DAYS}日 / onset frac={RISE_ONSET_FRAC}"
               f" / 非整合boost×{CAUSE_MISALIGN_MULT}")
         for line in alignment_report(rows, hist_by):
+            print(line)
+    if BASELINE_DIAG:   # 平常値の時刻整合（A′）診断・ログのみ（出力JSONには1バイトも足さない）
+        for line in baseline_diag_report(diag_rows, diag_by, diag_recent_obs, diag_secs):
             print(line)
     print("=" * 88)
 
