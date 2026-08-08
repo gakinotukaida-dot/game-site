@@ -29,8 +29,10 @@
   .wordmark{font-family:var(--serif);font-weight:500;font-size:26px;letter-spacing:.2px;line-height:1.05}
   .wordmark .dot{color:var(--accent)}
   .wordmark .sub{font-family:var(--serif);font-size:13px;color:var(--ink-faint)}
-  .plain{color:var(--ink);font-size:13.5px;letter-spacing:.2px;margin-top:6px;font-weight:500}
-  .tagline{color:var(--ink-soft);font-size:12.5px;letter-spacing:.2px;margin-top:3px}
+  .brandline{margin-top:6px;line-height:1.5}
+  .plain{color:var(--ink);font-size:13.5px;letter-spacing:.2px;font-weight:500}
+  .tagline{color:var(--ink-soft);font-size:12.5px;letter-spacing:.2px}
+  .tagline::before{content:"・";color:var(--ink-faint)}
   .toolbar{display:flex;align-items:center;gap:8px;flex-shrink:0}
   .pill{appearance:none;border:1px solid var(--line);background:transparent;color:var(--ink-soft);
     font-family:var(--sans);font-size:12px;border-radius:999px;padding:6px 12px;cursor:pointer;transition:.2s}
@@ -54,7 +56,10 @@
     vertical-align:middle;border:1px solid var(--line);border-radius:50%;background:transparent;
     color:var(--ink-faint);font-size:11px;font-family:inherit;cursor:pointer;line-height:1;padding:0}
   .ttlq:hover,.ttlq[aria-expanded="true"]{color:var(--accent);border-color:var(--accent)}
-  nav.views{display:flex;gap:0;margin:24px 0 2px;border-bottom:1px solid var(--line);flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  /* ⑮-1 タブ行＝タブ＋「？」。下線は行ごと引く（タブは横スクロールするので nav 側からは外す）。 */
+  .navrow{display:flex;align-items:flex-end;gap:10px;margin:16px 0 2px;border-bottom:1px solid var(--line)}
+  .navrow .ttlq{flex-shrink:0;margin:0 0 8px}
+  nav.views{display:flex;gap:0;margin:0;flex:1 1 auto;min-width:0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
   nav.views::-webkit-scrollbar{display:none}
   nav.views button{appearance:none;background:none;border:0;cursor:pointer;font-family:var(--sans);
     font-size:13.5px;color:var(--ink-soft);padding:10px 2px;margin-right:18px;position:relative;letter-spacing:.2px;transition:color .2s;white-space:nowrap}
@@ -106,6 +111,9 @@
   .morebtn{appearance:none;background:transparent;border:1px solid var(--line);color:var(--ink-soft);border-radius:999px;padding:8px 18px;font-family:var(--sans);font-size:12.5px;cursor:pointer;transition:.2s;display:inline-flex;gap:10px;align-items:center}
   .morebtn:hover{border-color:var(--accent);color:var(--accent)}
   .morecount{font-size:11px;color:var(--ink-faint);font-variant-numeric:tabular-nums}
+  /* ⑥ 「その他 N件を表示／隠す」＝「もっと見る」と並ぶので、静かな見た目にして主従を保つ。 */
+  .morebtn.upmore{border-style:dashed}
+  .morebtn+.morebtn{margin-left:8px}
   .title{font-size:15.5px;font-weight:500;letter-spacing:.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .sub{font-size:11.5px;color:var(--ink-soft);margin-top:2px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
   .chip{font-size:10.5px;padding:2px 7px;border-radius:999px;background:var(--chip);color:var(--chip-ink);white-space:nowrap}
@@ -203,7 +211,7 @@
     /* ヘッダの塔を潰す：縦積み＋ツールバー折返し＋説明2行はモバイルで隠す（サブ見出しが役割を兼ねる） */
     header{flex-direction:column;align-items:stretch;gap:10px}
     .toolbar{flex-wrap:wrap;justify-content:flex-end}
-    .plain,.tagline{display:none}
+    .brandline{display:none}
     .wordmark{font-size:22px}
     li.row{grid-template-columns:20px 1fr auto;gap:9px;padding:11px 0}
     .row2{gap:0 9px;padding:11px 0}
@@ -249,10 +257,13 @@
   .freelink:hover{color:var(--accent)}
   .freeends{font-size:11px;color:var(--ink-soft);margin-left:auto;white-space:nowrap}
   .freeends.unknown{color:var(--ink-faint)}
-  /* 選択中ビューの見出し＋詳細トグル（タブが切れても何を見ているか分かる） */
-  .viewhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:14px 0 2px}
-  .viewtitle{font-family:var(--serif);font-weight:500;font-size:19px;color:var(--ink);margin:0;line-height:1.2}
-  .viewtitle .vi{font-size:13px;color:var(--ink-faint);margin-right:7px}
+  /* ⑮ ビュー見出し（h2）を廃してタブに統合したので、この行は
+     「お気に入り切替（★があるときだけ）＋🔍」の道具の行になる。 */
+  .viewhead{display:flex;align-items:center;gap:12px;margin:8px 0 2px;min-height:26px}
+  .viewhead #qToggle{margin-left:auto}
+  .qtoggle{appearance:none;background:transparent;border:1px solid var(--line);border-radius:999px;color:var(--ink-faint);
+    font-size:12px;line-height:1;padding:6px 10px;cursor:pointer;transition:.2s;flex-shrink:0}
+  .qtoggle:hover,.qtoggle[aria-expanded="true"]{color:var(--accent);border-color:var(--accent)}
   /* 全体折り畳みの詳細：行の下に縦に開く＝幅は増やさない（grid-column 2/-1） */
   .rowdetail{grid-column:2 / -1;margin-top:8px}
   .rowdetail.muted{color:var(--ink-faint);font-size:11px}
@@ -442,8 +453,6 @@
   <header>
     <div class="brand">
       <div class="wordmark">トレパ<span class="dot">.</span> <span class="sub">Trend Pulse — Steam発見レーダー</span></div>
-      <div class="plain" data-i18n="brand.plain">いま、いつもより人が増えているPCゲームを、静かに見つけます。</div>
-      <div class="tagline" data-i18n="brand.tagline">頼んでいない情報は出しません。追いたいゲームだけ、静かに。</div>
     </div>
     <div class="toolbar">
       <button class="pill" id="helpBtn" type="button" title="このサイトの使い方" data-i18n="help.btn">？ 使い方</button>
@@ -453,6 +462,9 @@
       <button class="pill" id="themeBtn" type="button" title="配色を明るく／暗く">背景を明るく</button>
     </div>
   </header>
+  <!-- ⑮-任意5 デスクトップのブランド説明2行を1行に統合（モバイルでは元から非表示）。文言は両方とも残す。
+       ヘッダ内（.brand は 322px しか無く3行に折り返す）ではなくヘッダの外＝全幅に置くことで実際に1行に収まる。 -->
+  <div class="brandline"><span class="plain" data-i18n="brand.plain">いま、いつもより人が増えているPCゲームを、静かに見つけます。</span><span class="tagline" data-i18n="brand.tagline">頼んでいない情報は出しません。追いたいゲームだけ、静かに。</span></div>
 
   <div id="mainView">
   <section id="hero" class="hero" hidden>
@@ -477,14 +489,17 @@
     <div class="freenote" data-i18n="free.note">いま0円で「もらえば永久所有」できるもの（公式ストアの観測・見落とし拾い）。</div>
     <div id="freeBody"></div>
   </section>
-  <div class="data-note" id="dataNote"><button class="noteToggle" id="noteToggle" type="button" aria-expanded="false" aria-controls="dataNoteText"><span class="sq"></span><span class="noteLbl" id="noteLbl">データについて</span><span class="noteChev" aria-hidden="true">›</span></button><span id="dataNoteText" hidden></span></div>
-
-  <nav class="views" role="tablist" aria-label="表示の切り口">
-    <button role="tab" aria-selected="true"  data-view="3"><span class="idx">01</span><span data-i18n="nav.3">これから来そう</span></button>
-    <button role="tab" aria-selected="false" data-view="1"><span class="idx">02</span><span data-i18n="nav.1">今の人数</span></button>
-    <button role="tab" aria-selected="false" data-view="2"><span class="idx">03</span><span data-i18n="nav.2">いつもより伸び</span></button>
-    <button role="tab" aria-selected="false" data-view="L"><span class="idx">04</span><span data-i18n="nav.L">新着で伸び</span></button>
-  </nav>
+  <!-- ⑮-1 ビュー見出し（h2）は削除し、タブに統合した。タブが aria-selected で選択状態を示しているのに
+       直下に同じ名前をもう一度出していた＝純粋な重複。「？（この見方の説明）」はタブ行の右へ移す。 -->
+  <div class="navrow">
+    <nav class="views" role="tablist" aria-label="表示の切り口">
+      <button role="tab" aria-selected="true"  data-view="3"><span class="idx">01</span><span data-i18n="nav.3">これから来そう</span></button>
+      <button role="tab" aria-selected="false" data-view="1"><span class="idx">02</span><span data-i18n="nav.1">今の人数</span></button>
+      <button role="tab" aria-selected="false" data-view="2"><span class="idx">03</span><span data-i18n="nav.2">いつもより伸び</span></button>
+      <button role="tab" aria-selected="false" data-view="L"><span class="idx">04</span><span data-i18n="nav.L">新着で伸び</span></button>
+    </nav>
+    <button class="ttlq" id="ttlHelp" type="button" aria-label="この見方の説明" aria-controls="blurb" aria-expanded="false">？</button>
+  </div>
 
   <section id="intro" class="intro" hidden aria-label="このサイトの使い方"></section>
 
@@ -504,16 +519,19 @@
     </div>
   </details>
 
+  <!-- ⑮-2 お気に入り切替は favs.size>0 のときだけ出す（★が1件も無いなら押せば必ず空になるだけ）。
+       ⑮-3 検索窓は🔍に畳む＝「作品名を既に知っている人」の道具＝低優先。開閉は端末内に記憶する
+            （radar_scorecard_open_v1 と同じ型＝よく使う人は1回開けば以後ずっと開いたまま）。 -->
   <div class="viewhead">
-    <h2 class="viewtitle" id="viewTitle"></h2>
-    <div class="favseg" role="group" aria-label="表示範囲">
+    <div class="favseg" id="favSeg" role="group" aria-label="表示範囲" hidden>
       <button class="favsegbtn" id="favAll" type="button" aria-pressed="true" data-i18n="fav.all">すべて</button>
       <button class="favsegbtn" id="favStar" type="button" aria-pressed="false" data-i18n="fav.star">★ お気に入り</button>
     </div>
+    <button class="qtoggle" id="qToggle" type="button" aria-controls="searchBar" aria-expanded="false" aria-label="作品名でさがす">🔍</button>
   </div>
   <div class="obs" id="obs"></div>
   <div class="blurb" id="blurb"></div>
-  <div class="searchbar"><input id="q" class="qinput" type="search" data-i18n-ph="search.ph" placeholder="🔍 この一覧から作品名でさがす" autocomplete="off" aria-label="作品名でさがす"></div>
+  <div class="searchbar" id="searchBar" hidden><input id="q" class="qinput" type="search" data-i18n-ph="search.ph" placeholder="🔍 この一覧から作品名でさがす" autocomplete="off" aria-label="作品名でさがす"></div>
   <div class="filters" id="filters">
     <span class="flabel" data-i18n="filter.genre">ジャンル</span>
     <span id="genreChips"></span>
@@ -521,6 +539,8 @@
   </div>
   <ul class="list" id="list"></ul>
   <div id="moreWrap"></div>
+  <!-- ⑮-4 「データについて」＝出典と注意書き＝低優先。0アクション圏に置く理由がないので一覧の下（答え合わせの隣）へ。 -->
+  <div class="data-note" id="dataNote"><button class="noteToggle" id="noteToggle" type="button" aria-expanded="false" aria-controls="dataNoteText"><span class="sq"></span><span class="noteLbl" id="noteLbl">データについて</span><span class="noteChev" aria-hidden="true">›</span></button><span id="dataNoteText" hidden></span></div>
   <details id="scoreSec" class="scorecard" hidden></details><!-- 答え合わせ（根拠/L2）は一覧の下＝掘る位置に -->
   </div><!-- /#mainView -->
 
@@ -692,6 +712,8 @@ function applyI18n(){
   document.documentElement.lang=lang;
   document.querySelectorAll("[data-i18n]").forEach(el=>{ el.textContent=t(el.getAttribute("data-i18n")); });
   document.querySelectorAll("[data-i18n-ph]").forEach(el=>{ el.setAttribute("placeholder",t(el.getAttribute("data-i18n-ph"))); });
+  // ⑮-1 見出しを消したぶん、タブの完全名（例「これから来そう（発売前）」）は title で持たせる＝情報は落とさない。
+  document.querySelectorAll("nav.views button").forEach(b=>{ const v=VIEWTITLE[b.dataset.view]; if(v) b.title=v[lang==="en"?2:1]; });
   const dev=document.getElementById("devLine");
   if(dev){ dev.innerHTML=`${esc(t("dev.pre"))}<a id="optoutLink" href="#" onclick="return false">${esc(t("dev.link"))}</a>${esc(t("dev.post"))}`; wireOptout(); }
 }
@@ -701,9 +723,9 @@ const noteEl=document.getElementById("dataNote"),noteTxt=document.getElementById
 const moreWrap=document.getElementById("moreWrap");
 // 無限スクロール：一覧末尾が近づいたら自動で+20（rootMargin で手前から先読み）。moreHas は render が更新。
 // 「もっと見る」ボタンは手動フォールバックとして残す（キーボード／IO非対応でも進める）。
-let moreHas=false;
+let moreHas=false, moreAuto=false;   // moreAuto＝自動で伸ばしてよいか（⑥で畳んでいる間は false）
 if("IntersectionObserver" in window){
-  const io=new IntersectionObserver(es=>{ if(moreHas && es.some(e=>e.isIntersecting)){ shown+=20; render(current); } }, {rootMargin:"400px 0px"});
+  const io=new IntersectionObserver(es=>{ if(moreAuto && es.some(e=>e.isIntersecting)){ shown+=20; render(current); } }, {rootMargin:"400px 0px"});
   io.observe(moreWrap);
 }
 const freeSec=document.getElementById("freeSec"),freeBody=document.getElementById("freeBody");
@@ -716,9 +738,23 @@ const IMG_KEY="radar_img_v1"; try{ if(localStorage.getItem(IMG_KEY)==="0") imgOn
 function loadFavs(){ try{ const a=JSON.parse(localStorage.getItem(FAV_KEY)||"[]"); if(Array.isArray(a)) a.forEach(k=>favs.add(String(k))); }catch(e){} }
 function saveFavs(){ try{ localStorage.setItem(FAV_KEY, JSON.stringify([...favs])); }catch(e){} }
 let detailMap={};
-const viewTitleEl=document.getElementById("viewTitle");
-// 見出しの ？ で「この見方の説明」(blurb)、注記の ⓘ で「データについて」(note) を開閉。既定は畳む＝掘れる（面を浅く保つ）。
-viewTitleEl.addEventListener("click",e=>{ const b=e.target.closest("#ttlHelp"); if(!b) return; blurbEl.hidden=!blurbEl.hidden; b.setAttribute("aria-expanded",String(!blurbEl.hidden)); });
+// タブ行の ？ で「この見方の説明」(blurb)、注記の ⓘ で「データについて」(note) を開閉。既定は畳む＝掘れる（面を浅く保つ）。
+const ttlHelpEl=document.getElementById("ttlHelp");
+ttlHelpEl.addEventListener("click",()=>{ blurbEl.hidden=!blurbEl.hidden; ttlHelpEl.setAttribute("aria-expanded",String(!blurbEl.hidden)); });
+// ⑮-3 検索窓の開閉。低優先なので既定は畳むが、開閉は端末内に記憶する＝「毎回クリック」にはしない（0808-0915-21）。
+const Q_KEY="radar_q_open_v1"; let qOpen=false; try{ if(localStorage.getItem(Q_KEY)==="1") qOpen=true; }catch(e){}
+function syncSearch(focus){
+  const bar=document.getElementById("searchBar"), btn=document.getElementById("qToggle");
+  if(!bar||!btn) return;
+  bar.hidden=!qOpen; btn.setAttribute("aria-expanded",String(qOpen));
+  if(qOpen&&focus){ const i=document.getElementById("q"); if(i) i.focus(); }
+}
+document.getElementById("qToggle").addEventListener("click",()=>{
+  qOpen=!qOpen; try{localStorage.setItem(Q_KEY, qOpen?"1":"0");}catch(e){}
+  // 閉じるときは絞り込みも解く（隠れた検索語で一覧が減ったまま、という状態を作らない）。
+  if(!qOpen && query){ query=""; const i=document.getElementById("q"); if(i) i.value=""; shown=20; render(current); }
+  syncSearch(true);
+});
 noteEl.addEventListener("click",e=>{ const b=e.target.closest("#noteToggle"); if(!b) return; noteTxt.hidden=!noteTxt.hidden; b.setAttribute("aria-expanded",String(!noteTxt.hidden)); const cv=b.querySelector(".noteChev"); if(cv) cv.textContent=noteTxt.hidden?"›":"▾"; });
 const VIEWTITLE={1:["02","今のプレイヤー数","Current players"],2:["03","いつもより伸びている","Rising more than usual"],L:["04","新着で伸びている","New & rising"],3:["01","これから来そう（発売前）","Upcoming (pre-release)"]};
 function fmtJST(iso){ return iso ? new Date(iso).toLocaleString("ja-JP",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}) : "—"; }
@@ -960,15 +996,40 @@ function viewItems(view){
   }
   return [];
 }
+// ⑥ 下位を既定で畳む（view3）。実データでは spike_prob <5% が183件・中央値0.6%＝畳む側が本当に低優先であることは実測済み。
+// 閾値は「基準率の何倍」で持つ（0808-0915-19 の訂正：倍率と%と件数は必ず3つ並べて書く。本日＝×1.2／5.02%／主要17件）。
+const UP_FOLD_MULT=1.2;   // 閾値＝base_rate×この倍率。変えるときはここ1か所だけ。
+const UP_MIN_MAIN=5;      // 下限。閾値方式は残存件数が日々動き0件の日もありうるので、最低この件数は必ず出す。
+const UP_MORE_KEY="radar_up_more_v1";
+let upMoreOpen=false; try{ if(localStorage.getItem(UP_MORE_KEY)==="1") upMoreOpen=true; }catch(e){}
+let UP_STATE="loading";   // loading／ok／failed。取得失敗を「該当なし」と書かないための状態（0802E-05）。
+// 畳める場合だけ {main, hidden} を返す。base_rate が無い＝畳まない（従来どおり全件）。
+function upFoldOf(view, all){
+  if(view!=="3") return null;
+  const br=(UP_MODEL&&UP_MODEL.base_rate)||0;
+  if(!(br>0) || !all.length) return null;
+  const thr=br*UP_FOLD_MULT;
+  let main=all.filter(o=>(o.spike!=null?o.spike:-1)>=thr);
+  if(main.length<UP_MIN_MAIN) main=all.slice().sort((a,b)=>(b.spike||-1)-(a.spike||-1)).slice(0,UP_MIN_MAIN);
+  return (main.length<all.length)?{main:main,hidden:all.length-main.length}:null;
+}
+// ⑮-2 ★が1件も無いなら切替は出さない（押せば必ず空になるだけ＝初訪問者には常に無意味）。
+// 最後の★を外したときは「★のみ」に取り残されないよう「すべて」へ戻す。
+function syncFavSeg(){
+  const seg=document.getElementById("favSeg"); if(!seg) return;
+  const has=favs.size>0; seg.hidden=!has;
+  if(!has && favOnly){ favOnly=false; if(favAllEl) favAllEl.setAttribute("aria-pressed","true"); if(favStarEl) favStarEl.setAttribute("aria-pressed","false"); }
+}
 function render(view){
-  current=view; blurbEl.textContent=BLURB[view][lang]; blurbEl.hidden=true; syncHeroVis();  // 説明は既定で畳む（見出しの ？ で展開＝掘れる）
-  viewTitleEl.innerHTML=`<span class="vi">${VIEWTITLE[view][0]}</span>${VIEWTITLE[view][lang==="en"?2:1]}`
-    +`<button class="ttlq" id="ttlHelp" type="button" aria-label="${esc(L("この見方の説明","About this view"))}" aria-expanded="false">？</button>`;
+  current=view; blurbEl.textContent=BLURB[view][lang]; blurbEl.hidden=true; syncHeroVis();  // 説明は既定で畳む（タブ行の ？ で展開＝掘れる）
+  ttlHelpEl.setAttribute("aria-expanded","false"); ttlHelpEl.setAttribute("aria-label",L("この見方の説明","About this view"));
+  syncFavSeg(); syncSearch(false);
   noteEl.className="data-note "+NOTE[view].cls; noteTxt.textContent=NOTE[view].txt[lang]; noteTxt.hidden=true;  // 注記も既定で畳む
   document.getElementById("noteLbl").textContent=L("データについて","About the data");
   const nt=document.getElementById("noteToggle"); if(nt) nt.setAttribute("aria-expanded","false");
-  if(view==="1"){ obsEl.innerHTML=L(`観測時刻 <b>${fmtJST(OBSERVED_AT)}</b>（JST）・公式API（いま遊んでいる人数）`,`Observed <b>${fmtJST(OBSERVED_AT)}</b> (JST) · official API (players in-game now)`); }
-  else { obsEl.textContent=""; }
+  // 観測時刻の行は view02 だけ。それ以外では中身が空なのにマージンだけ場所を取っていたので、空なら行ごと畳む。
+  if(view==="1"){ obsEl.innerHTML=L(`観測時刻 <b>${fmtJST(OBSERVED_AT)}</b>（JST）・公式API（いま遊んでいる人数）`,`Observed <b>${fmtJST(OBSERVED_AT)}</b> (JST) · official API (players in-game now)`); obsEl.hidden=false; }
+  else { obsEl.textContent=""; obsEl.hidden=true; }
   renderScorecard();   // 跳ね予想(view3)の答え合わせパネル（他ビューでは自動で隠す）
   // 全ビュー共通：お気に入り絞り込み → shown件まで → 行（各行に「詳しく」）→ もっと見る（残りがあれば）
   const all=viewItems(view).filter(o=>!favOnly||favs.has(o.key)).filter(o=> (view!=="1"&&view!=="2"&&view!=="L") || genreMatch(o.detail)).filter(o=> !query || String(o.title).toLowerCase().includes(query)); document.getElementById("filters").style.display=(view==="1"||view==="2"||view==="L")?"":"none";
@@ -981,24 +1042,41 @@ function render(view){
       : sortMode==="momentum" ? ((b.ratio||0)-(a.ratio||0))
       : ((b.ccu||0)-(a.ccu||0)) );
   }
-  const data=all.slice(0,shown);
+  // ⑥ view3 の下位を既定で畳む。閾値＝base_rate×UP_FOLD_MULT。base_rate が取れないときは畳まない（推測で閾値を作らない）。
+  const upFold=upFoldOf(view,all);
+  const folded=!!upFold && !upMoreOpen;
+  const base=folded?upFold.main:all;
+  const data=base.slice(0,shown);
   detailMap={}; data.forEach((o,i)=>{ detailMap[i]=Object.assign({i,view},o); });
+  // 「0件」と「読めなかった」を混同しない（0802E-05）。読み込み中／取得失敗は「該当なし」と書かない。
   const emptyMsg=(query)?L(`「${esc(query)}」に一致する作品は、いまの一覧にありません。`,`No titles in this list match "${esc(query)}".`)
+    :(view==="3"&&UP_STATE==="loading")?L("発売前リストを読み込んでいます…","Loading the pre-release list…")
+    :(view==="3"&&UP_STATE==="failed")?L("発売前リストを読み込めませんでした（該当が無いという意味ではありません）。時間をおいて再読み込みしてください。","Couldn't load the pre-release list — this does not mean there is nothing. Please reload later.")
     :(view==="3")?L("発売前の作品を監視中です。いまは該当がありません（発売前ゲームの取り込み後、跳ね予想つきでここへ並びます）。","Watching pre-release games. Nothing to show yet — they appear here with spike predictions once the pre-release list is imported.")
     :(view==="1"&&activeGenres.size)?L("選んだジャンル（すべてに一致）に合う作品がありません。タグを外すと戻ります。","No titles match all selected genres. Remove a tag to go back.")
     :(favOnly?L("お気に入りはまだありません。各行の ☆ で追加できます。","No favorites yet. Add with the ☆ on each row."):L("表示できる作品がありません。","No titles to show."));
   listEl.innerHTML = data.map((o,i)=>rowHtml(Object.assign({i},o))).join("")
     || `<li class="row" style="grid-template-columns:1fr"><div class="sub" style="padding:18px 0">${emptyMsg}</div></li>`;
-  moreHas = all.length>shown;
-  moreWrap.innerHTML = moreHas
-    ? `<button class="morebtn" id="moreBtn" type="button">${L("もっと見る（+20）","Show more (+20)")}<span class="morecount">${data.length} / ${all.length}</span></button>`
+  moreHas = base.length>shown;
+  // 無限スクロールは「その他」を開いているときだけ効かせる。閉じているのに勝手に200件へ伸びては畳んだ意味がない。
+  moreAuto = moreHas && !folded;
+  let mw = moreHas
+    ? `<button class="morebtn" id="moreBtn" type="button">${L("もっと見る（+20）","Show more (+20)")}<span class="morecount">${data.length} / ${base.length}</span></button>`
     : "";
+  if(upFold) mw += folded
+    ? `<button class="morebtn upmore" id="upMoreBtn" type="button">${L("その他 "+upFold.hidden+"件を表示","Show "+upFold.hidden+" more")}<span class="morecount">${L("跳ね予想が基準未満","below baseline")}</span></button>`
+    : `<button class="morebtn upmore" id="upMoreBtn" type="button">${L("その他を隠す","Hide the rest")}<span class="morecount">${L("上位 "+upFold.main.length+"件だけ","top "+upFold.main.length+" only")}</span></button>`;
+  moreWrap.innerHTML = mw;
 }
 document.querySelectorAll('nav.views button').forEach(b=>b.addEventListener("click",()=>{
   document.querySelectorAll('nav.views button').forEach(x=>x.setAttribute("aria-selected","false"));
   b.setAttribute("aria-selected","true"); shown=20; activeGenres.clear(); current=b.dataset.view; buildGenreChips(); render(b.dataset.view);
 }));
-moreWrap.addEventListener("click",e=>{ if(e.target.closest("#moreBtn")){ shown+=20; render(current); } });
+moreWrap.addEventListener("click",e=>{
+  if(e.target.closest("#moreBtn")){ shown+=20; render(current); return; }
+  // ⑥ 「その他」の開閉は端末内に記憶する＝毎回クリックさせない（0808-0915-21・本人指摘への回答）。
+  if(e.target.closest("#upMoreBtn")){ upMoreOpen=!upMoreOpen; try{localStorage.setItem(UP_MORE_KEY, upMoreOpen?"1":"0");}catch(e2){} shown=20; render(current); }
+});
 // 行クリック：☆はお気に入り切替、それ以外（行のどこでも）は詳細ページを開く
 listEl.addEventListener("click",e=>{
   const sh=e.target.closest("[data-share]");
@@ -1502,7 +1580,7 @@ loadRising();  // 02「いつもより伸び」を最新 view02_rising で上書
 loadFree();    // 無料配布レンズ（あれば表示・無ければ隠す）
 // B1'/B2：全ゲーム対象エクスポート（あれば view L/3 を差し替え・無ければ現状フォールバック）
 async function loadNewRising(){ try{ const r=await fetch("./data/new_rising.json?cb="+Date.now(),{cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); if(d&&Array.isArray(d.rows)&&d.rows.length){ REAL_L=d.rows; rebuildCatalog(); const ld=((d.params&&d.params.launch_days)||14); NOTE.L={cls:"",txt:{ja:"実データ：発売から日が浅く自己比で伸びている作品（全ゲーム対象・release_date "+ld+"日）。早期・低確信は明示。",en:"Real data: recently released titles rising vs their own usual (all games · release_date "+ld+"d). Early/low-confidence is marked."}}; if(current==="L"){buildGenreChips();render("L");} } }catch(e){} }
-async function loadUpcoming(){ try{ const r=await fetch("./data/upcoming.json?cb="+Date.now(),{cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); if(d&&Array.isArray(d.rows)&&d.rows.length){ REAL_UP=d.rows; rebuildCatalog(); UP_MODEL=d.model||null; let jt,et; if(UP_MODEL){ const np=UP_MODEL.n_pairs||0; const lift=(UP_MODEL.validation_oos&&UP_MODEL.validation_oos.top_decile_lift)||null; const val=UP_MODEL.readiness==="validated"; jt="実データ：跳ね予想＝発売直後の跳ね確率。自社実績 "+nf.format(np)+"件で較正"+(lift?("・上位ほど跳ねやすさ ×"+lift):"")+"（"+(val?"検証済み":"検証中")+"）。予測は外れることがあります。"; et="Real data: spike prediction = probability of a launch spike. Calibrated on "+nf.format(np)+" of our own cases"+(lift?(" · top picks spike ×"+lift):"")+" ("+(val?"validated":"in validation")+"). Predictions can be wrong."; } else { const nh=d.rows.filter(x=>x&&(x.demo_ccu||x.has_news)).length; jt="実データ：発売前リスト。期待度は実測シグナル（体験版CCU・告知）から（"+nh+"件にシグナルあり）。予測モデルの生成待ち。"; et="Real data: pre-release list from measured signals (demo CCU, news; "+nh+" with a signal). Awaiting the prediction model."; } NOTE[3]={cls:"",txt:{ja:jt,en:et}}; if(current==="3"){render("3");} } }catch(e){} }
+async function loadUpcoming(){ try{ const r=await fetch("./data/upcoming.json?cb="+Date.now(),{cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); if(d&&Array.isArray(d.rows)&&d.rows.length){ REAL_UP=d.rows; rebuildCatalog(); UP_MODEL=d.model||null; let jt,et; if(UP_MODEL){ const np=UP_MODEL.n_pairs||0; const lift=(UP_MODEL.validation_oos&&UP_MODEL.validation_oos.top_decile_lift)||null; const val=UP_MODEL.readiness==="validated"; jt="実データ：跳ね予想＝発売直後の跳ね確率。自社実績 "+nf.format(np)+"件で較正"+(lift?("・上位ほど跳ねやすさ ×"+lift):"")+"（"+(val?"検証済み":"検証中")+"）。予測は外れることがあります。"; et="Real data: spike prediction = probability of a launch spike. Calibrated on "+nf.format(np)+" of our own cases"+(lift?(" · top picks spike ×"+lift):"")+" ("+(val?"validated":"in validation")+"). Predictions can be wrong."; } else { const nh=d.rows.filter(x=>x&&(x.demo_ccu||x.has_news)).length; jt="実データ：発売前リスト。期待度は実測シグナル（体験版CCU・告知）から（"+nh+"件にシグナルあり）。予測モデルの生成待ち。"; et="Real data: pre-release list from measured signals (demo CCU, news; "+nh+" with a signal). Awaiting the prediction model."; } NOTE[3]={cls:"",txt:{ja:jt,en:et}}; } UP_STATE="ok"; if(current==="3"){render("3");} }catch(e){ UP_STATE="failed"; if(current==="3"){render("3");} } }
 // ③ 跳ね予想の答え合わせ（的中率スコアカード）：as-of・リーク無しの成績を view3 に添える
 // 初期は折りたたみ（summary だけ表示）。開閉状態は端末内に記憶する（データ好きは常に開いておける）。
 const SC_KEY="radar_scorecard_open_v1";
