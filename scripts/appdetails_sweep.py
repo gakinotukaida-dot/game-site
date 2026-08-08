@@ -1,5 +1,9 @@
 """
-②-appdetails: 発売日 / is_free / 価格・割引 / ジャンル / type / 開発元 / 販売元 / カテゴリ / DLC を全名簿ローリングで取得する。
+②-appdetails: 発売日 / is_free / 価格・割引 / ジャンル / type / 開発元 / 販売元 / カテゴリ / DLC / サムネURL / 対応言語
+  を全名簿ローリングで取得する。
+⑱ header_image＝サムネの**正しい**URL。新Steamは …/store_item_assets/steam/apps/{appid}/{40桁ハッシュ}/header.jpg
+  に画像を置き、ハッシュは推測できない＝URLを組み立てる方式では当たらない。appdetails の header_image が唯一の手段。
+⑨-b supported_languages（原文）＋ has_japanese（日本語を含むか・NULL＝未取得）。⑱と同じ1回の取得で両方取れる。
 ③拡張(v2): 体験版(demo)を発見して名簿に登録し、親ゲームへ紐づける（発売前の早期人気シグナルの土台）。
   - 親ゲームの appdetails の `demos`[{appid,...}] から体験版appidを発見 → games に INSERT（status=active・親appidを fullgame_appid に）。
   - 体験版自身の appdetails の `fullgame.appid`（文字列）から親appidを取得 → 自分の行の fullgame_appid を設定。
@@ -99,6 +103,28 @@ def _to_int(v):
         return None
 
 
+def _nz(s):
+    """空文字は None に寄せる（「取れていない」と「空」を混ぜない＝0802E-05）。"""
+    if s is None:
+        return None
+    s = str(s).strip()
+    return s or None
+
+
+# ⑨-b 日本語対応の有無。supported_languages は **呼び出し元の言語で表記が変わる**（"Japanese" / "日本語"）。
+#   このスクリプトは以前から l=english を明示しているので英語表記で返るはずだが、
+#   表記が変わっても取りこぼさないよう両方を見る（どちらで来ても意味は同じ＝日本語対応）。
+#   ★取れなかった作品は None（＝まだ調べていない）。False（＝日本語非対応）と必ず区別する（0802E-05）。
+JA_MARKERS = ("Japanese", "日本語")
+
+
+def has_japanese_from(text):
+    t = _nz(text)
+    if t is None:
+        return None
+    return any(m in t for m in JA_MARKERS)
+
+
 def fetch_appdetails(appid):
     _throttle()
     url = API + "?" + urllib.parse.urlencode({"appids": appid, "cc": CC, "l": LANG})
@@ -129,8 +155,15 @@ def fetch_appdetails(appid):
                     da = _to_int(x.get("appid"))
                     if da is not None:
                         demo_appids.append(da)
+            # ⑱ サムネの正しいURL。新しいSteamは .../store_item_assets/steam/apps/{appid}/{40桁のハッシュ}/header.jpg に
+            #   画像を置いており、ハッシュは推測できない＝URLを組み立てる方式では当たらない。appdetails の header_image が唯一の手段。
+            #   ★?t=… のクエリは落とさずそのまま保存する（Steam側でハッシュが変わったときの手掛かりになる）。
+            sup_lang = _nz(d.get("supported_languages"))   # ⑨-b 原文をそのまま保存（捨てない）
             fields = {
                 "name": d.get("name"),
+                "header_image": _nz(d.get("header_image")),
+                "supported_languages": sup_lang,
+                "has_japanese": has_japanese_from(sup_lang),
                 "release_date_text": rd_text,
                 "release_date": parse_release_date(rd_text, coming),
                 "coming_soon": coming,
@@ -242,6 +275,8 @@ def flush(buffer):
                                 Json(f["developers"]), Json(f["publishers"]),
                                 Json(f["categories"]), Json(f["dlc"]),
                                 f.get("website"), f.get("is_adult"),
+                                f.get("header_image"), f.get("supported_languages"),
+                                f.get("has_japanese"),
                                 f.get("fullgame_appid"), appid))
             if f["price"]:
                 cur_, ini, fin, disc = f["price"]
@@ -253,7 +288,9 @@ def flush(buffer):
                     base = (f.get("name") or ("appid " + str(appid)))[:120]
                     demo_rows.append((da, base + " (Demo)", appid))
         elif status == "nodata":
-            static_rows.append((None, None, None, None, None, None, None, None, None, None, None, None, None, appid))
+            # 販売終了・地域外＝「確認したが中身が無い」。他の静的列と同じ扱いで NULL に戻す
+            # （＝空文字は入れない。has_japanese も NULL＝不明であって false ではない）。
+            static_rows.append((None,) * 16 + (appid,))
         # "fail" は何も書かない（last_appdetails_check_at を進めない＝次回再試行）
     if not static_rows and not price_rows and not demo_rows:
         return 0, 0
@@ -275,6 +312,7 @@ def flush(buffer):
                         "  is_free = %s, app_type = %s, genres = %s, "
                         "  developers = %s, publishers = %s, categories = %s, dlc = %s, "
                         "  website = %s, is_adult = COALESCE(%s, is_adult), "
+                        "  header_image = %s, supported_languages = %s, has_japanese = %s, "
                         "  fullgame_appid = COALESCE(%s, fullgame_appid), "
                         "  last_appdetails_check_at = now() "
                         "WHERE appid = %s",
@@ -312,13 +350,47 @@ def flush(buffer):
 
 
 def ensure_schema():
-    """新設列を冪等に用意（既存なら何もしない）。is_adult＝成人向け判定（サイトから除外用）。"""
+    """新設列を冪等に用意（既存なら何もしない）。is_adult＝成人向け判定（サイトから除外用）。
+    ⑱ header_image＝appdetails が返すサムネの正しいURL（ハッシュ入りで推測不可）。
+    ⑨-b supported_languages＝対応言語の原文／has_japanese＝そこに日本語が含まれるか（NULL＝未取得）。"""
     conn = psycopg2.connect(DATABASE_URL)
     try:
         with conn, conn.cursor() as cur:
             cur.execute("ALTER TABLE games ADD COLUMN IF NOT EXISTS is_adult boolean")
+            cur.execute("ALTER TABLE games ADD COLUMN IF NOT EXISTS header_image text")
+            cur.execute("ALTER TABLE games ADD COLUMN IF NOT EXISTS supported_languages text")
+            cur.execute("ALTER TABLE games ADD COLUMN IF NOT EXISTS has_japanese boolean")
     finally:
         conn.close()
+
+
+def report_coverage():
+    """★合格条件の“原因の指標”をログに出す：収集が効いたかを列の埋まり具合で測る。
+    件数（結果）ではなく「NULL でない行の割合」を見る＝母数も必ず併記する。"""
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        try:
+            with conn, conn.cursor() as cur:
+                cur.execute(
+                    "SELECT count(*), count(header_image), count(supported_languages), "
+                    "       count(*) FILTER (WHERE has_japanese IS TRUE), "
+                    "       count(*) FILTER (WHERE has_japanese IS FALSE), "
+                    "       count(*) FILTER (WHERE has_japanese IS NULL), "
+                    "       count(*) FILTER (WHERE last_appdetails_check_at IS NOT NULL) "
+                    "FROM games"
+                )
+                n, n_img, n_lang, ja_t, ja_f, ja_n, n_enriched = cur.fetchone()
+        finally:
+            conn.close()
+    except Exception as e:
+        print(f"[coverage] 集計に失敗（{e}）。収集自体には影響しません。")
+        return
+    def pct(x, base):
+        return f"{(100.0 * x / base):.1f}%" if base else "—"
+    print(f"[coverage] games 総数 {n} 件（うち appdetails 済み {n_enriched} 件）")
+    print(f"  header_image が NULL でない: {n_img} 件 = 全体の {pct(n_img, n)} / appdetails済みの {pct(n_img, n_enriched)}")
+    print(f"  supported_languages が NULL でない: {n_lang} 件 = 全体の {pct(n_lang, n)}")
+    print(f"  has_japanese: true={ja_t} / false={ja_f} / NULL(未取得)={ja_n}")
 
 
 def main():
@@ -326,8 +398,9 @@ def main():
     if not should_run():
         return
     targets = get_targets()
+    # l（表示言語）を必ずログに残す：supported_languages の表記はこれで決まる（"Japanese" か「日本語」か）。
     print(f"今回appdetailsを観測する対象: {len(targets)} 件 "
-          f"(cap={APPDETAILS_CAP}, rate={RATE_PER_SEC}/s, workers={WORKERS}, cc={CC}, flush={FLUSH_EVERY})")
+          f"(cap={APPDETAILS_CAP}, rate={RATE_PER_SEC}/s, workers={WORKERS}, cc={CC}, l={LANG}, flush={FLUSH_EVERY})")
 
     buffer = []
     written = 0
@@ -343,6 +416,10 @@ def main():
                       f"release='{f['release_date_text']}'(parsed={f['release_date']}) "
                       f"price={f['price']} demos={f.get('demos')} fullgame={f.get('fullgame_appid')} "
                       f"genres={[g.get('description') for g in f['genres']]} website={f.get('website')}")
+                # ⑱⑨-b の実測サンプル：genres/release が英語のままか（l=english が効いているか）も
+                # 上の行と並べて読めるようにする。supported_languages は長いので先頭だけ。
+                print(f"    header_image={f.get('header_image')}")
+                print(f"    has_japanese={f.get('has_japanese')} languages={(f.get('supported_languages') or '')[:120]!r}")
                 shown += 1
             if len(buffer) >= FLUSH_EVERY:
                 w, dms = flush(buffer)
@@ -359,6 +436,7 @@ def main():
     print(f"取得: ok(データ有)={counts['ok']} / nodata(販売終了等)={counts['nodata']} / fail(再試行)={counts['fail']}")
     print("ステータス内訳:", dict(_status))
     print(f"保存（last_appdetails_check_at 更新）: {written} 件。体験版を発見・登録: {demos_total} 件。")
+    report_coverage()   # ⑱⑨-b：列の埋まり具合＝収集が効いたかの指標
     mark_success()
 
 
