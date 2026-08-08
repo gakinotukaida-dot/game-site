@@ -668,8 +668,8 @@ const DUMMY={
 const BLURB={
   1:{ja:"いま観測している同時接続プレイヤー数（多い順）。各行はSteam公式の観測値です。",
      en:"Current concurrent players (most first). Each row is an official Steam observation."},
-  2:{ja:"順位ではなく、その作品が“ふだんの自分”と比べてどれだけ動いたか。×N ＝ 直近の同時接続が、平常（過去14日の中央値）のおよそ N 倍。推定きっかけつき。",
-     en:"Not a ranking — how much each game moved vs its own usual. ×N = recent concurrent players ≈ N× the usual (14-day median). With an estimated trigger."},
+  2:{ja:"順位ではなく、その作品が“ふだんの自分”と比べてどれだけ動いたか。×N ＝ 直近6時間のピークが、平常（過去14日の中央値）のおよそ N 倍。推定きっかけつき。",
+     en:"Not a ranking — how much each game moved vs its own usual. ×N = the recent 6h peak ≈ N× the usual (14-day median). With an estimated trigger."},
   L:{ja:"発売から日が浅く、いま動いている作品（now_ccu 上位内・実データ）。全ゲーム対象は new-games エクスポート後。",
      en:"Recently released and moving now (within top now_ccu · real data). Full coverage after the new-games export."},
   3:{ja:"発売前のゲームが“発売直後にどれだけ跳ねるか”を予測します。体験版の遊ばれ具合・配信の注目・告知・開発元の実績などを自社データで較正した跳ね確率。予測は外れることがあります。",
@@ -999,7 +999,7 @@ function viewItems(view){
       const frac=Math.max(0,Math.min(1,(g.r-1)/5));
       const surge = spark || `<div class="surgebar"><div class="surgetrack"><div class="surgefill" style="width:${(frac*100).toFixed(1)}%"></div></div></div>`;
       return { key:"v2_"+g.a, appid:g.a, title:g.n, ccu:g.now, detail:{genres:g.g||[]},
-        r:g.r, ratio:g.r, now:g.now, base:g.base, cf:g.cf, causes:cs, ur:g.ur||null,
+        r:g.r, ratio:g.r, now:g.now, rec:(g.rec!=null?g.rec:null), base:g.base, cf:g.cf, causes:cs, ur:g.ur||null,
         tagsP:causes, tagsS:genres, detailBody:"",
         surge:surge,
         primary:`<span class="num mult ${ratioClass(g.r)}">×${g.r.toFixed(1)}</span>`,  // L0主指標＝平常比
@@ -1271,9 +1271,15 @@ function whyPicked(o){
   const cz=(o.causes&&o.causes.length)?o.causes.slice(0,4).map(causeChip).join(""):unknownChip(o.ur);
   const small=(o.base!=null && o.base>0 && o.base<300);
   const lab=o.cf==='high'?L('高','High'):o.cf==='low'?L('低','Low'):L('中','Mid');
-  const rx=`<b>×${(o.r||1).toFixed(1)}</b>`, nowb=`<b>${nf.format(o.now||0)}</b>`, baseb=`<b>${nf.format(o.base||0)}</b>`;
+  const rx=`<b>×${(o.r||1).toFixed(1)}</b>`, baseb=`<b>${nf.format(o.base||0)}</b>`;
+  // 分子は rec（＝×N の分子）だけ。埋め込みフォールバックのように rec が無い行では
+  // 数字を捏造せず分子ごと文から外す（now を代わりに置くと ×N と噛み合わない）。
+  const recb=(o.rec!=null)?`<b>${nf.format(o.rec)}</b>`:null;
+  const growth=recb
+    ?L(`直近6時間のピーク ${recb} が、平常（過去14日の中央値）${baseb} のおよそ ${rx}`,`Recent 6h peak ${recb} vs the usual (14-day median) ${baseb} — about ${rx}`)
+    :L(`平常（過去14日の中央値）${baseb} のおよそ ${rx}`,`About ${rx} the usual (14-day median) ${baseb}`);
   return `<div class="why">`
-    +`<div class="whyrow"><span class="wk">${L("伸び","Growth")}</span><span class="wv">${L(`直近の同時接続 ${nowb} が、平常（過去14日の中央値）${baseb} のおよそ ${rx}`,`Recent concurrent players ${nowb} vs the usual (14-day median) ${baseb} — about ${rx}`)}</span></div>`
+    +`<div class="whyrow"><span class="wk">${L("伸び","Growth")}</span><span class="wv">${growth}</span></div>`
     +`<div class="whyrow"><span class="wk">${L("きっかけ","Trigger")}</span><span class="wv"><span class="tags">${cz}</span></span></div>`
     +`<div class="whyrow"><span class="wk">${L("確度","Confidence")}</span><span class="wv">${lab} — ${L("伸びの大きさ（平常のばらつき比）・観測点数・原因の有無で判定。伸びがばらつきの約2倍以上・観測7点以上・原因ありで「高」、データが薄い/伸びが小さい/原因不明で「低」。","judged by the size of the rise (vs the usual variability), number of observations, and whether a cause was found. ≈2× the variability + 7+ observations + a cause → High; thin data / small rise / no cause → Low.")}</span></div>`
     +(small?`<div class="whynote">${L("※ 母数が小さく、×N はブレやすい（参考値）。","* Small base — ×N is volatile (reference only).")}</div>`:"")
@@ -1663,6 +1669,9 @@ async function loadRising(){
     if(d && Array.isArray(d.items) && d.items.length){
       REAL_V2=d.items.map(it=>{ const de=it.detection||{};
         return { a:it.appid, n:it.name, now:de.current_ccu, base:de.baseline||0,
+          // rec＝ratio の分子そのもの（サーバ側 COALESCE(直近6h p90, current_ccu) ÷ baseline）。
+          // now（最新1点）を分子として出すと ×R と噛み合わないので、文に出す数字はこちらを使う。
+          rec:(de.recent_value!=null ? de.recent_value : de.current_ccu),
           r:de.ratio||(de.baseline?de.current_ccu/de.baseline:1), cf:it.confidence||"mid",
           hist:(Array.isArray(it.history)&&it.history.length>=2)?it.history:null,  // 折れ線グラフ用の観測履歴
           ur:(it.investigation&&it.investigation.unknown_reason)||null,  // 原因不明の理由（調べて陰性か／調べられなかったか）
