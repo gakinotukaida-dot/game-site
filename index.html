@@ -465,7 +465,7 @@
 
   <section id="intro" class="intro" hidden aria-label="このサイトの使い方"></section>
 
-  <details class="ctlbox">
+  <details class="ctlbox" id="ctlBox">
     <summary data-i18n="ctl.summary">並び替え</summary>
     <div class="controls">
     <label class="ctl"><span data-i18n="ctl.summary">並び替え</span>
@@ -770,7 +770,8 @@ function detailBodyReal(d){
 // L0（一覧）＝順位・タイトル・主指標＋2行目に「詳細タグ（見立て＋ジャンル）」と折れ線。隙間を詰めて情報を敷き詰める。
 function rowHtml(o){
   const rank=(typeof o.i==="number")?(o.i+1):"";
-  const tags=(o.tagsP||"")+(o.tagsS||"");          // 見立て（平常比・きっかけ等）＋ジャンル/詳細タグ
+  // 見立て（平常比・きっかけ等）＋ジャンル/詳細タグ。tagsRow があれば一覧用に畳んだ列を使う（詳細ページは全部出す）。
+  const tags=(o.tagsRow!=null)?o.tagsRow:((o.tagsP||"")+(o.tagsS||""));
   const sub=(tags||o.surge)?`<div class="r2sub"><span class="r2tags">${tags}</span>${o.surge||""}</div>`:"";
   return `<li class="row2 ${favs.has(o.key)?'faved':''}" data-detail="${o.i}" role="button" tabindex="0" aria-label="${esc(o.title)}（${L("詳しく","details")}）" style="animation-delay:${o.i*30}ms">
       <div class="r2rank">${rank}</div>
@@ -785,6 +786,21 @@ function padDummy(list, mk, n){ const out=list.slice(); let k=out.length+1; whil
 // upcoming.json は1日2回更新なので、その合間に発売した作品もクライアント側で即座に落とす。
 // 過剰除外を避けるため“日付まで揃った”表記のときだけ落とし、「2026」「Jul 2026」「未定」等は残す。
 const UP_MON_RE=/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i;
+// 発売日表記の日本語化：Steam の "11 Aug, 2026" / "2026-08-10" → 「8月11日」、"Coming soon" → 「近日」。
+// パースできない表記（"Q3 2026" / "2026" / "January 2027" など）は原文のまま残す＝勝手に丸めない。
+// 英語表示のときは原文（ストア表記）をそのまま出す。年が今年と違うときだけ「2027年2月10日」と年を添える。
+const REL_MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+function relDateJa(str){
+  const s=String(str==null?"":str).trim();
+  if(!s||lang==="en") return s;
+  if(/^coming\s+soon$/i.test(s)) return "近日";
+  let y=null,m=null,d=null,mm;
+  if(mm=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/)){ y=+mm[1]; m=+mm[2]; d=+mm[3]; }
+  else if(mm=s.match(/^(\d{1,2})\s+([A-Za-z]{3,9})\.?,?\s+(\d{4})$/)){ y=+mm[3]; m=REL_MON[mm[2].slice(0,3).toLowerCase()]; d=+mm[1]; }
+  else if(mm=s.match(/^([A-Za-z]{3,9})\.?\s+(\d{1,2}),?\s+(\d{4})$/)){ y=+mm[3]; m=REL_MON[mm[1].slice(0,3).toLowerCase()]; d=+mm[2]; }
+  if(!y||!m||!d||m<1||m>12||d<1||d>31) return s;   // 日付として読めない＝原文のまま
+  return (y===new Date().getFullYear()?"":y+"年")+m+"月"+d+"日";
+}
 function upIsReleased(g){
   const nowMs=Date.now();
   if(g.release_known && g.release){ const t=Date.parse(String(g.release).slice(0,10)); if(!isNaN(t)&&t<=nowMs) return true; }
@@ -828,7 +844,7 @@ function viewItems(view){
       const frac=Math.max(0,Math.min(1,(g.r-1)/5));
       const surge = spark || `<div class="surgebar"><div class="surgetrack"><div class="surgefill" style="width:${(frac*100).toFixed(1)}%"></div></div></div>`;
       return { key:"v2_"+g.a, appid:g.a, title:g.n, ccu:g.now, detail:{genres:g.g||[]},
-        r:g.r, ratio:g.r, now:g.now, base:g.base, cf:g.cf, causes:cs,
+        r:g.r, ratio:g.r, now:g.now, base:g.base, cf:g.cf, causes:cs, ur:g.ur||null,
         tagsP:causes, tagsS:genres, detailBody:"",
         surge:surge,
         primary:`<span class="num mult ${ratioClass(g.r)}">×${g.r.toFixed(1)}</span>`,  // L0主指標＝平常比
@@ -860,9 +876,13 @@ function viewItems(view){
     // upcoming.json（全ゲーム対象・export済）があれば近日発売リスト、無ければ正直に空（emptyMsg）。
     if(!(REAL_UP&&REAL_UP.length)) return [];
     const base=(UP_MODEL&&UP_MODEL.base_rate)||0.03;
+    // A2：他タブと表現を揃える。発売前は観測履歴が無いのが普通なので、同一appidの now_ccu 履歴があれば折れ線、
+    // 無ければ跳ね予想の強さを「伸びバー」で出す（view02 のフォールバックと同じ部品・同じ濃さの尺度）。
+    const ncByApp=({}); (REAL_V1||[]).forEach(x=>{ if(x&&x.appid!=null) ncByApp[x.appid]=x; });
     // 発売済み（居座り）はここでも落とす（export の取りこぼし・更新の合間の保険）。
     return REAL_UP.filter(g=>!upIsReleased(g)).map(g=>{
-      const known=g.release_known&&g.release, relTxt=known?String(g.release).slice(0,10):(g.release||L("発売日 未定","Release TBD"));
+      const known=g.release_known&&g.release, relRaw=known?String(g.release).slice(0,10):(g.release||L("発売日 未定","Release TBD"));
+      const relTxt=relDateJa(relRaw);   // "11 Aug, 2026"→8月11日 ／ "Coming soon"→近日（読めない表記は原文）
       const dc=(typeof g.demo_ccu==="number"&&g.demo_ccu>0)?g.demo_ccu:0;
       const tw=(typeof g.twitch_peak==="number"&&g.twitch_peak>0)?g.twitch_peak:0;
       const hasP=(typeof g.spike_prob==="number"&&g.spike_prob>=0);
@@ -880,8 +900,8 @@ function viewItems(view){
       const cfChip=(hasP&&cfLabel)?`<span class="chip ${cfClass}">${cfLabel}</span>`:"";
       // 押し上げ要因（モデルが選んだ上位）をチップに。無ければ生シグナルで代替。
       const factChips=(g.factors&&g.factors.length)
-        ? g.factors.map(f=>`<span class="chip c-fac ic" title="${esc(L("この予測を押し上げている要因","A signal raising this prediction"))}">▲${esc(factLabel(f.name))}</span>`).join("")
-        : (dc?`<span class="chip c-demo ic">${ICON.demo}${L("体験版 "+nf.format(dc)+"人","Demo "+nf.format(dc))}</span>`:"")+(g.has_news?`<span class="chip c-news ic">${ICON.news}${L("告知あり","News")}</span>`:"");
+        ? g.factors.map(f=>`<span class="chip c-fac ic" title="${esc(L("この予測を押し上げている要因","A signal raising this prediction"))}">▲${esc(factLabel(f.name))}</span>`)
+        : [(dc?`<span class="chip c-demo ic">${ICON.demo}${L("体験版 "+nf.format(dc)+"人","Demo "+nf.format(dc))}</span>`:""),(g.has_news?`<span class="chip c-news ic">${ICON.news}${L("告知あり","News")}</span>`:"")].filter(Boolean);
       // 生シグナル（静かに・監査用）
       const rawS=[];
       if(dc) rawS.push(`<span class="chip">${L("体験版 最大"+nf.format(dc)+"人","Demo peak "+nf.format(dc))}</span>`);
@@ -891,10 +911,23 @@ function viewItems(view){
       if(g.web_views) rawS.push(`<span class="chip">${L("世界の閲覧 "+nf.format(g.web_views),"Global views "+nf.format(g.web_views))}</span>`);
       if(g.web_reach) rawS.push(`<span class="chip">${L("言語版Wiki "+nf.format(g.web_reach),"Lang wikis "+nf.format(g.web_reach))}</span>`);
       if(g.dev_best_peak) rawS.push(`<span class="chip">${L("開発元ベスト "+nf.format(g.dev_best_peak)+"人","Dev best "+nf.format(g.dev_best_peak))}</span>`);
-      const genreS=(g.genres&&g.genres.length)?g.genres.map(t=>`<span class="chip">${esc(genreLabel(t))}</span>`).join(""):"";
+      const genreS=(g.genres&&g.genres.length)?g.genres.map(t=>`<span class="chip">${esc(genreLabel(t))}</span>`):[];
+      const relChip=`<span class="chip ic">${ICON.cal}${known?(L("発売予定 ","Releases ")+esc(relTxt)):esc(relTxt)}</span>`;
+      const pChips=[relChip,predChip,cfChip].filter(Boolean).concat(factChips);
+      const sChips=rawS.concat(genreS);
+      // L0（一覧）の2行目は先頭3つ＋「+N」に畳む（view02/L と同じ畳み方）。畳んだ残りは詳細ページの「見立て」で全部見える。
+      const allChips=pChips.concat(sChips);
+      const tagsRow=allChips.slice(0,3).join("")+(allChips.length>3?`<span class="chip more">+${allChips.length-3}</span>`:"");
+      // 発売前は観測履歴が無いのが普通：あれば折れ線、無ければ跳ね予想の強さ（主指標の色と同じ pct/40 の尺度）を伸びバーで。
+      const nc=ncByApp[g.appid], ncd=nc&&nc.detail;
+      const spark=sparkline(ncd&&ncd.history,(ncd&&ncd.stats&&ncd.stats.baseline));
+      const spikeFrac=hasP?Math.max(0,Math.min(1,pct/40)):0;
+      const surge=spark || (hasP?`<div class="surgebar"><div class="surgetrack"><div class="surgefill" style="width:${(spikeFrac*100).toFixed(1)}%"></div></div></div>`:"");
       return { key:"U_"+g.appid, appid:g.appid, title:g.name, detail:{genres:g.genres||[]}, spike:hasP?g.spike_prob:-1,
-        tagsP:`<span class="chip ic">${ICON.cal}${known?(L("発売予定 ","Releases ")+esc(relTxt)):esc(relTxt)}</span>`+predChip+cfChip+factChips,
-        tagsS:rawS.join("")+genreS,
+        tagsP:pChips.join(""),
+        tagsS:sChips.join(""),
+        tagsRow:tagsRow,
+        surge:surge,
         detailBody:"",
         primary: hasP ? `<span class="num pct" style="color:color-mix(in srgb, var(--accent) ${Math.round(28+Math.min(1,pct/40)*72)}%, var(--ink-faint))">${pctTxt}</span><span class="unit">%</span>`
           : (dc?`<span class="num">${nf.format(dc)}</span><span class="unit">${L("人 体験版","demo")}</span>`
@@ -920,6 +953,8 @@ function render(view){
   renderScorecard();   // 跳ね予想(view3)の答え合わせパネル（他ビューでは自動で隠す）
   // 全ビュー共通：お気に入り絞り込み → shown件まで → 行（各行に「詳しく」）→ もっと見る（残りがあれば）
   const all=viewItems(view).filter(o=>!favOnly||favs.has(o.key)).filter(o=> (view!=="1"&&view!=="2"&&view!=="L") || genreMatch(o.detail)).filter(o=> !query || String(o.title).toLowerCase().includes(query)); document.getElementById("filters").style.display=(view==="1"||view==="2"||view==="L")?"":"none";
+  // 並び替えは view01/02/L だけで効く。view3（これから来そう）では選べてしまうと嘘になるので箱ごと隠す。
+  const ctlBox=document.getElementById("ctlBox"); if(ctlBox){ ctlBox.style.display=(view==="3")?"none":""; if(view==="3") ctlBox.open=false; }
   if(view==="1"||view==="2"||view==="L"){  // 並び替えを view01/02/L で有効化（①の指摘）。rank＝各ビュー既定順を維持。
     if(sortMode==="rank"){ if(view==="1") all.sort((a,b)=> (b.ccu||0)-(a.ccu||0)); }
     else all.sort((a,b)=> sortMode==="name" ? String(a.title).localeCompare(b.title,"ja")
@@ -1006,9 +1041,18 @@ function historySection(o){
   return stat+chart;
 }
 // view02 詳細「なぜ拾ったか」：伸び・きっかけ・確度の根拠・小N注記を正直に開示（佐々木/木村の指摘）。
+// 原因が付かなかったときのチップ：「全部調べて陰性（＝正直な未知）」と「そもそも調べられなかった（照会失敗/未実施）」を
+// 区別する（失敗を『調べ尽くした』と偽らない）。理由コードが無い/未知のときだけ従来どおり「原因不明」。
+function unknownChip(ur){
+  if(ur==="investigated_all_negative")
+    return `<span class="chip tagmuted" title="${esc(L("セール・告知・新作・無料・レビュー・国内ニュース・配信をひと通り照会して、どれも該当なし。","Checked sale, news, launch, free, reviews, JP news and streams — none matched."))}">${L("原因不明（調べたが無し）","Unknown (checked, none found)")}</span>`;
+  if(ur)
+    return `<span class="chip tagmuted" title="${esc(L("照会に失敗した（または実施できなかった）ソースがあり、「調べ尽くした」とは言えません。理由コード：","A source could not be queried, so this is not an exhaustive check. Reason code: ")+ur)}">${L("調べられなかった","Could not check")}</span>`;
+  return `<span class="chip tagmuted">${L("原因不明","Cause unknown")}</span>`;
+}
 function whyPicked(o){
   if(o.r==null) return "";
-  const cz=(o.causes&&o.causes.length)?o.causes.slice(0,4).map(causeChip).join(""):`<span class="chip tagmuted">${L("原因不明","Cause unknown")}</span>`;
+  const cz=(o.causes&&o.causes.length)?o.causes.slice(0,4).map(causeChip).join(""):unknownChip(o.ur);
   const small=(o.base!=null && o.base>0 && o.base<300);
   const lab=o.cf==='high'?L('高','High'):o.cf==='low'?L('低','Low'):L('中','Mid');
   const rx=`<b>×${(o.r||1).toFixed(1)}</b>`, nowb=`<b>${nf.format(o.now||0)}</b>`, baseb=`<b>${nf.format(o.base||0)}</b>`;
@@ -1340,6 +1384,7 @@ async function loadRising(){
         return { a:it.appid, n:it.name, now:de.current_ccu, base:de.baseline||0,
           r:de.ratio||(de.baseline?de.current_ccu/de.baseline:1), cf:it.confidence||"mid",
           hist:(Array.isArray(it.history)&&it.history.length>=2)?it.history:null,  // 折れ線グラフ用の観測履歴
+          ur:(it.investigation&&it.investigation.unknown_reason)||null,  // 原因不明の理由（調べて陰性か／調べられなかったか）
           c:(it.signals||[]).map(function(s){return {t:s.type,v:s.value};}), g:it.genres||[] }; });
       NOTE[2]={cls:"",txt:{ja:"実データ：平常比の伸び（検証中）。生の人数順より上位ほど伸びやすい傾向（初期検証・約1.8倍）。",en:"Real data: rise vs usual (in validation). Higher ranks tend to rise more than a raw player-count order (early test ≈1.8×)."}};
     }
