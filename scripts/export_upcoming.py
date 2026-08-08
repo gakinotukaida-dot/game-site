@@ -11,7 +11,7 @@
 
 線：DBは読み取り専用（SELECTのみ）。書き込みは data/upcoming.json 1ファイルのみ・毎回上書き＝可逆。新規収集ゼロ。
     著作物は載せない（ジャンル語・appid・数値のみ）。モデルが無ければ確率は出さず従来の期待度に自動フォールバック。
-env：GENRE_MAX / LIMIT / MODEL_PATH。
+env：GENRE_MAX / LIMIT / MODEL_PATH / UPCOMING_APP_TYPES。
 """
 
 import json
@@ -33,15 +33,46 @@ LIMIT = int(os.environ.get("LIMIT") or "200")
 # 発売済み（居座り）を落とすと表示枠が減るので、多めに取得してから絞る（絞った後に LIMIT まで）。
 OVERFETCH = float(os.environ.get("UPCOMING_OVERFETCH") or "1.6")
 
+# ⑰ 付随物（DLC・サントラ・壁紙・バンドル等）を「これから来そう」から除く。
+#   使うのは games.app_type＝Steam appdetails の `type`（appdetails_sweep.py が収集済み＝新規収集ゼロ）。
+#   ★名前による除外（"DLC" を含む等）は入れない：誤除外のリスクが高く、一次情報の列がある以上、代理指標を使う理由がない。
+#   ★app_type の実値（'game' か 'Game' か等）はこの環境からDBに繋げず未確認なので、
+#     ①比較は小文字化して行い、②許可リストは env（UPCOMING_APP_TYPES・既定 "game"）で判定を待たずに変えられるようにする。
+APP_TYPES = [t.strip().lower() for t in (os.environ.get("UPCOMING_APP_TYPES") or "game").split(",") if t.strip()]
+
+
+def is_game(alias="g"):
+    """games（別名 alias）から付随物（dlc/music/demo…）を除外する WHERE 断片。
+    NULL 安全：app_type IS NULL は通す。理由＝app_type は appdetails でエンリッチ済みの作品にしか付かず、
+    落とすと「見つかったばかりの新作」ほど巻き添えになる（＝このサイトが最も拾いたいもの）。
+    `_filters.not_adult` と同じ「既知の該当だけ落とす」2層の考え方。
+    UPCOMING_APP_TYPES="" ＝許可リスト空＝この除外を丸ごと無効化（判定を待たずに戻せる逃げ道）。"""
+    if not APP_TYPES:
+        return "TRUE"
+    return "(" + alias + ".app_type IS NULL OR lower(" + alias + ".app_type) = ANY(%(app_types)s))"
+
+
 # ★「これから来そう」に載せる条件（＝まだ発売前）。
 #   - coming_soon フラグ、または未来の確定発売日。
 #   - ただし発売日が確定していて過去なら除外（coming_soon が古いままでも居座らせない）。
 #     ※ appdetails 再取得の遅れで coming_soon=true が残る“居座り”は、列が NULL のことが多い。
 #       その取りこぼしは compute_rows の _is_released（release_date_text の日付判定）で拾う。
 #   - 成人向けは除外。
-UPCOMING_WHERE = ("(g.coming_soon IS TRUE OR (g.release_date IS NOT NULL AND g.release_date > now()::date))"
-                  " AND (g.release_date IS NULL OR g.release_date > now()::date)"
-                  " AND " + not_adult("g"))
+UPCOMING_BASE_WHERE = ("(g.coming_soon IS TRUE OR (g.release_date IS NOT NULL AND g.release_date > now()::date))"
+                       " AND (g.release_date IS NULL OR g.release_date > now()::date)"
+                       " AND " + not_adult("g"))
+# ⑰ ＋ゲーム本体だけ（付随物を除く）。戻すときはこの1行を UPCOMING_BASE_WHERE に戻すか、env で許可リストを広げる。
+UPCOMING_WHERE = UPCOMING_BASE_WHERE + " AND " + is_game("g")
+
+# 診断：発売前の母集団に app_type が実際どう入っているかを1回だけ数える（読み取りのみ・ログに出すだけ）。
+# ★これが「原因の指標」＝除外条件が効くかは app_type の実値で決まる。件数（結果）ではなく分布を見る。
+APP_TYPE_DIST_SQL = f"""
+SELECT COALESCE(g.app_type, '(NULL)') AS t, count(*) AS n
+FROM games g
+WHERE {UPCOMING_BASE_WHERE}
+GROUP BY 1 ORDER BY 2 DESC
+"""
+
 
 def build_query(web_ok):
     return f"""
@@ -165,7 +196,7 @@ def compute_rows(conn, limit=None):
         cur.execute("SELECT now()::date")   # SQL の now()::date と同一基準の“今日”（発売済み判定に使う）
         today = cur.fetchone()[0]
         web_ok = F.web_mentions_exists(cur)   # web_mentions が無ければ web_* は NULL（無影響）
-        cur.execute(build_query(web_ok), {"limit": fetch_limit})
+        cur.execute(build_query(web_ok), {"limit": fetch_limit, "app_types": APP_TYPES})
         cols = [d[0] for d in cur.description]
         recs = cur.fetchall()
         # ⑨-a：価格・割引・レビュー好評率。発売前なので多くは未取得（＝None）だが、
@@ -257,6 +288,10 @@ def main():
     try:
         conn.set_session(readonly=True, autocommit=True)
         rows, model, base, validated = compute_rows(conn)
+        # ⑰ の診断：発売前の母集団の app_type 分布（＝除外条件が効くかを決める“原因の指標”）をログに出す。
+        with conn.cursor() as cur:
+            cur.execute(APP_TYPE_DIST_SQL)
+            app_type_dist = cur.fetchall()
     finally:
         conn.close()
 
@@ -281,7 +316,7 @@ def main():
                    "hit_threshold": (model.get("params") or {}).get("hit_threshold"),
                    "validation_oos": model.get("validation_oos"),
                    "generated_at": model.get("generated_at")} if model else None),
-        "params": {"limit": LIMIT, "genre_max": GENRE_MAX},
+        "params": {"limit": LIMIT, "genre_max": GENRE_MAX, "app_types": APP_TYPES},
         "count": len(rows),
         "rows": rows,
     }
@@ -293,9 +328,21 @@ def main():
         json.dump(payload, f, ensure_ascii=False, indent=2, sort_keys=False)
         f.write("\n")
 
+    # ⑰ 診断ログ：app_type の実測分布と、許可リスト／未エンリッチ（NULL）の件数。
+    #    ★母数（rows 総数）と必ず並べて読むこと（割合の意味が母数で変わるため）。
+    n_all = sum(int(n) for _t, n in app_type_dist)
+    n_null = sum(int(n) for t, n in app_type_dist if t == "(NULL)")
+    n_kept = sum(int(n) for t, n in app_type_dist if t != "(NULL)" and str(t).lower() in APP_TYPES)
+    print(f"app_type 分布（発売前の母集団 {n_all} 件・除外前）: "
+          + " / ".join(f"{t}={n}" for t, n in app_type_dist))
+    print(f"  許可リスト={APP_TYPES}（env UPCOMING_APP_TYPES）"
+          f" → 通す {n_kept + n_null} 件（うち未エンリッチ NULL {n_null} 件）"
+          f" / 落とす {n_all - n_kept - n_null} 件")
+
     n_news = sum(1 for r in rows if r["has_news"])
     n_high = sum(1 for r in rows if r["expect"] == "high")
-    print(f"書き出し: {OUT_PATH}（{len(rows)} 件・発売前）"
+    n_nogenre = sum(1 for r in rows if not r["genres"])
+    print(f"書き出し: {OUT_PATH}（{len(rows)} 件・発売前・ジャンル無し {n_nogenre} 件）"
           f" model={'あり('+str(model.get('readiness'))+')' if model else 'なし'}"
           f" 期待度高 {n_high} / 最近告知 {n_news}")
     for r in rows[:10]:
