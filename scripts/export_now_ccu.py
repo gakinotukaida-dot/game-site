@@ -28,6 +28,8 @@ import psycopg2
 
 from _filters import not_adult
 from _market import fetch_market, market_of
+# detail（詳細ページ「情報」節の材料）の組み立ては export_upcoming.py と共有する＝キーと形が片方だけずれない。
+import _detail as D
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 OUT_PATH = os.environ.get("OUT_PATH") or "data/now_ccu.json"
@@ -63,17 +65,6 @@ FROM (SELECT * FROM latest ORDER BY player_count DESC LIMIT %s) l
 JOIN games g ON g.appid = l.appid
 WHERE """ + not_adult("g") + """
 ;
-"""
-
-SIBLING_QUERY = """
-SELECT g2.appid, g2.name,
-       (SELECT pc.player_count FROM player_counts pc
-        WHERE pc.appid = g2.appid ORDER BY pc.recorded_at DESC LIMIT 1) AS ccu
-FROM games g2
-WHERE g2.developers ?| %s AND g2.appid <> %s
-  AND """ + not_adult("g2") + """
-ORDER BY ccu DESC NULLS LAST
-LIMIT %s
 """
 
 # v5：top-N の appid 群について、平常値(中央値)・24hピーク・観測ピーク・履歴(バケット化max) を一括取得。
@@ -123,33 +114,8 @@ def _as_list(cell):
     return list(cell)
 
 
-def _names(arr, cap):
-    if not isinstance(arr, list):
-        return []
-    out = [str(x).strip() for x in arr if x and str(x).strip()]
-    return out[:cap]
-
-
-def _descs(arr, cap):
-    if not isinstance(arr, list):
-        return []
-    out = []
-    for x in arr:
-        if isinstance(x, dict):
-            d = x.get("description")
-            if d and str(d).strip():
-                out.append(str(d).strip())
-        if len(out) >= cap:
-            break
-    return out
-
-
 def _fetch_siblings(cur, developers, self_appid):
-    names = _names(developers, 50)
-    if not names:
-        return []
-    cur.execute(SIBLING_QUERY, (names, self_appid, SIBLINGS_MAX))
-    return [{"appid": r[0], "name": r[1], "ccu": r[2]} for r in cur.fetchall()]
+    return D.fetch_siblings(cur, developers, self_appid, SIBLINGS_MAX)
 
 
 def _fetch_stats(cur, appids):
@@ -175,30 +141,8 @@ def _fetch_stats(cur, appids):
 
 
 def _build_detail(it):
-    dlc = it.get("dlc")
-    dlc_count = len(dlc) if isinstance(dlc, list) else 0
-    st = it.get("_stats") or {}
-    return {
-        "developers": _names(it.get("developers"), DEV_MAX),
-        "publishers": _names(it.get("publishers"), DEV_MAX),
-        "genres": _descs(it.get("genres"), GENRE_MAX),
-        "categories": _descs(it.get("categories"), CATEGORY_MAX),
-        "dlc_count": dlc_count,
-        "release": it.get("release_date") or it.get("release_date_text"),
-        "website": it.get("website"),
-        "siblings": it.get("_siblings") or [],
-        # v5：観測の履歴（無い/浅い場合は None/空＝箱が「履歴が浅い」を出す）
-        "stats": {
-            "baseline": st.get("baseline"),
-            "peak24h": st.get("peak24h"),
-            "peak_observed": st.get("peak_observed"),
-            "n_points": st.get("n_points", 0),
-        },
-        "history": it.get("_history") or [],
-        # ⑨-a：価格・レビュー。未取得は None（0円・好評率0% と読めてはいけない＝0802E-05）。
-        "price": (it.get("_market") or {}).get("price"),
-        "review": (it.get("_market") or {}).get("review"),
-    }
+    """発売後の作品なので観測の履歴あり＝with_stats=True（キーも並びも従来と同一）。"""
+    return D.build_detail(it, DEV_MAX, GENRE_MAX, CATEGORY_MAX, with_stats=True)
 
 
 def _max_observed_at(items):
