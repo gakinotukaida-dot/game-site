@@ -99,9 +99,16 @@
   .meta{min-width:0}
   .metaImg{display:flex;gap:10px;align-items:center}
   .coverlink{flex-shrink:0;line-height:0}
-  /* ⑪ 一覧行のサムネ枠。読めるまでは透明で場所だけ確保（遅延読み込みのため）、読めなければ枠ごと消える。 */
-  .coverthumb{flex-shrink:0;line-height:0}
+  /* ⑪ 一覧行のサムネ枠。読めるまでは透明で場所だけ確保（遅延読み込みのため）。
+     ⑫案A：読めなくても枠は消さない。消すと画像のある行だけ字下がりして左端が揃わないため（実測 17行中4行だけインデント）。 */
+  .coverthumb{flex-shrink:0;line-height:0;width:84px;height:39px}
   .coverthumb .cover{opacity:0;transition:opacity .18s}
+  /* 画像が取れなかった行の空枠＝控えめな地色だけ（ここに何かを描くと「読み込み中」に見える）。 */
+  .coverthumb.empty{border:1px solid var(--line);border-radius:5px;background:var(--chip)}
+  .coverthumb.empty .cover{display:none}
+  /* ⑫案A：画像が取れなかった行にだけ、ジャンルを1つ可視枠に出す（画像がある行は現状のまま＝要因チップを減らさない）。 */
+  .chip.gfb{display:none}
+  .row2.nothumb .chip.gfb{display:inline}
   .cover{width:84px;height:39px;object-fit:cover;border-radius:5px;flex-shrink:0;border:1px solid var(--line);display:block;filter:saturate(.9)}
   .metatext{min-width:0}
   .titlelink{color:inherit;text-decoration:none}
@@ -222,6 +229,7 @@
     .r2top .title{font-size:14.5px}
     .r2top{gap:7px}
     .cover{width:60px;height:28px}
+    .coverthumb{width:60px;height:28px}
     .metaImg{gap:8px}
     .title{font-size:14.5px}
     .metric .num{font-size:17px}
@@ -776,15 +784,32 @@ function coverUrl(appid){ return `https://cdn.cloudflare.steamstatic.com/steam/a
 function coverImg(appid){ if(!appid||!imgOn) return ""; return `<a class="coverlink" href="https://store.steampowered.com/app/${appid}/" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true" style="display:none"><img class="cover" src="${coverUrl(appid)}" alt="" onload="var a=this.closest('.coverlink'); if(a) a.style.display='';" onerror="var a=this.closest('.coverlink'); if(a) a.remove();"></a>`; }
 // ⑪ 一覧行のサムネイル。行そのものが「詳細を開くボタン」なので、ここだけはリンクにしない
 // （リンクにすると1クリックで Steam が別タブに開き、同時に詳細ページも開く＝二重動作になる）。
-// 出す・出さないの制御は coverImg と同じ imgOn。取得できない作品は onerror で枠ごと消えるので行は崩れない。
+// 出す・出さないの制御は coverImg と同じ imgOn。取得できない作品は空枠のまま残す（⑫案A・下の onThumbFail）。
 // ★display:none で待つ方式（coverImg）は loading="lazy" と併用できない。display:none の画像は
 // 位置が決まらないため遅延読み込みが発火せず、onload が来ない＝永久に出ないというデッドロックになる（実測）。
-// そこで枠は最初から場所を取り（opacity:0）、読めたら不透明に、読めなければ枠ごと消す。
+// そこで枠は最初から場所を取り（opacity:0）、読めたら不透明にする（読めなかったときは ⑫案A で空枠のまま）。
 // ★さらに loading="lazy" 自体を外した（0808-0915-24）。opacity:0 にしても本番では1枚も発火せず、
 // 16/17行が complete:false / currentSrc:null ＝取りに行ってすらいなかった（404ではない）。
 // 同じ <img> でも eager なら読める・new Image() でも読める＝URLもCSPも位置も正常。根本原因は未特定。
 // ⑥で初期表示が17行に畳まれている今なら eager でも17〜20枚なので、まず1属性を消して様子を見る。
-function coverThumb(appid){ if(!appid||!imgOn) return ""; return `<span class="coverthumb"><img class="cover" src="${coverUrl(appid)}" alt="" onload="this.style.opacity='1';" onerror="var a=this.closest('.coverthumb'); if(a) a.remove();"></span>`; }
+// ★⑫案A（0808-0915-27 本人確定）：画像が取れなかったときの振る舞いを2つ変えた。
+//   1) 枠は消さず空枠のまま残す（84×39／モバイル60×28）＝全行の左端が揃う。
+//   2) その行にだけ、畳んだチップの中からジャンルを1つ可視枠に出す（画像がある行は現状のまま）。
+//   画像の成否は非同期（onerror）なので、行のHTMLを組む時点では分からない。そこでジャンルのチップは
+//   常に生成して既定で隠しておき（.gfb）、失敗した行に目印（.nothumb）を付けてCSSで出す。
+//   ただし「+N」の数字だけはCSSで変えられないので、ここで1減らす（＝実際に隠れている数と必ず一致させる）。
+function coverThumb(appid){ if(!appid||!imgOn) return ""; return `<span class="coverthumb"><img class="cover" src="${coverUrl(appid)}" alt="" onload="this.style.opacity='1';" onerror="onThumbFail(this)"></span>`; }
+function onThumbFail(img){
+  const box=img.closest(".coverthumb"); if(box) box.classList.add("empty");   // 枠は残す（消さない）
+  const row=img.closest(".row2"); if(!row) return;
+  if(row.classList.contains("nothumb")) return;   // 二重発火の保険（+N を2回減らさない）
+  row.classList.add("nothumb");
+  // ジャンルを1つ可視化したぶん、隠れている数は1つ減る。0になったら「+N」自体を出さない。
+  if(!row.querySelector(".chip.gfb")) return;     // 出すジャンルが無い行＝+N も動かさない
+  const more=row.querySelector(".r2tags .chip.more"); if(!more) return;
+  const n=(parseInt(more.dataset.n,10)||0)-1;
+  if(n>0){ more.dataset.n=String(n); more.textContent="+"+n; } else { more.remove(); }
+}
 function titleCell(name){ return `<span class="title titlelink detailtrigger">${esc(name)}</span>`; }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 // URLはスキームを許可リスト（http/https/mailto）に制限。javascript: 等は無効化＝XSS/リダイレクト封じ。
@@ -1022,7 +1047,14 @@ function viewItems(view){
       // 行の並びは 発売日 → 押し上げ要因 → 跳ね予想・確度 → 生シグナル／ジャンル。要因（▲）を先に見せて、
       // 予想%は主指標（右の数字）で既に出ているぶん後ろに回す。詳細ページ側（tagsP）の並びは変えない。
       const rowChips=[relChip].concat(factChips).concat([predChip,cfChip].filter(Boolean)).concat(sChips);
-      const tagsRow=rowChips.slice(0,3).join("")+(rowChips.length>3?`<span class="chip more">+${rowChips.length-3}</span>`:"");
+      const ROW_VIS=3, hiddenN=Math.max(0,rowChips.length-ROW_VIS);
+      // ⑫案A：画像が取れなかった行にだけ出すジャンル（既定は非表示。onThumbFail が .nothumb を付けた行でだけCSSで出る）。
+      // 用意するのは「畳んだ側にジャンルがある」ときだけ＝可視枠に既に出ているなら二重に出さない／ジャンル0個なら何も出さない。
+      // genreS は sChips の末尾なので、最初のジャンルの位置は rowChips.length-genreS.length。
+      const genreIdx=genreS.length?(rowChips.length-genreS.length):-1;
+      const gfb=(genreIdx>=ROW_VIS)?`<span class="chip gq gfb">${esc(genreLabel(g.genres[0]))}</span>`:"";
+      // 「+N」は data-n を持たせて onThumbFail が1減らせるようにする（ジャンルを1つ出したぶん隠れている数が減る）。
+      const tagsRow=rowChips.slice(0,ROW_VIS).join("")+gfb+(hiddenN>0?`<span class="chip more" data-n="${hiddenN}">+${hiddenN}</span>`:"");
       // 発売前は観測履歴が無いのが普通：あれば折れ線、無ければ跳ね予想の強さ（主指標の色と同じ pct/40 の尺度）を伸びバーで。
       const nc=ncByApp[g.appid], ncd=nc&&nc.detail;
       const spark=sparkline(ncd&&ncd.history,(ncd&&ncd.stats&&ncd.stats.baseline));
