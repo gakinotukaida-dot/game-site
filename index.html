@@ -225,8 +225,20 @@
     nav.views button{margin-right:13px;font-size:13px;padding:10px 0}
     nav.views button .idx{margin-right:4px}
   }
+  /* ⑯ 最終更新の1行（ヒーロー直下・0アクション）。fallback は「前回値」であることが読み取れる色分け。 */
+  .lastupd{font-size:11px;color:var(--ink-faint);margin:6px 0 0;font-variant-numeric:tabular-nums}
+  .lastupd:empty{display:none}
+  .lastupd b{color:var(--ink-soft);font-weight:600}
+  .lastupd .stale{color:var(--ink-soft)}
   /* 「無料でもらえる」横断レンズ（Steam∪Epic・両方A・静か＝根幹9／配布がある時だけ表示） */
-  .freesec{margin:26px 0 2px;padding-top:14px;border-top:1px solid var(--line)}
+  /* ⑭でヒーロー直下へ移設したので上マージンは詰める（ファーストビューを圧迫しない）。 */
+  .freesec{margin:14px 0 2px;padding-top:12px;border-top:1px solid var(--line)}
+  /* 超過分は「+N件」の中＝低優先はクリックの奥（0808-0915-21）。開いた高さは一覧を押し下げない範囲。 */
+  .freemore{margin:2px 0 4px}
+  .freemore>summary{cursor:pointer;list-style:none;display:inline-block;font-size:11px;color:var(--ink-faint);padding:3px 8px;border:1px solid var(--line);border-radius:999px}
+  .freemore>summary::-webkit-details-marker{display:none}
+  .freemore>summary:hover{color:var(--accent);border-color:var(--accent)}
+  .freemore[open]>summary{margin-bottom:6px}
   .freehd{font-family:var(--serif);font-weight:500;font-size:15px;color:var(--ink);margin:0 0 2px}
   .freenote{font-size:11px;color:var(--ink-faint);margin:0 0 8px}
   .freestore{margin:8px 0 12px}
@@ -454,6 +466,17 @@
       <span class="heroratio" id="heroRatio"></span>
     </button>
   </section>
+  <!-- ⑯ 最終更新：再訪の動機（中身が変わっている）を0アクションで伝える。書けるのは最終更新時刻だけで、
+       更新頻度（「毎日更新」等）は実測していないので書かない。取得失敗で埋め込みフォールバックを出しているときは
+       その旨を併記する（時刻だけ出すと嘘になる）。 -->
+  <div class="lastupd" id="lastUpd"></div>
+  <!-- ⑭ 「無料でもらえる」＝0円・期限つき・即行動可能でサイト内で最も優先度が高いので、
+       0アクションの位置（ヒーロー直下）に置く。超過分は「+N件」の中＝低優先はクリックの奥（0808-0915-21）。 -->
+  <section id="freeSec" class="freesec" hidden>
+    <h2 class="freehd" data-i18n="free.hd">無料でもらえる</h2>
+    <div class="freenote" data-i18n="free.note">いま0円で「もらえば永久所有」できるもの（公式ストアの観測・見落とし拾い）。</div>
+    <div id="freeBody"></div>
+  </section>
   <div class="data-note" id="dataNote"><button class="noteToggle" id="noteToggle" type="button" aria-expanded="false" aria-controls="dataNoteText"><span class="sq"></span><span class="noteLbl" id="noteLbl">データについて</span><span class="noteChev" aria-hidden="true">›</span></button><span id="dataNoteText" hidden></span></div>
 
   <nav class="views" role="tablist" aria-label="表示の切り口">
@@ -499,12 +522,6 @@
   <ul class="list" id="list"></ul>
   <div id="moreWrap"></div>
   <details id="scoreSec" class="scorecard" hidden></details><!-- 答え合わせ（根拠/L2）は一覧の下＝掘る位置に -->
-
-  <section id="freeSec" class="freesec" hidden>
-    <h2 class="freehd" data-i18n="free.hd">無料でもらえる</h2>
-    <div class="freenote" data-i18n="free.note">いま0円で「もらえば永久所有」できるもの（公式ストアの観測・見落とし拾い）。</div>
-    <div id="freeBody"></div>
-  </section>
   </div><!-- /#mainView -->
 
   <section id="detailView" class="detailview" hidden>
@@ -1224,7 +1241,7 @@ syncImgBtn();
 imgBtn.addEventListener("click",()=>{ imgOn=!imgOn; try{localStorage.setItem(IMG_KEY, imgOn?"1":"0");}catch(e){} syncImgBtn(); buildHero(); render(current); });
 // 言語トグル（日本語 / English）。端末内に記憶。静的DOMは applyI18n、動的は再描画で切替。
 const langBtn=document.getElementById("langBtn");
-langBtn.addEventListener("click",()=>{ lang=lang==="en"?"ja":"en"; try{localStorage.setItem(LANG_KEY,lang);}catch(e){} applyI18n(); syncImgBtn(); syncThemeBtn(); syncFontBtn(); buildIntro(); buildGenreChips(); buildHero(); render(current); });
+langBtn.addEventListener("click",()=>{ lang=lang==="en"?"ja":"en"; try{localStorage.setItem(LANG_KEY,lang);}catch(e){} applyI18n(); syncImgBtn(); syncThemeBtn(); syncFontBtn(); buildIntro(); buildGenreChips(); buildHero(); renderLastUpd(); renderFree(); render(current); });
 
 // ---- 共有（E1）：Web Share API（対応時）→ 非対応はリンクをコピー。作品ページ(公式ストア)を共有する。----
 function toast(msg){
@@ -1293,12 +1310,32 @@ applyFont(); syncFontBtn();
 const qEl=document.getElementById("q");
 if(qEl) qEl.addEventListener("input",()=>{ query=qEl.value.trim().toLowerCase(); shown=20; render(current); });
 // 3秒ヒーロー：view02 のうち最も伸びている1件を実例として上部に。該当が弱い/無いときは隠す（静か）。
-let heroReady=false;
+let heroReady=false, heroSeq=0;
+// ⑩ 選定に条件を付ける。倍率降順の先頭をそのまま採ると、平常値が小さいほど倍率が跳ねる構造上、
+// 看板には必ず「無名・小規模・原因不明」が来る（0808-0915-20-04）。詳細ページでは自分で
+// 「母数が小さく×Nはブレやすい（参考値）」と警告しているのに、看板だけがその警告を無視していた。
+const HERO_MIN_BASE=300;   // 平常値の下限（暫定値）。調整するときはここ1か所だけ。
+// 原因あり（c＝signals が空でない）かつ 平常値≥下限 の先頭を採る。該当ゼロなら従来どおり＝空にしない。
+function heroPick(){
+  const cands=(REAL_V2||[]).slice().sort((a,b)=>(b.r||0)-(a.r||0));
+  const good=cands.filter(x=> x && x.r>=1.3 && (x.c&&x.c.length) && (x.base||0)>=HERO_MIN_BASE);
+  return good.length?good:cands.filter(x=> x && x.r>=1.3);
+}
+// 画像が取れない作品は次点へ送る（header.jpg が無い作品があり、onerror で消えると看板が画像なしになる）。
+// 参照先は coverImg と同じ公式CDN（CSPで許可済み・再ホストしない）。
+async function firstWithCover(list){
+  for(const x of list.slice(0,5)){
+    const ok=await new Promise(r=>{ const i=new Image();
+      i.onload=()=>r(true); i.onerror=()=>r(false);
+      i.src=`https://cdn.cloudflare.steamstatic.com/steam/apps/${x.a}/header.jpg`; });
+    if(ok) return x;
+  }
+  return list[0]||null;
+}
 // view02 では一覧の1行目とヒーローが同じ作品になり重複するため、view02 のときだけ隠す（リンの指摘）。
 function syncHeroVis(){ const el=document.getElementById("hero"); if(el) el.hidden=!(heroReady && current!=="2"); }
-function buildHero(){
+function paintHero(top){
   const el=document.getElementById("hero"); if(!el) return;
-  const top=((REAL_V2||[]).slice().sort((a,b)=>(b.r||0)-(a.r||0)))[0];
   heroReady=!!(top && top.r>=1.3);
   if(heroReady){
     document.getElementById("heroImg").innerHTML=coverImg(top.a);
@@ -1311,10 +1348,33 @@ function buildHero(){
   } else { el.dataset.appid=""; }
   syncHeroVis();
 }
+function buildHero(){
+  const el=document.getElementById("hero"); if(!el) return;
+  const pool=heroPick(), seq=++heroSeq;
+  paintHero(pool[0]||null);   // まず即出し（「3秒ヒーロー」の性格は変えない）
+  // 画像オフのときは probe を飛ばして先頭を採る（画像を出さない設定を尊重する＝守る線）。
+  if(imgOn && pool.length>1){
+    firstWithCover(pool).then(x=>{ if(seq===heroSeq && x && String(x.a)!==el.dataset.appid) paintHero(x); })
+      .catch(()=>{});   // probe が落ちても先頭のまま＝看板は空にしない
+  }
+}
 document.getElementById("heroCard").addEventListener("click",()=>{
   const btn=document.querySelector('nav.views button[data-view="2"]'); if(btn) btn.click();
   try{ document.getElementById("list").scrollIntoView({behavior:"smooth",block:"start"}); }catch(e){}
 });
+// ⑯ 最終更新の1行（ヒーロー直下＝0アクション）。再訪の動機＝「中身が変わっている」を切替なしで伝える。
+// ★書けるのは最終更新時刻だけ。更新頻度（「毎日更新」等）は実測していないので書かない（cron の実測が先）。
+// ★埋め込みフォールバックを表示中は必ずその旨を併記する。時刻だけ出すと「その時刻に更新された」という嘘になる。
+let NOW_STATE="loading";   // loading（確認中）／fresh（now_ccu.json 取得成功）／stale（取得できず前回値）
+function renderLastUpd(){
+  const el=document.getElementById("lastUpd"); if(!el) return;
+  if(NOW_STATE==="loading"){ el.textContent=L("最終更新 確認中…","Last updated — checking…"); return; }
+  const t=esc(fmtShort(OBSERVED_AT)||fmtJST(OBSERVED_AT));   // fmtShort＝「8/8 04:57」（JST・年を省く）
+  el.innerHTML = (NOW_STATE==="fresh")
+    ? L(`最終更新 <b>${t}</b>（JST）`,`Last updated <b>${t}</b> (JST)`)
+    : L(`最終更新 <b>${t}</b>（JST）<span class="stale">・最新を取得できず前回値を表示中</span>`,
+        `Last updated <b>${t}</b> (JST) <span class="stale">· couldn't fetch latest, showing previous</span>`);
+}
 // === 配信：定期更新される ./data/now_ccu.json を読む。失敗時は埋め込みフォールバックのまま表示（空にしない）。===
 async function loadNow(){
   try{
@@ -1322,13 +1382,15 @@ async function loadNow(){
     if(!res.ok) throw new Error("HTTP "+res.status);
     const d=await res.json();
     if(d && Array.isArray(d.rows) && d.rows.length){
-      REAL_V1=d.rows; OBSERVED_AT=d.observed_at||OBSERVED_AT;
+      REAL_V1=d.rows; OBSERVED_AT=d.observed_at||OBSERVED_AT; NOW_STATE="fresh";
       NOTE[1].txt={ja:"実データ：Steam公式APIの観測値（いま遊んでいる人数）。各作品の最新値・上位"+d.rows.length+"件（定期更新）。",en:"Real data: official Steam API (players in-game now). Latest per title · top "+d.rows.length+" (updated regularly)."};
       buildGenreChips(); rebuildCatalog();
     }
   }catch(e){
     NOTE[1].txt={ja:"実データ（埋め込みスナップショット）：最新を取得できず前回値を表示中。Steam公式APIの観測値・上位20件。",en:"Real data (embedded snapshot): couldn't fetch latest, showing previous. Official Steam API · top 20."};
   }
+  if(NOW_STATE==="loading") NOW_STATE="stale";   // 取得できた場合のみ fresh。それ以外は前回値である旨を出す。
+  renderLastUpd();
   // view01 を最新JSONで描き直す。view02 の折れ線は now_ccu の履歴を借りるため、こちらも更新する。
   if(current==="1"||current==="2") render(current);
 }
@@ -1363,17 +1425,37 @@ function freeStoreBlock(label, items){
   if(!Array.isArray(items) || !items.length) return "";
   return `<div class="freestore"><div class="freestorehd">${esc(label)}</div><ul class="freelist">${items.map(freeRow).join("")}</ul></div>`;
 }
+const FREE_MAX=3;   // ヒーロー直下に置くのは最大3件。超過分は「+N件」の中（低優先＝クリックの奥で正しい）。
 function buildFreeHtml(d){           // 純関数（DOM非依存・テスト容易）
   if(!d || !d.stores) return "";
-  return freeStoreBlock("Steam", d.stores.steam) + freeStoreBlock("Epic", d.stores.epic);
+  // ストアの区切り（両方A・混ぜない）は保ったまま、Steam→Epic の順で通し番号を振って上位3件だけを表に出す。
+  const flat=[];
+  [["Steam",d.stores.steam],["Epic",d.stores.epic]].forEach(pair=>{
+    if(Array.isArray(pair[1])) pair[1].forEach(it=>{ if(it) flat.push({lab:pair[0],it:it}); });
+  });
+  if(!flat.length) return "";        // 0件＝空文字＝節ごと出さない（呼び出し側の hidden 制御は変えない）
+  const group=list=>{                // 連続する同一ストアをまとめて元の freeStoreBlock に渡す
+    let html="",cur=null,buf=[];
+    const flush=()=>{ if(cur!==null&&buf.length) html+=freeStoreBlock(cur,buf); buf=[]; };
+    list.forEach(x=>{ if(x.lab!==cur){ flush(); cur=x.lab; } buf.push(x.it); });
+    flush(); return html;
+  };
+  const head=flat.slice(0,FREE_MAX), rest=flat.slice(FREE_MAX);
+  return group(head)+(rest.length?`<details class="freemore"><summary>${L("+"+rest.length+"件","+"+rest.length+" more")}</summary>${group(rest)}</details>`:"");
+}
+// 取得した中身は保持しておき、言語切替では再取得せずに描き直すだけにする（「+N件」の表記が言語に追随する）。
+let FREE_DATA=null;
+function renderFree(){
+  const html=buildFreeHtml(FREE_DATA);
+  if(html){ freeBody.innerHTML=html; freeSec.hidden=false; } else { freeSec.hidden=true; }
 }
 async function loadFree(){
   try{
     const res=await fetch("./data/free_promos.json?cb="+Date.now(),{cache:"no-store"});
     if(!res.ok) throw new Error("HTTP "+res.status);
-    const html=buildFreeHtml(await res.json());
-    if(html){ freeBody.innerHTML=html; freeSec.hidden=false; } else { freeSec.hidden=true; }
-  }catch(e){ freeSec.hidden=true; }   // 配布なし／ファイルなし＝静かに隠す（空のUIを置かない＝根幹9）
+    FREE_DATA=await res.json();
+    renderFree();
+  }catch(e){ FREE_DATA=null; freeSec.hidden=true; }   // 配布なし／ファイルなし＝静かに隠す（空のUIを置かない＝根幹9）
 }
 // === 02「いつもより伸び」＝ view02_rising.json を読む。失敗時は埋め込みフォールバックのまま（空にしない）。===
 async function loadRising(){
@@ -1412,7 +1494,8 @@ if(PP_URL){ const pp=document.getElementById("ppLink"); pp.href=PP_URL; pp.textC
 loadFavs();    // 端末内（localStorage）からお気に入りを復元
 rebuildCatalog(); // つながり用カタログを埋め込みデータで先に構築（fetch 前でも深掘りできる）
 render("3");   // 目玉「これから来そう」を既定ビューに。REAL_UP 未読込のうちは空状態→loadUpcoming で充填
-buildHero();   // 3秒ヒーロー（フォールバックの top1 で即出し・loadRising 後に更新）
+buildHero();   // 3秒ヒーロー（フォールバックの条件付き先頭で即出し・loadRising 後に更新）
+renderLastUpd();  // ⑯ 最終更新（この時点は「確認中…」。loadNow の結果で fresh/stale に確定する）
 applyI18n(); syncThemeBtn();   // i18n：静的DOMを現在の言語で反映＋開発者オプトアウト行を構築
 loadNow();     // 次に最新JSONで上書き
 loadRising();  // 02「いつもより伸び」を最新 view02_rising で上書き
