@@ -2,7 +2,7 @@
   "view": "prediction_scorecard",
   "schema": "prediction_scorecard_v1",
   "note": "羽根予想の答え合わせ（as-of・リーク無し）。holdout=過去を70/30分割しtrainだけで学習しtestを採点（honestなバックテスト）。live=発売前に記録した予測→発売後の結果（最も硬い真のout-of-sample・日々増える）。calibration は「◯%と予測した群が実際に何%跳ねたか」＝予測と実測が近いほど信頼できる。",
-  "generated_at": "2026-08-08T06:36:31.272663+00:00",
+  "generated_at": "2026-08-09T06:40:05.668782+00:00",
   "params": {
     "lookback_days": 180,
     "outcome_days": 14,
@@ -18,20 +18,20 @@
     ]
   },
   "holdout": {
-    "n_pairs": 3128,
-    "train_n": 2222,
-    "test_n": 906,
+    "n_pairs": 3355,
+    "train_n": 2380,
+    "test_n": 975,
     "ready": true,
     "metrics": {
-      "n": 906,
-      "hits": 39,
-      "base_rate": 0.04305,
-      "top_decile_n": 90,
-      "top_decile_rate": 0.25556,
-      "top_decile_lift": 5.94,
-      "brier": 0.03781,
-      "high_conf_n": 53,
-      "high_conf_rate": 0.28302
+      "n": 975,
+      "hits": 40,
+      "base_rate": 0.04103,
+      "top_decile_n": 97,
+      "top_decile_rate": 0.23711,
+      "top_decile_lift": 5.78,
+      "brier": 0.03667,
+      "high_conf_n": 64,
+      "high_conf_rate": 0.26562
     },
     "calibration": [
       {
@@ -39,54 +39,54 @@
           0.0,
           0.02
         ],
-        "n": 651,
-        "pred_mean": 0.0065,
-        "actual_rate": 0.0108
+        "n": 667,
+        "pred_mean": 0.0072,
+        "actual_rate": 0.009
       },
       {
         "range": [
           0.02,
           0.05
         ],
-        "n": 138,
-        "pred_mean": 0.0291,
-        "actual_rate": 0.0507
+        "n": 152,
+        "pred_mean": 0.0325,
+        "actual_rate": 0.0526
       },
       {
         "range": [
           0.05,
           0.1
         ],
-        "n": 62,
-        "pred_mean": 0.0635,
-        "actual_rate": 0.1452
+        "n": 81,
+        "pred_mean": 0.0743,
+        "actual_rate": 0.0988
       },
       {
         "range": [
           0.1,
           0.2
         ],
-        "n": 16,
-        "pred_mean": 0.1417,
-        "actual_rate": 0.125
+        "n": 29,
+        "pred_mean": 0.1485,
+        "actual_rate": 0.1034
       },
       {
         "range": [
           0.2,
           0.4
         ],
-        "n": 13,
-        "pred_mean": 0.3095,
-        "actual_rate": 0.2308
+        "n": 14,
+        "pred_mean": 0.3164,
+        "actual_rate": 0.1429
       },
       {
         "range": [
           0.4,
           1.0
         ],
-        "n": 26,
-        "pred_mean": 0.672,
-        "actual_rate": 0.4231
+        "n": 32,
+        "pred_mean": 0.6976,
+        "actual_rate": 0.4062
       }
     ],
     "examples": [
@@ -94,7 +94,7 @@
         "appid": 2936290,
         "name": "The Life and Suffering of Prince Jerian",
         "release": "2026-07-20",
-        "pred": 0.9964,
+        "pred": 0.9978,
         "hit": true,
         "launch_peak": 1775
       },
@@ -102,7 +102,7 @@
         "appid": 3276050,
         "name": "SpaceCraft",
         "release": "2026-06-11",
-        "pred": 0.9848,
+        "pred": 0.9924,
         "hit": true,
         "launch_peak": 7685
       },
@@ -110,7 +110,7 @@
         "appid": 3751950,
         "name": "Assassin's Creed Black Flag Resynced",
         "release": "2026-07-09",
-        "pred": 0.965,
+        "pred": 0.9858,
         "hit": true,
         "launch_peak": 104679
       },
@@ -118,7 +118,7 @@
         "appid": 2417470,
         "name": "Beastro",
         "release": "2026-06-11",
-        "pred": 0.957,
+        "pred": 0.9723,
         "hit": false,
         "launch_peak": 657
       },
@@ -126,7 +126,7 @@
         "appid": 1454370,
         "name": "STARSEEKER: Astroneer Expeditions",
         "release": "2026-06-11",
-        "pred": 0.9563,
+        "pred": 0.9692,
         "hit": false,
         "launch_peak": 701
       },
@@ -134,7 +134,7 @@
         "appid": 4134600,
         "name": "EverRail",
         "release": "2026-07-20",
-        "pred": 0.9466,
+        "pred": 0.9627,
         "hit": false,
         "launch_peak": 353
       },
@@ -142,7 +142,7 @@
         "appid": 3576070,
         "name": "Sudden Attack Zero Point",
         "release": "2026-07-29",
-        "pred": 0.9395,
+        "pred": 0.9582,
         "hit": true,
         "launch_peak": 6855
       },
@@ -150,7 +150,7 @@
         "appid": 2819470,
         "name": "Aquapark Tycoon",
         "release": "2026-07-22",
-        "pred": 0.763,
+        "pred": 0.8276,
         "hit": false,
         "launch_peak": 432
       },
@@ -158,7 +158,7 @@
         "appid": 3825390,
         "name": "BLUE REFLECTION Quartet",
         "release": "2026-07-29",
-        "pred": 0.7098,
+        "pred": 0.7731,
         "hit": false,
         "launch_peak": 274
       },
@@ -166,7 +166,7 @@
         "appid": 4144680,
         "name": "DEAD OR ALIVE 6 Last Round",
         "release": "2026-06-24",
-        "pred": 0.7064,
+        "pred": 0.7532,
         "hit": false,
         "launch_peak": 642
       },
@@ -174,41 +174,41 @@
         "appid": 3590290,
         "name": "DIVE or DIE - Children of Rain",
         "release": "2026-07-21",
-        "pred": 0.6841,
+        "pred": 0.7496,
         "hit": true,
         "launch_peak": 1368
       },
       {
-        "appid": 3760100,
-        "name": "8 Ball by Pokerist",
-        "release": "2026-06-16",
-        "pred": 0.6306,
-        "hit": false,
-        "launch_peak": 167
+        "appid": 2001760,
+        "name": "Beast of Reincarnation",
+        "release": "2026-08-03",
+        "pred": 0.7067,
+        "hit": true,
+        "launch_peak": 14995
       },
       {
         "appid": 3152750,
         "name": "Taival",
         "release": "2026-07-14",
-        "pred": 0.629,
+        "pred": 0.6991,
         "hit": false,
         "launch_peak": 65
+      },
+      {
+        "appid": 3760100,
+        "name": "8 Ball by Pokerist",
+        "release": "2026-06-16",
+        "pred": 0.6896,
+        "hit": false,
+        "launch_peak": 167
       },
       {
         "appid": 2377930,
         "name": "Destiny of Immortal",
         "release": "2026-07-07",
-        "pred": 0.5896,
+        "pred": 0.6632,
         "hit": true,
         "launch_peak": 8306
-      },
-      {
-        "appid": 2211170,
-        "name": "Unrailed 2: Back on Track",
-        "release": "2026-06-11",
-        "pred": 0.5896,
-        "hit": true,
-        "launch_peak": 1140
       }
     ]
   },
@@ -219,11 +219,11 @@
         "hits": 0
       },
       "pending": {
-        "n": 2280,
+        "n": 2288,
         "hits": 0
       }
     },
-    "pending": 2280,
+    "pending": 2288,
     "settling": 1,
     "resolved": 0,
     "metrics": {},
