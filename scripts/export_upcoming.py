@@ -21,6 +21,7 @@ env：GENRE_MAX / LIMIT / MODEL_PATH / UPCOMING_APP_TYPES。
 
 import json
 import os
+import time
 from datetime import datetime, date
 
 import psycopg2
@@ -28,6 +29,8 @@ import psycopg2
 import prelaunch_features as F
 from _filters import not_adult
 from _market import fetch_market, market_of
+# ⑲ detail（詳細ページ「情報」節の材料）。export_now_ccu.py と同じ部品＝キーと形が片方だけずれない。
+import _detail as D
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 OUT_PATH = os.environ.get("OUT_PATH") or "data/upcoming.json"
@@ -35,6 +38,10 @@ MODEL_PATH = os.environ.get("MODEL_PATH") or "data/prelaunch_model.json"
 
 GENRE_MAX = int(os.environ.get("GENRE_MAX") or "7")
 LIMIT = int(os.environ.get("LIMIT") or "200")
+# ⑲ detail 用（export_now_ccu.py と同じ既定値）。SIBLINGS_MAX=0 で「同じ開発元」の照会を丸ごと止められる。
+DEV_MAX = int(os.environ.get("DEV_MAX") or "5")
+CATEGORY_MAX = int(os.environ.get("CATEGORY_MAX") or "7")
+SIBLINGS_MAX = int(os.environ.get("SIBLINGS_MAX") or "8")
 # 発売済み（居座り）を落とすと表示枠が減るので、多めに取得してから絞る（絞った後に LIMIT まで）。
 OVERFETCH = float(os.environ.get("UPCOMING_OVERFETCH") or "1.6")
 
@@ -105,6 +112,9 @@ self_up AS (
 ),
 {F.dev_best_cte('self_up', 'now()')}
 SELECT g.appid, g.name, g.release_date, g.release_date_text, g.genres, g.coming_soon,
+  -- ⑲ 詳細ページ「情報」節の材料。すべて appdetails_sweep が収集済みの既存列＝新規収集ゼロ。
+  --    未エンリッチの作品では NULL のまま来る＝表示側は「情報」節を出さない（嘘の文言を出さない）。
+  g.developers, g.publishers, g.categories, g.dlc, g.website,
   {extra},
   {F.feature_sql(asof='now()', web_ok=web_ok)},
   db.dev_best_peak, db.dev_best_reviews
@@ -222,10 +232,13 @@ def _tri(v):
     return None if v is None else bool(v)
 
 
-def compute_rows(conn, limit=None):
+def compute_rows(conn, limit=None, with_detail=False):
     """発売前ゲームを読み、各作品の羽根予想（spike_prob/expect/conf/factors…）を付けた行リストを返す。
     ※ 予測の“単一の源”：これを export（表示）と prediction_log（記録）の両方が使う＝表示と記録の値が必ず一致（skew防止）。
        conn のセッション（readonly 等）は呼び出し側が設定する。並べ替え・payload化は呼び出し側の責務。
+    with_detail：⑲ 詳細ページ「情報」節の材料（detail）を各行に付けるか。**既定 False**。
+       予測値には一切影響しない付加情報なので、記録側（prediction_log_sweep）には作らせない
+       ＝「同じ開発元」の照会（1行1クエリ）を、それを表示しないジョブで走らせない（PRED_LIMIT は 800）。
     返り値: (rows, model, base, validated)"""
     eff_limit = limit if limit is not None else LIMIT
     # 発売済み（居座り）を _is_released で落とすと枠が減るので、多めに取得してから絞る。
@@ -248,6 +261,7 @@ def compute_rows(conn, limit=None):
     validated = bool(model and model.get("readiness") == "validated")
 
     rows = []
+    pending_sib = []   # ⑲ (行, 開発元) ＝ 絞り込みを終えた行にだけ「同じ開発元」を照会するための控え
     for rec in recs:
         d = dict(zip(cols, rec))
         # ★発売済み（＝もう「これから来そう」ではない）はここで除外。
@@ -288,10 +302,11 @@ def compute_rows(conn, limit=None):
         else:
             conf = "low"
 
+        rel_iso = _release_iso(d.get("release_date"), d.get("release_date_text"))
         rows.append({
             "appid": d.get("appid"),
             "name": d.get("name"),
-            "release": _release_iso(d.get("release_date"), d.get("release_date_text")),
+            "release": rel_iso,
             "release_known": d.get("release_date") is not None,
             "coming_soon": bool(d.get("coming_soon")),
             "spike_prob": spike_prob,        # ★羽根予想＝跳ね確率（0..1）。モデル無しは null。
@@ -324,8 +339,34 @@ def compute_rows(conn, limit=None):
             "price": market_of(mkt, d.get("appid"))["price"],
             "review": market_of(mkt, d.get("appid"))["review"],
         })
+        if with_detail:
+            # ⑲ 詳細ページの「情報」節。★stats / history は出さない（with_stats=False）＝
+            #   発売前にCCU観測は存在せず、空の器を渡すと「観測の履歴：準備中」が復活する（_detail.py 参照）。
+            #   release は行の release と同じ値を渡す＝一覧と詳細で発売日が食い違わない。
+            rows[-1]["detail"] = D.build_detail({
+                "developers": d.get("developers"), "publishers": d.get("publishers"),
+                "genres": d.get("genres"), "categories": d.get("categories"),
+                "dlc": d.get("dlc"), "release_date": rel_iso, "website": d.get("website"),
+                "_market": {"price": rows[-1]["price"], "review": rows[-1]["review"]},
+            }, DEV_MAX, GENRE_MAX, CATEGORY_MAX, with_stats=False,
+                # appdetails の痕跡が1つも無い行では DLC の有無を「調べていない」＝null にする。
+                # 0 のまま渡すと表示側が「DLC なし」と断定してしまう（0802E-05）。
+                dlc_known=bool(d.get("developers") or d.get("categories") or d.get("dlc")))
+            pending_sib.append((rows[-1], d.get("developers")))
         if len(rows) >= eff_limit:   # 発売済みを除いた“発売前のみ”で LIMIT 件に達したら打ち切り
             break
+
+    # ⑲ 「同じ開発元の他作品」は1行1クエリなので、発売済みを落として LIMIT まで絞った**最終行にだけ**引く
+    #    （母集団は OVERFETCH で多めに取っているため、絞る前に引くと最大1.6倍の無駄になる）。
+    #    開発元名が無い行は照会そのものが起きない（_detail.fetch_siblings が空で戻る）。
+    if with_detail and SIBLINGS_MAX > 0 and pending_sib:
+        t0 = time.time()
+        with conn.cursor() as cur:
+            for row, devs in pending_sib:
+                row["detail"]["siblings"] = D.fetch_siblings(cur, devs, row["appid"], SIBLINGS_MAX)
+        n_sib = sum(1 for r, _ in pending_sib if r["detail"]["siblings"])
+        print(f"同じ開発元の他作品: {n_sib} 件／{len(pending_sib)} 行で取得"
+              f"（照会 {time.time() - t0:.1f}秒・SIBLINGS_MAX={SIBLINGS_MAX}・0 で止められる）")
 
     return rows, model, base, validated
 
@@ -334,7 +375,7 @@ def main():
     conn = psycopg2.connect(DATABASE_URL)
     try:
         conn.set_session(readonly=True, autocommit=True)
-        rows, model, base, validated = compute_rows(conn)
+        rows, model, base, validated = compute_rows(conn, with_detail=True)   # ⑲ 表示側は detail を使う
         # ⑰ の診断：発売前の母集団の app_type 分布（＝除外条件が効くかを決める“原因の指標”）をログに出す。
         with conn.cursor() as cur:
             cur.execute(APP_TYPE_DIST_SQL)
@@ -352,7 +393,8 @@ def main():
 
     payload = {
         "view": "upcoming",
-        "schema": "upcoming_v4",   # v4＝各行に header_image（string/null）と has_japanese（true/false/null）を追加
+        # v5＝⑲ 各行に detail（詳細ページ「情報」節の材料）を追加。stats/history は持たない（発売前にCCU観測は無い）。
+        "schema": "upcoming_v5",
         "source": "games(coming_soon/release_date) + 実測シグナル(体験版/Twitch/告知/開発元実績/ジャンル) + prelaunch_model",
         "note": ("発売前の羽根予想。spike_prob=跳ね確率＝自社実績で較正したモデルの出力（参考・外れうる）。"
                  "モデルが無い場合は expect のみ（実測シグナルの有無）。"
@@ -397,6 +439,22 @@ def main():
     ja_n = sum(1 for r in rows if r["has_japanese"] is None)
     img_pct = f"（{100.0 * n_img / len(rows):.1f}%）" if rows else ""
     print(f"header_image 非null {n_img} 件／{len(rows)}{img_pct}")
+    # ⑲ の計器：「情報」節が実際に描画される行が何件か。★母数併記。
+    #   ・描画される＝表示側 detailBodyReal の hasAny と同じ判定（画面と食い違わない数え方）。
+    #   ・うち appdetails 由来＝release を除いた中身。**外れの検出はこちらで見る**：
+    #     50件未満なら「開発元等は既にDBにある」という推定が外れている＝急いで直さず数日の収集を待って再測定する。
+    n_body = sum(1 for r in rows if D.has_body(r.get("detail")))
+    n_appd = sum(1 for r in rows if D.has_appdetails(r.get("detail")))
+    n_dev = sum(1 for r in rows if (r.get("detail") or {}).get("developers"))
+    body_pct = f"（{100.0 * n_body / len(rows):.1f}%）" if rows else ""
+    appd_pct = f"（{100.0 * n_appd / len(rows):.1f}%）" if rows else ""
+    print(f"detail の中身が1つ以上ある行 {n_body} 件／{len(rows)}{body_pct}"
+          f" ── うち appdetails 由来（発売日を除く）{n_appd} 件{appd_pct}／開発元あり {n_dev} 件")
+    # 事前登録されたしきい値は「200件中50件未満」なので、母数が本番規模のときだけ鳴らす。
+    # 小さな試し撃ちで鳴らすと、それ自体が「推定が外れた」という嘘の警報になる。
+    if len(rows) >= 100 and n_appd < 50:
+        print(f"  ⚠ appdetails 由来が 50件未満（母数 {len(rows)}）＝「開発元等は既にDBにある」の推定が外れている。"
+              "急いで直さず、数日の収集を待って再測定する（0808-2157-08-04-D）。")
     print(f"has_japanese true {ja_t} / false {ja_f} / null {ja_n}（母数 {len(rows)}）")
     print(f"書き出し: {OUT_PATH}（{len(rows)} 件・発売前・ジャンル無し {n_nogenre} 件）"
           f" model={'あり('+str(model.get('readiness'))+')' if model else 'なし'}"

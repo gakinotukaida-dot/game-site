@@ -900,7 +900,9 @@ function detailBodyReal(d){
   if(dev) rows+=`<span class="dk">${L("開発元","Developer")}</span><span class="dv">${dev}</span>`;
   if(samePub) rows+=`<span class="dk">${L("販売元","Publisher")}</span><span class="dv">${pub}</span>`;
   rows+=`<span class="dk">${L("発売日","Release")}</span><span class="dv">${d.release?esc(d.release):"—"}</span>`;
-  rows+=`<span class="dk">DLC</span><span class="dv">${d.dlc_count>0?L(`あり（${d.dlc_count}）`,`Yes (${d.dlc_count})`):L("なし","None")}</span>`;
+  // ⑲ dlc_count が null＝DLCを**まだ調べていない**（appdetails 未到達）。行ごと出さない。
+  //    0 と null を同じ「なし」にすると、調べていないものを「無い」と断定することになる（0802E-05）。
+  if(d.dlc_count!=null) rows+=`<span class="dk">DLC</span><span class="dv">${d.dlc_count>0?L(`あり（${d.dlc_count}）`,`Yes (${d.dlc_count})`):L("なし","None")}</span>`;
   // ⑨-a 価格・レビュー。★未取得（null）は行ごと出さない。「—」でも「0円」でもなく、黙っているのが正しい（0802E-05）。
   if(pr){
     const f=fmtMoney(pr.final,pr.currency), i=fmtMoney(pr.initial,pr.currency), dc=pr.discount_percent||0;
@@ -1097,12 +1099,17 @@ function viewItems(view){
       const spark=sparkline(ncd&&ncd.history,(ncd&&ncd.stats&&ncd.stats.baseline));
       const spikeFrac=hasP?Math.max(0,Math.min(1,pct/40)):0;
       const surge=spark || (hasP?`<div class="surgebar"><div class="surgetrack"><div class="surgefill" style="width:${(spikeFrac*100).toFixed(1)}%"></div></div></div>`:"");
-      return { key:"U_"+g.appid, appid:g.appid, title:g.name, detail:{genres:g.genres||[]}, spike:hasP?g.spike_prob:-1,
+      // ⑲ detail は upcoming.json の行が持つもの（開発元・発売日・カテゴリ・同じ開発元…）を使う。
+      //    まだ appdetails が届いていない行（detail 無し）は従来どおりジャンルだけ＝壊れない。
+      return { key:"U_"+g.appid, appid:g.appid, title:g.name, detail:g.detail||{genres:g.genres||[]}, spike:hasP?g.spike_prob:-1,
         tagsP:pChips.join(""),
         tagsS:sChips.join(""),
         tagsRow:tagsRow,
         surge:surge,
-        detailBody:"",
+        // ⑲ 「詳細情報は準備中」を実際の中身に置き換える。detail が無い/空の行は detailBodyReal が "" を返し、
+        //    infoSec 側で節ごと出ない（嘘の文言を残さない）。ジャンルは detailBodyReal が出さないので
+        //    「この作品の見立て」の tagsS と二重にならない。
+        detailBody:detailBodyReal(g.detail),
         primary: hasP ? `<span class="num pct" style="color:color-mix(in srgb, var(--accent) ${Math.round(28+Math.min(1,pct/40)*72)}%, var(--ink-faint))">${pctTxt}</span><span class="unit">%</span>`
           : (dc?`<span class="num">${nf.format(dc)}</span><span class="unit">${L("人 体験版","demo")}</span>`
              :`<span class="when">${known?esc(relTxt):L("未定","TBD")}</span>`),  // L0主指標＝跳ね予想%（高いほど濃く＝色スケール／color-mix非対応はCSSで一律accentにフォールバック）
@@ -1306,7 +1313,9 @@ function rebuildCatalog(){
   CATALOG.clear();
   (REAL_V1||[]).forEach(g=>catalogAdd(g.appid,g.name,(g.detail&&g.detail.genres)||[],g.detail,g.ccu));
   (REAL_L||[]).forEach(g=>catalogAdd(g.appid,g.name,(g.detail&&g.detail.genres)||[],g.detail,g.ccu));
-  (REAL_UP||[]).forEach(g=>catalogAdd(g.appid,g.name,g.genres||[],{genres:g.genres||[]},null));
+  // ⑲ ここで {genres:…} に組み直すと detail が落ち、ホップ（「同じ開発元」等）で開いた発売前の作品だけ
+  //    「情報」節が空のままになる。行の detail をそのまま渡す（無い行は従来どおりジャンルだけ）。
+  (REAL_UP||[]).forEach(g=>catalogAdd(g.appid,g.name,g.genres||[],g.detail||{genres:g.genres||[]},null));
   (REAL_V2||[]).forEach(g=>catalogAdd(g.a,g.n,g.g||[],{genres:g.g||[]},g.now));
 }
 // CATALOG の1件を詳細ページ用レコードに（view:"hop" ＝ ホップで開いた作品）。
@@ -1380,11 +1389,14 @@ function showDetail(o){
   const steam=o.appid?`<a class="go" href="https://store.steampowered.com/app/${o.appid}/" target="_blank" rel="noopener noreferrer">${L("Steamで見る","View on Steam")} <span class="arr">↗</span></a>`:"";
   const why=(o.view==="2")?whyPicked(o):"";
   const hasHist=o.detail&&(o.detail.stats||(o.detail.history&&o.detail.history.length));
-  // ホップで来た作品は観測履歴が無ければ節ごと出さない（「準備中」を並べない）。既存ビューの表示は従来どおり。
-  const histSec=(o.view==="2")?"":((o.view==="hop"&&!hasHist)?""
+  // 観測履歴が無ければ節ごと出さない（「準備中」を並べない）。対象＝ホップで来た作品と、
+  // ⑲ ビュー01「これから来そう」（view==="3"）＝発売前なのでCCU観測が無いのが普通。既存ビューの表示は従来どおり。
+  const histSec=(o.view==="2")?"":(((o.view==="hop"||o.view==="3")&&!hasHist)?""
     :`<div class="dvsection"><div class="dvlabel">${L("観測の履歴","Observation history")}</div>${historySection(o)}</div>`);
+  // ⑲ 中身があれば出す。無ければ節ごと出さない＝「準備中（appdetails 収集後に表示）」という
+  //    守られない約束を、配線の無いビュー01にはもう出さない（0802E-05 と同型の嘘を残さない）。
   const infoSec=o.detailBody?`<div class="dvsection"><div class="dvlabel">${L("情報","Info")}</div><div class="drillbody">${o.detailBody}</div></div>`
-    :((o.view==="2"||o.view==="hop")?"":`<div class="dvsection"><div class="dvlabel">${L("情報","Info")}</div><div class="dvmuted">${L("詳細情報は準備中（appdetails 収集後に表示）。","Details pending (shown after appdetails collection).")}</div></div>`);
+    :((o.view==="2"||o.view==="3"||o.view==="hop")?"":`<div class="dvsection"><div class="dvlabel">${L("情報","Info")}</div><div class="dvmuted">${L("詳細情報は準備中（appdetails 収集後に表示）。","Details pending (shown after appdetails collection).")}</div></div>`);
   const conns=buildConnections(o);
   // L1「見立て」：一覧(L0)の行から外したチップ（平常比・確度・きっかけ・予想・タグ）をここに整列（掘れば全部見える）。
   const assess=(o.tagsP||o.tagsS)?`<div class="dvsection"><div class="dvlabel">${L("この作品の見立て","At a glance")}</div><div class="assess">${o.tagsP?`<div class="assessrow">${o.tagsP}</div>`:""}${o.tagsS?`<div class="assessrow assesstags">${o.tagsS}</div>`:""}</div></div>`:"";
