@@ -48,6 +48,9 @@ jobs:
           REV_BASELINE_DAYS: "14"        # 平常窓（14=2週＝曜日効果を相殺／各ゲームに 14+7=21日 の履歴が要る）
           REV_REL_MULT: "3"              # 平常週ペースの何倍で「急増」とみなすか（暫定）
           REV_ABS_FLOOR: "15"            # 極小ゲームのノイズ除け・最低増加数（暫定）
+          # === A′（時刻整合の平常値）点灯（2026-08-27・0827-0744）。1.6は暫定値（0826-2349-03-2） ===
+          BASELINE_MODE: hour_matched    # 戻し方＝この2行と上のコメント行を削除するだけ（コードのrevert不要・docs/state/0827-0723-phase2-a-prime.md §6）
+          RISING_UP_THRESH: "1.6"
           # OUT_PATH: "data/view02_rising.json"   # 既定のまま。変える場合のみ有効化
         run: python scripts/view02_rank_v2.py
         # ↑ スクリプトの置き場所が scripts/ でない場合はパスを直す（v1のymlに合わせた想定）
