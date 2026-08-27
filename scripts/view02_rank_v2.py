@@ -119,6 +119,23 @@ CAUSE_MISALIGN_MULT = float(os.environ.get("CAUSE_MISALIGN_MULT") or "0.4")  # �
 BASELINE_DIAG = (os.environ.get("BASELINE_DIAG") or "0").strip().lower() in ("1", "true", "yes", "on")
 MIN_BASE_DAYS = int(os.environ.get("MIN_BASE_DAYS") or "5")       # 窓に観測がある「日数」の下限（点数ではない）
 ALIGN_WIDEN_MULT = float(os.environ.get("ALIGN_WIDEN_MULT") or "2")  # 日数が足りないとき窓を広げる倍率
+# ── 平常値の時刻整合（A′）本採用・フェーズ2 ─────────────────────────────────
+# 既定 all ＝現行と完全同一（追加クエリ0本・出力JSONに新キー0個・ログも同一）。
+# hour_matched のときだけ A′（同じ時計時刻の窓の平常値）を本番の分母として採用する。
+#   ・分母3値（baseline / q1 / q3）だけを差し替える＝分子・n_points・boost は現行のまま（0802D-27）。
+#   ・順位（eff）も表示（ratio）も差し替え後の同じ値から出す（分母が割れると自己矛盾チップが再発する）。
+#   ・日数不足の行は現行の分母のまま採用し印（al=0）を立て、確度を一段下げる（0802E-05）。
+#   ・「今日の窓」に観測が1点も無い行は倍率を出さない（古い1点に落ちる COALESCE 経路を塞ぐ・0808-2310-03）。
+# 広い窓（ALIGN_WIDEN_MULT）は本番分岐に使わない＝narrow 1系統のみ（0826-2349-01-3）。
+# 点灯＝本番 yml に env 2行を足すだけ。戻し＝その2行を消すだけ（コードの revert は不要）。
+BASELINE_MODE = (os.environ.get("BASELINE_MODE") or "all").strip().lower()
+if BASELINE_MODE not in ("all", "hour_matched"):   # 打ち間違いは現行（all）に落とす＝勝手に挙動を変えない
+    print(f"⚠ BASELINE_MODE={BASELINE_MODE!r} は未知の値。現行どおり all で実行します。")
+    BASELINE_MODE = "all"
+HOUR_MATCHED = (BASELINE_MODE == "hour_matched")
+# 「いつもより」強調のしきい値。Python の候補選定には使っていない（実体は index.html 側）ので、
+# hour_matched のときだけ JSON に同梱してクライアントへ渡す（＝分母定義としきい値を必ず同じ便で運ぶ）。
+RISING_UP_THRESH = float(os.environ.get("RISING_UP_THRESH") or "1.3")
 # B1 しきい値（暫定）
 B1_FEW_CH    = int(os.environ.get("B1_FEW_CH")    or "10")   # 「少数配信」の上限
 B1_CONC_REF  = float(os.environ.get("B1_CONC_REF") or "300") # 視聴/配信 の基準（集中度）
@@ -738,6 +755,82 @@ def baseline_diag_report(rows_all, diag_by, recent_obs, elapsed):
     return L
 
 
+# ---------- 平常値の時刻整合（A′）本採用・フェーズ2 ----------
+# 【値が渡る経路の全ホップ】（0808-2225-17 の再発防止・指示書0827-0723 §5と同文）
+#   ① SQL（Q_MAIN ＋ hour_matched のときだけ Q_BASELINE_DIAG(narrow) / Q_RECENT_OBS_DIAG）
+#   ② カーソル→dict化（fetch_hour_matched の戻り値 base_by / recent_obs）
+#   ③ rows 組み立ての直前（apply_hour_matched）＝分母3値の差し替え・ratio=None 化・印(al)付け
+#      ／確度の降格は rows 組み立てループ内（conf_code を決めた直後）
+#   ④ rows.sort(key=eff) → TOP_N 切り
+#   ⑤ export dict（item["al"] ＝ここで行に載せる／トップレベルに up_thresh・baseline_mode）
+#   ⑥ data/view02_rising.json
+#   ⑦ index.html loadRising() → viewItems() のキー列挙（中継点）→ usualChip() / 詳細 / heroPick()
+# ⑦の「キー列挙」を通さないと画面まで値が届かない＝ホップを1つでも飛ばすと静かに落ちる。
+def fetch_hour_matched(cur, ids):
+    """A′ の平常値（狭い窓のみ）と「今日の窓の観測点数」を取得する（SELECTのみ・本番の base CTE には触れない）。
+    返り値: (base_by, recent_obs, elapsed_sec)
+      base_by   : {appid: {"baseline","q1","q3","n_days"}}（Q_BASELINE_DIAG の narrow 1系統）
+      recent_obs: {appid: 直近 RECENT_HOURS の観測点数}（載っていない appid ＝ 今日の窓に観測ゼロ）
+      elapsed_sec: 追加2本の合計実行時間（点灯後の初回実行でログから1回読む＝指示書0827-0723 §9）"""
+    if not ids:
+        return {}, {}, 0.0
+    align_secs = RECENT_HOURS * 3600   # 狭い窓＝分子と同じ幅（広い窓は本番分岐に使わない）
+    t0 = time.time()
+    cur.execute(Q_BASELINE_DIAG, {"appids": list(ids), "recent_q": RECENT_Q,
+                                  "gap_days": GAP_DAYS, "base_days": BASE_DAYS,
+                                  "align_secs": align_secs})
+    base_by = {}
+    for appid, baseline, q1, q3, n_days in cur.fetchall():
+        base_by[int(appid)] = {"baseline": None if baseline is None else float(baseline),
+                               "q1": None if q1 is None else float(q1),
+                               "q3": None if q3 is None else float(q3),
+                               "n_days": int(n_days)}
+    cur.execute(Q_RECENT_OBS_DIAG, {"appids": list(ids), "recent_h": RECENT_HOURS})
+    recent_obs = {int(appid): int(n) for appid, n in cur.fetchall()}
+    return base_by, recent_obs, time.time() - t0
+
+
+def apply_hour_matched(cand, base_by, recent_obs):
+    """候補行の分母を A′ に差し替える（hour_matched のときだけ呼ばれる）。
+    差し替えるのは分母系の3値（baseline / q1 / q3）だけ＝分子（recent_value）・n_points・boost は現行のまま。
+    倍率(raw_ratio)と robust_z は差し替え後の分母から**この1か所で**引き直す
+    （順位も表示もこの値を使う＝分母が割れて『×1.2なのに いつもより』が起きない）。
+    返り値: 印字用の件数 {"adopted","marked","no_recent"}"""
+    adopted = marked = no_recent = 0
+    for r in cand:
+        appid = int(r["appid"])
+        slot = base_by.get(appid) or {}
+        ok = bool(slot.get("baseline")) and slot.get("n_days", 0) >= MIN_BASE_DAYS
+        if ok:
+            r["baseline"] = slot["baseline"]
+            r["q1_hm"], r["q3_hm"] = slot.get("q1"), slot.get("q3")
+            r["al"] = 1
+            adopted += 1
+        else:
+            # 日数不足＝現行 base CTE の値のまま採用し、印だけ立てる（落とさない・捏造しない）。
+            # 確度の降格は rows 組み立てループ側（conf_code を決めた直後）で行う。
+            r["al"] = 0
+            marked += 1
+        if not recent_obs.get(appid):
+            # 今日の窓（直近 RECENT_HOURS）に観測が1点も無い＝分子が数日前の1点に落ちている。
+            # 倍率を出さない（分子ごと外す）＝base_score が 0 を返す既存経路に乗り、新しい分岐を作らない。
+            r["recent_value"] = None
+            no_recent += 1
+        rv = r["recent_value"]
+        if rv is None:
+            r["raw_ratio"] = None
+            r["robust_z"] = None   # SQL の robust_z も同じ分子で計算済み＝分子を捨てたら一緒に捨てる
+        elif ok:
+            b = r["baseline"]
+            r["raw_ratio"] = float(rv) / b
+            spread = None
+            if r.get("q1_hm") is not None and r.get("q3_hm") is not None:
+                spread = r["q3_hm"] - r["q1_hm"]
+            r["robust_z"] = ((float(rv) - b) / spread) if spread else None
+        # ok=False かつ分子あり＝現行の raw_ratio / robust_z（Q_MAIN の値）をそのまま使う
+    return {"adopted": adopted, "marked": marked, "no_recent": no_recent}
+
+
 def main():
     print("=" * 88)
     print("view02 v2（A＋B1・読み取り専用・Twitch保存なし）")
@@ -745,6 +838,7 @@ def main():
           f"/ riser=dense整合(mult={RISER_MULT}) / boost上限={BOOST_CAP}")
     print("=" * 88)
     diag_by, diag_recent_obs, diag_secs = {}, {}, 0.0   # 診断（既定OFF＝空のまま使われない）
+    hm_base, hm_recent_obs, hm_secs = {}, {}, 0.0       # A′本採用（既定 all＝空のまま使われない）
     conn = psycopg2.connect(DATABASE_URL)
     try:
         conn.set_session(readonly=True, autocommit=True)
@@ -760,8 +854,21 @@ def main():
             hist_by = fetch_history(cur, ids)   # 折れ線グラフ用の観測履歴（候補分をまとめて取得）
             if BASELINE_DIAG:   # 診断（フェーズ1）：本番経路とは別の追加クエリ。既定OFFならここは走らない。
                 diag_by, diag_recent_obs, diag_secs = fetch_baseline_diag(cur, ids)
+            if HOUR_MATCHED:    # A′本採用（フェーズ2）：既定 all ならここは走らない＝追加クエリ0本。
+                hm_base, hm_recent_obs, hm_secs = fetch_hour_matched(cur, ids)
     finally:
         conn.close()
+
+    if HOUR_MATCHED:   # ③ 分母3値の差し替え・ratio=None 化・印(al)付け（rows 組み立ての直前）
+        hm_stat = apply_hour_matched(cand, hm_base, hm_recent_obs)
+        print(f"平常値=A′（時刻整合・狭い窓{RECENT_HOURS}h・BASELINE_MODE=hour_matched）: "
+              f"A′採用 {hm_stat['adopted']}/{len(cand)} 件 ／ "
+              f"日数不足で現行のまま（印 al=0・確度を一段下げる） {hm_stat['marked']} 件 ／ "
+              f"今日の窓に観測ゼロで倍率を出さない {hm_stat['no_recent']} 件 ／ "
+              f"追加クエリ2本 {hm_secs:.1f}秒 ／ しきい値 RISING_UP_THRESH={RISING_UP_THRESH}")
+        if BASELINE_DIAG:
+            print("  ※BASELINE_DIAG と同時ONです。診断表の「現行」列は既に A′ に差し替わった値を指します"
+                  "（比較したいときは片方だけONにしてください）。")
 
     tw = twitch_fetch([r["name"] for r in cand])   # DB接続外でTwitch取得（保存なし）
 
@@ -888,6 +995,11 @@ def main():
             if n < 5:
                 conf = "低"; conf_code = "low"
             label = " + ".join(label_parts) if label_parts else "（シグナルあり）"
+        if HOUR_MATCHED and r.get("al") == 0:
+            # 時刻をそろえた平常値を作れなかった行＝分母の質が一段落ちる。high→mid・mid→low・low→low。
+            # 「照会できなかった」を「陰性」と同じ顔で出さない（0802E-05）。画面側で二重に下げない。
+            conf_code = {"high": "mid", "mid": "low", "low": "low"}[conf_code]
+            conf = {"高": "中", "中": "低", "低": "低"}[conf]
         r.update({"shrunk": sr, "base": bs, "eff": eff, "label": label, "conf": conf,
                   "conf_code": conf_code, "signals": signals, "boost": boost,
                   "boost_capped": boost_capped, "tw": tw.get(r["name"]), "web": web.get(r["name"]),
@@ -909,7 +1021,8 @@ def main():
         ratio = "—" if r["shrunk"] is None else f"{r['shrunk']:.2f}"
         z = "—" if r["robust_z"] is None else f"{r['robust_z']:.1f}"
         tws = "—" if not r["tw"] else f"{r['tw'][0]}/{r['tw'][1]}"
-        print(f"  {nm} {str(r['current_ccu']).rjust(6)} {str(r['recent_value']).rjust(6)} "
+        rec_s = "—" if r["recent_value"] is None else str(r["recent_value"])   # A′で分子を外した行（allでは常に値あり＝表示不変）
+        print(f"  {nm} {str(r['current_ccu']).rjust(6)} {rec_s.rjust(6)} "
               f"{base.rjust(6)} {ratio.rjust(5)} {z.rjust(4)} {'Y' if r['is_riser'] else '-'}    "
               f"{'Y' if r['is_launch'] else '-'}    {tws.rjust(10)}  {r['label']} / {r['conf']}")
     reason_ct = {}
@@ -947,6 +1060,9 @@ def main():
         },
         "items": [],
     }
+    if HOUR_MATCHED:   # ⑥ all のときは1キーも足さない＝出力は現行と完全一致
+        out["baseline_mode"] = "hour_matched"       # 分母の定義（画面側の後方互換判定にも使う）
+        out["up_thresh"] = RISING_UP_THRESH         # 「いつもより」強調のしきい値（しきい値は分母と同じ便で運ぶ）
     for i, r in enumerate(rows, 1):
         item = {
             "rank": i,
@@ -973,6 +1089,8 @@ def main():
             # 折れ線グラフ用の観測履歴（[[ts,ccu],...]・6hバケット・now_ccuと同形式）。無い作品は付けない。
             "history": hist_by.get(int(r["appid"]), []),
         }
+        if HOUR_MATCHED:  # ⑤ 時刻整合の平常値を使えたか（1=A′採用 / 0=日数不足で現行の平常値＋確度は降格済み）
+            item["al"] = int(r["al"])
         if INV_META:  # 透明性（B）：調査メタ（何を調べ・陰性/陽性・なぜ不明か）。集計のみ・Twitch数値なし。
             item["investigation"] = r["investigation"]
         if TIMING_ALIGN:  # A：時刻整合で確認できた主因（無ければ null＝シグナルはあるが時刻未確認）。

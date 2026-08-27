@@ -636,11 +636,24 @@ function isRevival(hist, st, cur){
 function ratioClass(r){ return r>=3 ? "r3" : (r>=1.8 ? "r2" : "r1"); }
 // 確度メーター：high=●●●／mid=●●○／low=●○○。ラベルは title に（静か＝根幹9）。
 function confMeter(cf){ const lv= cf==='high'?3 : cf==='low'?1 : 2; const lab= cf==='high'?L('高','High') : cf==='low'?L('低','Low') : L('中','Mid'); let s=""; for(let i=0;i<3;i++) s+=`<span class="${i<lv?'on':'d'}">●</span>`; return `<div class="conf conf-${cf||'mid'}" title="${L('確度','Confidence')} ${lab}（${L('伸びの推定の確からしさ','how reliable the rise estimate is')}）"><span class="dots">${s}</span><span class="conflab">${L('確度 ','Conf ')}${lab}</span></div>`; }
-// 平常比チップ（全ビュー共通）：現在が平常（過去14日の中央値）の何倍か。1.3倍以上は「いつもより上」を強調。呼称は全タブ「いつもより ×N」で統一（タブ間で表記を揃える）。
-function usualChip(ratio){
+// 「いつもより上」を強調するしきい値。既定 1.3＝全ビュー共通（平常値の定義が現行のままのビューはこの値のまま）。
+// view02 だけは平常値が A′（同じ時計時刻の窓）に変わりうるため、データ同梱の up_thresh に従う
+//（＝しきい値は平常値の定義と必ず同じ便で運ぶ。キーが無い＝従来どおり 1.3）。
+const UP_THRESH_DEFAULT=1.3;
+let UP_THRESH_V2=UP_THRESH_DEFAULT;   // loadRising() が view02_rising.json の up_thresh で上書きする（⑦の中継点）
+// 平常比チップ（全ビュー共通）：現在が平常（過去14日の中央値）の何倍か。しきい値以上は「いつもより上」を強調。呼称は全タブ「いつもより ×N」で統一（タブ間で表記を揃える）。
+// 第2引数 up＝そのビューのしきい値（省略＝1.3）。view02 由来の行だけ UP_THRESH_V2 を渡す＝他ビューに view02 のしきい値を持ち込まない。
+function usualChip(ratio, up){
+  const th=up||UP_THRESH_DEFAULT;
   const lab=L("いつもより ×"+ratio.toFixed(1),"×"+ratio.toFixed(1)+" vs usual");
   const tip=esc(L("ふだん（過去14日の中央値）と比べて今どれだけ人が多いか。×2なら“いつもの2倍”。","How many more players than usual (median of the last 14 days). ×2 = twice the usual."));
-  return ratio>=1.3 ? `<span class="chip c-up ic" title="${tip}">${ICON.up}${lab}</span>` : `<span class="chip" title="${tip}">${lab}</span>`;
+  return ratio>=th ? `<span class="chip c-up ic" title="${tip}">${ICON.up}${lab}</span>` : `<span class="chip" title="${tip}">${lab}</span>`;
+}
+// 「時間帯をそろえられませんでした」チップ（view02・A′のときだけ）。控えめ＝強調しない。
+// 確度は JSON の confidence をそのまま使う（降格は Python 側で済んでいる＝画面で二重に下げない）。
+function alignChip(al){
+  if(al!==0) return "";
+  return `<span class="chip tagmuted" title="${esc(L("この作品は同じ時間帯の観測日数が足りず、平常値を時間帯でそろえられませんでした（過去14日ぜんぶの中央値を使っています）。確度は一段下げてあります。","Not enough same-time-of-day observations, so the usual value could not be time-matched (using the plain 14-day median). Confidence has been lowered one step."))}">${L("時間帯をそろえられませんでした","Time-of-day not matched")}</span>`;
 }
 // 平常値のサブ行（全ビュー共通）：見出しの下に「平常 N」を静かに添える。書式をタブ間で揃える（現在数は各ビューの見出し／詳細ページに集約）。
 function baseLine(usual){ return usual ? `<div class="base">${L("平常","usual")} ${nf.format(usual)}</div>` : ""; }
@@ -998,15 +1011,20 @@ function viewItems(view){
       const nc=ncByApp[g.a], ncd=nc&&nc.detail;
       const spark = (g.hist ? sparkline(g.hist, g.base)
                             : sparkline(ncd&&ncd.history, (ncd&&ncd.stats&&ncd.stats.baseline)||g.base));
-      const frac=Math.max(0,Math.min(1,(g.r-1)/5));
+      const frac=Math.max(0,Math.min(1,((g.r!=null?g.r:1)-1)/5));
       const surge = spark || `<div class="surgebar"><div class="surgetrack"><div class="surgefill" style="width:${(frac*100).toFixed(1)}%"></div></div></div>`;
+      // 倍率が出せない行（＝今日の窓に観測が1点も無い。A′のときだけ起きる）。×N を捏造せず、いまの人数を主指標に落とす。
+      const mult = (g.r!=null) ? `<span class="num mult ${ratioClass(g.r)}">×${g.r.toFixed(1)}</span>`
+                               : `<span class="num">${nf.format(g.now||0)}</span><span class="unit">${L("人","players")}</span>`;
+      // ⑦ キー列挙の中継点：ここに足さないと al は描画まで届かない（0808-2225-17 の再発防止）。
       return { key:"v2_"+g.a, appid:g.a, title:g.n, ccu:g.now, detail:{genres:g.g||[]},
-        r:g.r, ratio:g.r, now:g.now, rec:(g.rec!=null?g.rec:null), base:g.base, cf:g.cf, causes:cs, ur:g.ur||null,
-        tagsP:causes, tagsS:genres, detailBody:"",
+        r:(g.r!=null?g.r:null), ratio:(g.r!=null?g.r:-1), now:g.now, rec:(g.rec!=null?g.rec:null), base:g.base, cf:g.cf, causes:cs, ur:g.ur||null,
+        al:(g.al!=null?g.al:null),
+        tagsP:causes+alignChip(g.al), tagsS:genres, detailBody:"",
         surge:surge,
-        primary:`<span class="num mult ${ratioClass(g.r)}">×${g.r.toFixed(1)}</span>`,  // L0主指標＝平常比
+        primary:mult,  // L0主指標＝平常比（出せない行は人数）
         kicker: cs.length ? L("きっかけ：","Trigger: ")+esc(causeLabel(cs[0].t)) : L("原因不明","Cause unknown"),
-        metric:`<span class="num mult ${ratioClass(g.r)}">×${g.r.toFixed(1)}</span>${confMeter(g.cf)}${baseLine(g.base)}` };
+        metric:`${mult}${confMeter(g.cf)}${baseLine(g.base)}` };
     });
   }
   if(view==="L"){
@@ -1274,22 +1292,26 @@ function unknownChip(ur){
   return `<span class="chip tagmuted">${L("原因不明","Cause unknown")}</span>`;
 }
 function whyPicked(o){
-  if(o.r==null) return "";
+  if(o.r==null && o.base==null) return "";
   const cz=(o.causes&&o.causes.length)?o.causes.slice(0,4).map(causeChip).join(""):unknownChip(o.ur);
   const small=(o.base!=null && o.base>0 && o.base<300);
   const lab=o.cf==='high'?L('高','High'):o.cf==='low'?L('低','Low'):L('中','Mid');
-  const rx=`<b>×${(o.r||1).toFixed(1)}</b>`, baseb=`<b>${nf.format(o.base||0)}</b>`;
+  const rx=(o.r!=null)?`<b>×${o.r.toFixed(1)}</b>`:null, baseb=`<b>${nf.format(o.base||0)}</b>`;
   // 分子は rec（＝×N の分子）だけ。埋め込みフォールバックのように rec が無い行では
   // 数字を捏造せず分子ごと文から外す（now を代わりに置くと ×N と噛み合わない）。
   const recb=(o.rec!=null)?`<b>${nf.format(o.rec)}</b>`:null;
-  const growth=recb
+  // 倍率そのものが無い行（今日の窓に観測ゼロ）は ×N も出さない＝古い1点から作った倍率を見せない。
+  const growth=(rx==null)
+    ?L(`平常（過去14日の中央値）${baseb}。直近6時間に観測が無いため、いまの倍率は出していません。`,`Usual (14-day median) ${baseb}. No observations in the last 6 hours, so no ×N is shown.`)
+    :(recb
     ?L(`直近6時間の高いほう（上位10%） ${recb} が、平常（過去14日の中央値）${baseb} のおよそ ${rx}`,`Recent 6h high (90th percentile) ${recb} vs the usual (14-day median) ${baseb} — about ${rx}`)
-    :L(`平常（過去14日の中央値）${baseb} のおよそ ${rx}`,`About ${rx} the usual (14-day median) ${baseb}`);
+    :L(`平常（過去14日の中央値）${baseb} のおよそ ${rx}`,`About ${rx} the usual (14-day median) ${baseb}`));
   return `<div class="why">`
     +`<div class="whyrow"><span class="wk">${L("伸び","Growth")}</span><span class="wv">${growth}</span></div>`
     +`<div class="whyrow"><span class="wk">${L("きっかけ","Trigger")}</span><span class="wv"><span class="tags">${cz}</span></span></div>`
     +`<div class="whyrow"><span class="wk">${L("確度","Confidence")}</span><span class="wv">${lab} — ${L("伸びの大きさ（平常のばらつき比）・観測点数・原因の有無で判定。伸びがばらつきの約2倍以上・観測7点以上・原因ありで「高」、データが薄い/伸びが小さい/原因不明で「低」。","judged by the size of the rise (vs the usual variability), number of observations, and whether a cause was found. ≈2× the variability + 7+ observations + a cause → High; thin data / small rise / no cause → Low.")}</span></div>`
     +(small?`<div class="whynote">${L("※ 母数が小さく、×N はブレやすい（参考値）。","* Small base — ×N is volatile (reference only).")}</div>`:"")
+    +(o.al===0?`<div class="whynote">${L("※ 同じ時間帯の観測日数が足りず、平常値を時間帯でそろえられませんでした（過去14日ぜんぶの中央値）。確度は一段下げています。","* Not enough same-time-of-day observations — the usual value is the plain 14-day median. Confidence lowered one step.")}</div>`:"")
     +`<div class="whynote">${L("「レビュー増」は投稿件数の急増で、好悪は問いません。「約1.8倍」は初期のバックテストで、生の人数順に並べるより上位ほど実際に伸びやすかった度合いです（検証中）。","\"Reviews up\" is a surge in review count, regardless of sentiment. \"≈1.8×\" is from an early backtest: higher ranks actually rose more than a raw player-count order (in validation).")}</div>`
     +`</div>`;
 }
@@ -1532,9 +1554,10 @@ let heroReady=false, heroSeq=0;
 const HERO_MIN_BASE=300;   // 平常値の下限（暫定値）。調整するときはここ1か所だけ。
 // 原因あり（c＝signals が空でない）かつ 平常値≥下限 の先頭を採る。該当ゼロなら従来どおり＝空にしない。
 function heroPick(){
+  const th=UP_THRESH_V2;   // view02 のしきい値（データ同梱の up_thresh・無ければ 1.3）。倍率が無い行(null)は自動的に外れる。
   const cands=(REAL_V2||[]).slice().sort((a,b)=>(b.r||0)-(a.r||0));
-  const good=cands.filter(x=> x && x.r>=1.3 && (x.c&&x.c.length) && (x.base||0)>=HERO_MIN_BASE);
-  return good.length?good:cands.filter(x=> x && x.r>=1.3);
+  const good=cands.filter(x=> x && x.r>=th && (x.c&&x.c.length) && (x.base||0)>=HERO_MIN_BASE);
+  return good.length?good:cands.filter(x=> x && x.r>=th);
 }
 // 画像が取れない作品は次点へ送る（header.jpg が無い作品があり、onerror で消えると看板が画像なしになる）。
 // 参照先は coverImg と同じ公式CDN（CSPで許可済み・再ホストしない）。
@@ -1551,7 +1574,7 @@ async function firstWithCover(list){
 function syncHeroVis(){ const el=document.getElementById("hero"); if(el) el.hidden=!(heroReady && current!=="2"); }
 function paintHero(top){
   const el=document.getElementById("hero"); if(!el) return;
-  heroReady=!!(top && top.r>=1.3);
+  heroReady=!!(top && top.r>=UP_THRESH_V2);
   if(heroReady){
     document.getElementById("heroImg").innerHTML=coverImg(top.a);
     document.getElementById("heroName").textContent=top.n;
@@ -1679,12 +1702,17 @@ async function loadRising(){
     if(!res.ok) throw new Error("HTTP "+res.status);
     const d=await res.json();
     if(d && Array.isArray(d.items) && d.items.length){
+      // 平常値の定義としきい値は同じ便で受け取る。キーが無い＝従来どおり（後方互換＝all のまま）。
+      const hm=(d.baseline_mode==="hour_matched");   // A′＝同じ時計時刻の窓でそろえた平常値
+      UP_THRESH_V2=(typeof d.up_thresh==="number" && d.up_thresh>0) ? d.up_thresh : UP_THRESH_DEFAULT;
       REAL_V2=d.items.map(it=>{ const de=it.detection||{};
         return { a:it.appid, n:it.name, now:de.current_ccu, base:de.baseline||0,
           // rec＝ratio の分子そのもの（サーバ側 COALESCE(直近6h p90, current_ccu) ÷ baseline）。
           // now（最新1点）を分子として出すと ×R と噛み合わないので、文に出す数字はこちらを使う。
-          rec:(de.recent_value!=null ? de.recent_value : de.current_ccu),
-          r:de.ratio||(de.baseline?de.current_ccu/de.baseline:1), cf:it.confidence||"mid",
+          // A′のときは null＝「今日の窓に観測ゼロ」を意味するので、now で埋めない（＝数字を捏造しない）。
+          rec:(de.recent_value!=null ? de.recent_value : (hm ? null : de.current_ccu)),
+          r:(hm ? (de.ratio!=null?de.ratio:null) : (de.ratio||(de.baseline?de.current_ccu/de.baseline:1))), cf:it.confidence||"mid",
+          al:(it.al!=null ? it.al : null),   // 1=時刻整合の平常値／0=そろえられず現行の平常値（印つき）／null=A′以前のJSON
           hist:(Array.isArray(it.history)&&it.history.length>=2)?it.history:null,  // 折れ線グラフ用の観測履歴
           ur:(it.investigation&&it.investigation.unknown_reason)||null,  // 原因不明の理由（調べて陰性か／調べられなかったか）
           c:(it.signals||[]).map(function(s){return {t:s.type,v:s.value};}), g:it.genres||[] }; });
