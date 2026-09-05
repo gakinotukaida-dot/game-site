@@ -2,7 +2,7 @@
   "view": "prediction_scorecard",
   "schema": "prediction_scorecard_v1",
   "note": "羽根予想の答え合わせ（as-of・リーク無し）。holdout=過去を70/30分割しtrainだけで学習しtestを採点（honestなバックテスト）。live=発売前に記録した予測→発売後の結果（最も硬い真のout-of-sample・日々増える）。calibration は「◯%と予測した群が実際に何%跳ねたか」＝予測と実測が近いほど信頼できる。",
-  "generated_at": "2026-09-04T10:13:30.081245+00:00",
+  "generated_at": "2026-09-05T09:42:37.509161+00:00",
   "params": {
     "lookback_days": 180,
     "outcome_days": 14,
@@ -18,20 +18,20 @@
     ]
   },
   "holdout": {
-    "n_pairs": 5012,
-    "train_n": 3549,
-    "test_n": 1463,
+    "n_pairs": 5090,
+    "train_n": 3605,
+    "test_n": 1485,
     "ready": true,
     "metrics": {
-      "n": 1463,
+      "n": 1485,
       "hits": 54,
-      "base_rate": 0.03691,
-      "top_decile_n": 146,
-      "top_decile_rate": 0.20548,
+      "base_rate": 0.03636,
+      "top_decile_n": 148,
+      "top_decile_rate": 0.2027,
       "top_decile_lift": 5.57,
-      "brier": 0.03576,
-      "high_conf_n": 122,
-      "high_conf_rate": 0.2377
+      "brier": 0.03649,
+      "high_conf_n": 128,
+      "high_conf_rate": 0.22656
     },
     "calibration": [
       {
@@ -39,54 +39,54 @@
           0.0,
           0.02
         ],
-        "n": 926,
+        "n": 963,
         "pred_mean": 0.0074,
-        "actual_rate": 0.0086
+        "actual_rate": 0.0083
       },
       {
         "range": [
           0.02,
           0.05
         ],
-        "n": 281,
-        "pred_mean": 0.0357,
-        "actual_rate": 0.0285
+        "n": 261,
+        "pred_mean": 0.0364,
+        "actual_rate": 0.0307
       },
       {
         "range": [
           0.05,
           0.1
         ],
-        "n": 101,
-        "pred_mean": 0.0878,
-        "actual_rate": 0.0792
+        "n": 103,
+        "pred_mean": 0.0867,
+        "actual_rate": 0.0777
       },
       {
         "range": [
           0.1,
           0.2
         ],
-        "n": 60,
-        "pred_mean": 0.119,
-        "actual_rate": 0.0333
+        "n": 57,
+        "pred_mean": 0.1181,
+        "actual_rate": 0.0351
       },
       {
         "range": [
           0.2,
           0.4
         ],
-        "n": 37,
-        "pred_mean": 0.2713,
-        "actual_rate": 0.1892
+        "n": 40,
+        "pred_mean": 0.2653,
+        "actual_rate": 0.175
       },
       {
         "range": [
           0.4,
           1.0
         ],
-        "n": 58,
-        "pred_mean": 0.7263,
-        "actual_rate": 0.3621
+        "n": 61,
+        "pred_mean": 0.7342,
+        "actual_rate": 0.3443
       }
     ],
     "examples": [
@@ -94,41 +94,49 @@
         "appid": 2764460,
         "name": "Sandustry",
         "release": "2026-08-13",
-        "pred": 0.9989,
+        "pred": 0.9988,
         "hit": true,
         "launch_peak": 12531
-      },
-      {
-        "appid": 2936290,
-        "name": "The Life and Suffering of Prince Jerian",
-        "release": "2026-07-20",
-        "pred": 0.9974,
-        "hit": true,
-        "launch_peak": 1775
       },
       {
         "appid": 3949550,
         "name": "1666: Amsterdam",
         "release": "2026-08-25",
-        "pred": 0.9966,
+        "pred": 0.9981,
         "hit": true,
         "launch_peak": 1456
+      },
+      {
+        "appid": 2936290,
+        "name": "The Life and Suffering of Prince Jerian",
+        "release": "2026-07-20",
+        "pred": 0.9976,
+        "hit": true,
+        "launch_peak": 1775
       },
       {
         "appid": 3276050,
         "name": "SpaceCraft",
         "release": "2026-06-11",
-        "pred": 0.9936,
+        "pred": 0.9942,
         "hit": true,
         "launch_peak": 7685
       },
       {
-        "appid": 2417470,
-        "name": "Beastro",
-        "release": "2026-06-11",
-        "pred": 0.979,
-        "hit": false,
-        "launch_peak": 657
+        "appid": 3448650,
+        "name": "Aliens: Fireteam Elite 2",
+        "release": "2026-08-25",
+        "pred": 0.9831,
+        "hit": true,
+        "launch_peak": 7413
+      },
+      {
+        "appid": 3751950,
+        "name": "Assassin's Creed Black Flag Resynced",
+        "release": "2026-07-09",
+        "pred": 0.9815,
+        "hit": true,
+        "launch_peak": 104679
       },
       {
         "appid": 4246860,
@@ -139,26 +147,26 @@
         "launch_peak": 631
       },
       {
-        "appid": 3751950,
-        "name": "Assassin's Creed Black Flag Resynced",
-        "release": "2026-07-09",
-        "pred": 0.9772,
-        "hit": true,
-        "launch_peak": 104679
+        "appid": 2417470,
+        "name": "Beastro",
+        "release": "2026-06-11",
+        "pred": 0.979,
+        "hit": false,
+        "launch_peak": 657
       },
       {
-        "appid": 3448650,
-        "name": "Aliens: Fireteam Elite 2",
-        "release": "2026-08-25",
-        "pred": 0.9724,
-        "hit": true,
-        "launch_peak": 7413
+        "appid": 3393240,
+        "name": "Banker Simulator",
+        "release": "2026-07-17",
+        "pred": 0.979,
+        "hit": false,
+        "launch_peak": 93
       },
       {
         "appid": 4134600,
         "name": "EverRail",
         "release": "2026-07-20",
-        "pred": 0.9603,
+        "pred": 0.9647,
         "hit": false,
         "launch_peak": 353
       },
@@ -166,7 +174,7 @@
         "appid": 1454370,
         "name": "STARSEEKER: Astroneer Expeditions",
         "release": "2026-06-11",
-        "pred": 0.9509,
+        "pred": 0.9498,
         "hit": false,
         "launch_peak": 701
       },
@@ -174,7 +182,7 @@
         "appid": 1250410,
         "name": "Microsoft Flight Simulator (2020) 40th Anniversary Edition",
         "release": "2026-08-25",
-        "pred": 0.9483,
+        "pred": 0.9472,
         "hit": true,
         "launch_peak": 5152
       },
@@ -182,7 +190,7 @@
         "appid": 2001760,
         "name": "Beast of Reincarnation",
         "release": "2026-08-03",
-        "pred": 0.9157,
+        "pred": 0.9184,
         "hit": true,
         "launch_peak": 14995
       },
@@ -190,7 +198,7 @@
         "appid": 2819470,
         "name": "Aquapark Tycoon",
         "release": "2026-07-22",
-        "pred": 0.9051,
+        "pred": 0.9133,
         "hit": false,
         "launch_peak": 432
       },
@@ -198,24 +206,16 @@
         "appid": 3808690,
         "name": "Pathogenic",
         "release": "2026-07-16",
-        "pred": 0.9035,
+        "pred": 0.9034,
         "hit": true,
         "launch_peak": 5893
-      },
-      {
-        "appid": 2163330,
-        "name": "Yet Another Zombie Survivors",
-        "release": "2026-08-20",
-        "pred": 0.8504,
-        "hit": true,
-        "launch_peak": 9921
       }
     ]
   },
   "live": {
     "counts": {
       "pending": {
-        "n": 4613,
+        "n": 4691,
         "hits": 0
       },
       "resolved": {
@@ -223,7 +223,7 @@
         "hits": 0
       }
     },
-    "pending": 4613,
+    "pending": 4691,
     "settling": 0,
     "resolved": 2,
     "metrics": {
