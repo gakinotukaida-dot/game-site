@@ -61,7 +61,7 @@ def main():
     pub = format_datetime(gen)
 
     items = [it for it in (d.get("items") or [])
-             if (it.get("detection") or {}).get("ratio", 0) >= MIN_RATIO][:MAX_ITEMS]
+             if ((it.get("detection") or {}).get("ratio") or 0) >= MIN_RATIO][:MAX_ITEMS]
 
     old_guids = load_old_guids(OUT)
     entries, fresh = [], []
