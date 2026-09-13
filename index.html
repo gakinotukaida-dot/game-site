@@ -1556,7 +1556,7 @@ const HERO_MIN_BASE=300;   // 平常値の下限（暫定値）。調整する�
 function heroPick(){
   const th=UP_THRESH_V2;   // view02 のしきい値（データ同梱の up_thresh・無ければ 1.3）。倍率が無い行(null)は自動的に外れる。
   const cands=(REAL_V2||[]).slice().sort((a,b)=>(b.r||0)-(a.r||0));
-  const good=cands.filter(x=> x && x.r>=th && (x.c&&x.c.length) && (x.base||0)>=HERO_MIN_BASE);
+  const good=cands.filter(x=> x && x.r>=th && x.al!==0 && (x.c&&x.c.length) && (x.base||0)>=HERO_MIN_BASE);
   return good.length?good:cands.filter(x=> x && x.r>=th);
 }
 // 画像が取れない作品は次点へ送る（header.jpg が無い作品があり、onerror で消えると看板が画像なしになる）。
