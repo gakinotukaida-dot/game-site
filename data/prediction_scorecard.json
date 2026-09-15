@@ -2,7 +2,7 @@
   "view": "prediction_scorecard",
   "schema": "prediction_scorecard_v1",
   "note": "羽根予想の答え合わせ（as-of・リーク無し）。holdout=過去を70/30分割しtrainだけで学習しtestを採点（honestなバックテスト）。live=発売前に記録した予測→発売後の結果（最も硬い真のout-of-sample・日々増える）。calibration は「◯%と予測した群が実際に何%跳ねたか」＝予測と実測が近いほど信頼できる。",
-  "generated_at": "2026-09-14T11:19:12.247282+00:00",
+  "generated_at": "2026-09-15T10:43:57.465517+00:00",
   "params": {
     "lookback_days": 180,
     "outcome_days": 14,
@@ -18,20 +18,20 @@
     ]
   },
   "holdout": {
-    "n_pairs": 5789,
-    "train_n": 4089,
-    "test_n": 1700,
+    "n_pairs": 5810,
+    "train_n": 4105,
+    "test_n": 1705,
     "ready": true,
     "metrics": {
-      "n": 1700,
+      "n": 1705,
       "hits": 60,
-      "base_rate": 0.03529,
+      "base_rate": 0.03519,
       "top_decile_n": 170,
       "top_decile_rate": 0.20588,
-      "top_decile_lift": 5.83,
-      "brier": 0.0359,
-      "high_conf_n": 255,
-      "high_conf_rate": 0.17647
+      "top_decile_lift": 5.85,
+      "brier": 0.03579,
+      "high_conf_n": 256,
+      "high_conf_rate": 0.17578
     },
     "calibration": [
       {
@@ -39,17 +39,17 @@
           0.0,
           0.02
         ],
-        "n": 1050,
+        "n": 1055,
         "pred_mean": 0.0078,
-        "actual_rate": 0.0067
+        "actual_rate": 0.0066
       },
       {
         "range": [
           0.02,
           0.05
         ],
-        "n": 302,
-        "pred_mean": 0.037,
+        "n": 301,
+        "pred_mean": 0.0368,
         "actual_rate": 0.0199
       },
       {
@@ -58,7 +58,7 @@
           0.1
         ],
         "n": 61,
-        "pred_mean": 0.0679,
+        "pred_mean": 0.0675,
         "actual_rate": 0.0328
       },
       {
@@ -66,9 +66,9 @@
           0.1,
           0.2
         ],
-        "n": 160,
-        "pred_mean": 0.1118,
-        "actual_rate": 0.0813
+        "n": 161,
+        "pred_mean": 0.1114,
+        "actual_rate": 0.0807
       },
       {
         "range": [
@@ -76,7 +76,7 @@
           0.4
         ],
         "n": 51,
-        "pred_mean": 0.2662,
+        "pred_mean": 0.2653,
         "actual_rate": 0.1176
       },
       {
@@ -85,7 +85,7 @@
           1.0
         ],
         "n": 76,
-        "pred_mean": 0.7386,
+        "pred_mean": 0.7383,
         "actual_rate": 0.3421
       }
     ],
@@ -150,7 +150,7 @@
         "appid": 1454370,
         "name": "STARSEEKER: Astroneer Expeditions",
         "release": "2026-06-11",
-        "pred": 0.9826,
+        "pred": 0.9825,
         "hit": false,
         "launch_peak": 701
       },
@@ -158,31 +158,31 @@
         "appid": 3393240,
         "name": "Banker Simulator",
         "release": "2026-07-17",
-        "pred": 0.9779,
+        "pred": 0.9778,
         "hit": false,
         "launch_peak": 93
-      },
-      {
-        "appid": 4246860,
-        "name": "Security 51",
-        "release": "2026-08-12",
-        "pred": 0.9779,
-        "hit": false,
-        "launch_peak": 631
       },
       {
         "appid": 3971730,
         "name": "Donutal",
         "release": "2026-09-03",
-        "pred": 0.9779,
+        "pred": 0.9778,
         "hit": false,
         "launch_peak": 25
+      },
+      {
+        "appid": 4246860,
+        "name": "Security 51",
+        "release": "2026-08-12",
+        "pred": 0.9778,
+        "hit": false,
+        "launch_peak": 631
       },
       {
         "appid": 2417470,
         "name": "Beastro",
         "release": "2026-06-11",
-        "pred": 0.9779,
+        "pred": 0.9778,
         "hit": false,
         "launch_peak": 657
       },
@@ -198,7 +198,7 @@
         "appid": 3219630,
         "name": "Halloween: The Game",
         "release": "2026-09-08",
-        "pred": 0.9643,
+        "pred": 0.9644,
         "hit": true,
         "launch_peak": 33611
       },
@@ -206,7 +206,7 @@
         "appid": 1250410,
         "name": "Microsoft Flight Simulator (2020) 40th Anniversary Edition",
         "release": "2026-08-25",
-        "pred": 0.9393,
+        "pred": 0.9392,
         "hit": true,
         "launch_peak": 5152
       }
@@ -215,7 +215,7 @@
   "live": {
     "counts": {
       "pending": {
-        "n": 5231,
+        "n": 5370,
         "hits": 0
       },
       "resolved": {
@@ -223,7 +223,7 @@
         "hits": 0
       }
     },
-    "pending": 5231,
+    "pending": 5370,
     "settling": 0,
     "resolved": 2,
     "metrics": {
