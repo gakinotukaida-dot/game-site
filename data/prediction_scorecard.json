@@ -2,7 +2,7 @@
   "view": "prediction_scorecard",
   "schema": "prediction_scorecard_v1",
   "note": "羽根予想の答え合わせ（as-of・リーク無し）。holdout=過去を70/30分割しtrainだけで学習しtestを採点（honestなバックテスト）。live=発売前に記録した予測→発売後の結果（最も硬い真のout-of-sample・日々増える）。calibration は「◯%と予測した群が実際に何%跳ねたか」＝予測と実測が近いほど信頼できる。",
-  "generated_at": "2026-09-15T10:43:57.465517+00:00",
+  "generated_at": "2026-09-16T10:32:10.076680+00:00",
   "params": {
     "lookback_days": 180,
     "outcome_days": 14,
@@ -18,20 +18,20 @@
     ]
   },
   "holdout": {
-    "n_pairs": 5810,
-    "train_n": 4105,
-    "test_n": 1705,
+    "n_pairs": 5889,
+    "train_n": 4162,
+    "test_n": 1727,
     "ready": true,
     "metrics": {
-      "n": 1705,
-      "hits": 60,
-      "base_rate": 0.03519,
-      "top_decile_n": 170,
-      "top_decile_rate": 0.20588,
-      "top_decile_lift": 5.85,
-      "brier": 0.03579,
-      "high_conf_n": 256,
-      "high_conf_rate": 0.17578
+      "n": 1727,
+      "hits": 61,
+      "base_rate": 0.03532,
+      "top_decile_n": 172,
+      "top_decile_rate": 0.2093,
+      "top_decile_lift": 5.93,
+      "brier": 0.03577,
+      "high_conf_n": 253,
+      "high_conf_rate": 0.18182
     },
     "calibration": [
       {
@@ -39,8 +39,8 @@
           0.0,
           0.02
         ],
-        "n": 1055,
-        "pred_mean": 0.0078,
+        "n": 1064,
+        "pred_mean": 0.0077,
         "actual_rate": 0.0066
       },
       {
@@ -48,45 +48,45 @@
           0.02,
           0.05
         ],
-        "n": 301,
-        "pred_mean": 0.0368,
-        "actual_rate": 0.0199
+        "n": 300,
+        "pred_mean": 0.0362,
+        "actual_rate": 0.02
       },
       {
         "range": [
           0.05,
           0.1
         ],
-        "n": 61,
-        "pred_mean": 0.0675,
-        "actual_rate": 0.0328
+        "n": 68,
+        "pred_mean": 0.0667,
+        "actual_rate": 0.0294
       },
       {
         "range": [
           0.1,
           0.2
         ],
-        "n": 161,
-        "pred_mean": 0.1114,
-        "actual_rate": 0.0807
+        "n": 165,
+        "pred_mean": 0.1147,
+        "actual_rate": 0.0788
       },
       {
         "range": [
           0.2,
           0.4
         ],
-        "n": 51,
-        "pred_mean": 0.2653,
-        "actual_rate": 0.1176
+        "n": 52,
+        "pred_mean": 0.2634,
+        "actual_rate": 0.1154
       },
       {
         "range": [
           0.4,
           1.0
         ],
-        "n": 76,
-        "pred_mean": 0.7383,
-        "actual_rate": 0.3421
+        "n": 78,
+        "pred_mean": 0.7449,
+        "actual_rate": 0.3462
       }
     ],
     "examples": [
@@ -99,20 +99,20 @@
         "launch_peak": 84889
       },
       {
-        "appid": 2764460,
-        "name": "Sandustry",
-        "release": "2026-08-13",
-        "pred": 0.9988,
-        "hit": true,
-        "launch_peak": 12531
-      },
-      {
         "appid": 3949550,
         "name": "1666: Amsterdam",
         "release": "2026-08-25",
-        "pred": 0.9986,
+        "pred": 0.9988,
         "hit": true,
         "launch_peak": 1456
+      },
+      {
+        "appid": 2764460,
+        "name": "Sandustry",
+        "release": "2026-08-13",
+        "pred": 0.9987,
+        "hit": true,
+        "launch_peak": 12531
       },
       {
         "appid": 2936290,
@@ -126,7 +126,7 @@
         "appid": 3448650,
         "name": "Aliens: Fireteam Elite 2",
         "release": "2026-08-25",
-        "pred": 0.996,
+        "pred": 0.9966,
         "hit": true,
         "launch_peak": 7413
       },
@@ -134,7 +134,7 @@
         "appid": 3751950,
         "name": "Assassin's Creed Black Flag Resynced",
         "release": "2026-07-09",
-        "pred": 0.994,
+        "pred": 0.9938,
         "hit": true,
         "launch_peak": 104679
       },
@@ -142,23 +142,39 @@
         "appid": 3276050,
         "name": "SpaceCraft",
         "release": "2026-06-11",
-        "pred": 0.9937,
+        "pred": 0.9938,
         "hit": true,
         "launch_peak": 7685
+      },
+      {
+        "appid": 3219630,
+        "name": "Halloween: The Game",
+        "release": "2026-09-08",
+        "pred": 0.9915,
+        "hit": true,
+        "launch_peak": 33611
       },
       {
         "appid": 1454370,
         "name": "STARSEEKER: Astroneer Expeditions",
         "release": "2026-06-11",
-        "pred": 0.9825,
+        "pred": 0.9838,
         "hit": false,
         "launch_peak": 701
+      },
+      {
+        "appid": 2001760,
+        "name": "Beast of Reincarnation",
+        "release": "2026-08-03",
+        "pred": 0.9785,
+        "hit": true,
+        "launch_peak": 14995
       },
       {
         "appid": 3393240,
         "name": "Banker Simulator",
         "release": "2026-07-17",
-        "pred": 0.9778,
+        "pred": 0.9784,
         "hit": false,
         "launch_peak": 93
       },
@@ -166,7 +182,7 @@
         "appid": 3971730,
         "name": "Donutal",
         "release": "2026-09-03",
-        "pred": 0.9778,
+        "pred": 0.9784,
         "hit": false,
         "launch_peak": 25
       },
@@ -174,7 +190,7 @@
         "appid": 4246860,
         "name": "Security 51",
         "release": "2026-08-12",
-        "pred": 0.9778,
+        "pred": 0.9784,
         "hit": false,
         "launch_peak": 631
       },
@@ -182,40 +198,24 @@
         "appid": 2417470,
         "name": "Beastro",
         "release": "2026-06-11",
-        "pred": 0.9778,
+        "pred": 0.9784,
         "hit": false,
         "launch_peak": 657
       },
       {
-        "appid": 4134600,
-        "name": "EverRail",
-        "release": "2026-07-20",
-        "pred": 0.9661,
-        "hit": false,
-        "launch_peak": 353
-      },
-      {
-        "appid": 3219630,
-        "name": "Halloween: The Game",
-        "release": "2026-09-08",
-        "pred": 0.9644,
+        "appid": 3070070,
+        "name": "TCG Card Shop Simulator",
+        "release": "2026-09-14",
+        "pred": 0.9766,
         "hit": true,
-        "launch_peak": 33611
-      },
-      {
-        "appid": 1250410,
-        "name": "Microsoft Flight Simulator (2020) 40th Anniversary Edition",
-        "release": "2026-08-25",
-        "pred": 0.9392,
-        "hit": true,
-        "launch_peak": 5152
+        "launch_peak": 9128
       }
     ]
   },
   "live": {
     "counts": {
       "pending": {
-        "n": 5370,
+        "n": 5474,
         "hits": 0
       },
       "resolved": {
@@ -223,7 +223,7 @@
         "hits": 0
       }
     },
-    "pending": 5370,
+    "pending": 5474,
     "settling": 0,
     "resolved": 2,
     "metrics": {
