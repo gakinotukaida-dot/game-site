@@ -35,6 +35,9 @@ DATABASE_URL = os.environ["DATABASE_URL"]
 PRED_LIMIT = int(os.environ.get("PRED_LIMIT") or "800")        # 1回に記録する発売前作品の上限
 OUTCOME_DAYS = int(os.environ.get("OUTCOME_DAYS") or "14")     # 発売直後の跳ねを測る窓（model と一致）
 HIT_THRESHOLD = int(os.environ.get("HIT_THRESHOLD") or "1000") # 跳ね（hit）とみなす発売後ピーク（model と一致）
+# 答え合わせの方式（0916-2145）。legacy＝従来どおり（既定）／observed＝発売日は games 側を優先し、
+#   窓の中に観測がある作品だけ確定する。観測が1点も無い作品は unobserved（「跳ねなかった」と区別する）。
+RESOLVE_MODE = (os.environ.get("RESOLVE_MODE") or "legacy").strip().lower()
 
 DDL = """
 CREATE TABLE IF NOT EXISTS prediction_log (
@@ -106,6 +109,74 @@ WHERE status = 'pending'
   AND release_date + make_interval(days => %(outcome)s) > now()
 """
 
+# ---- RESOLVE_MODE=observed 用（0916-2145）。従来の RESOLVE / SETTLING は上に残したまま使い分ける。----
+# 発売日：prediction_log.release_date は release_known が偽だと NULL で上書きされるため、
+#   発売後に games.release_date へ入る値を優先する（COALESCE(g.release_date, pl.release_date)）。
+# 確定：窓の中に観測が1点以上ある作品だけ（player_counts と内部結合）。最大同接は COALESCE(…,0) にしない。
+RESOLVE_OBSERVED = """
+UPDATE prediction_log pl
+SET release_date = sub.rd,
+    launch_peak  = sub.peak,
+    hit          = (sub.peak >= %(hit)s),
+    status       = 'resolved',
+    resolved_at  = now()
+FROM (
+  SELECT pl2.appid,
+         COALESCE(g.release_date, pl2.release_date) AS rd,
+         max(pc.player_count) AS peak
+  FROM prediction_log pl2
+  LEFT JOIN games g ON g.appid = pl2.appid
+  JOIN player_counts pc
+    ON pc.appid = pl2.appid
+   AND pc.recorded_at >= COALESCE(g.release_date, pl2.release_date)
+   AND pc.recorded_at <  COALESCE(g.release_date, pl2.release_date) + make_interval(days => %(outcome)s)
+  WHERE pl2.status <> 'resolved'
+    AND COALESCE(g.release_date, pl2.release_date) IS NOT NULL
+    AND COALESCE(g.release_date, pl2.release_date) + make_interval(days => %(outcome)s) <= now()
+  GROUP BY pl2.appid, COALESCE(g.release_date, pl2.release_date)
+) sub
+WHERE pl.appid = sub.appid
+"""
+
+# 窓が閉じたのに観測が1点も無い作品＝unobserved（確定しない）。RESOLVE_OBSERVED の後に流す。
+#   status <> 'resolved' の行は毎回見直すので、後から発売日が変わり観測が見つかれば resolved に進む。
+UNOBSERVED = """
+WITH d AS (
+  SELECT pl2.appid, COALESCE(g.release_date, pl2.release_date) AS rd
+  FROM prediction_log pl2
+  LEFT JOIN games g ON g.appid = pl2.appid
+  WHERE pl2.status IN ('pending', 'settling')
+)
+UPDATE prediction_log pl
+SET status = 'unobserved'
+FROM d
+WHERE pl.appid = d.appid
+  AND d.rd IS NOT NULL
+  AND d.rd + make_interval(days => %(outcome)s) <= now()
+  AND NOT EXISTS (
+    SELECT 1 FROM player_counts pc
+    WHERE pc.appid = d.appid
+      AND pc.recorded_at >= d.rd
+      AND pc.recorded_at <  d.rd + make_interval(days => %(outcome)s)
+  )
+"""
+
+SETTLING_OBSERVED = """
+WITH d AS (
+  SELECT pl2.appid, COALESCE(g.release_date, pl2.release_date) AS rd
+  FROM prediction_log pl2
+  LEFT JOIN games g ON g.appid = pl2.appid
+  WHERE pl2.status = 'pending'
+)
+UPDATE prediction_log pl
+SET status = 'settling'
+FROM d
+WHERE pl.appid = d.appid
+  AND d.rd IS NOT NULL
+  AND d.rd <= now()::date
+  AND d.rd + make_interval(days => %(outcome)s) > now()
+"""
+
 
 def _run(conn):
     with conn.cursor() as cur:
@@ -134,17 +205,27 @@ def _run(conn):
                 logged = len(values)
 
         # 2) 発売直後の窓が閉じた作品を確定（答え合わせ）。
-        cur.execute(RESOLVE, {"hit": HIT_THRESHOLD, "outcome": OUTCOME_DAYS})
-        resolved = cur.rowcount
-        # 3) 発売済み・窓が閉じる前を settling に。
-        cur.execute(SETTLING, {"outcome": OUTCOME_DAYS})
-        settling = cur.rowcount
+        unobserved = 0
+        if RESOLVE_MODE == "observed":
+            cur.execute(RESOLVE_OBSERVED, {"hit": HIT_THRESHOLD, "outcome": OUTCOME_DAYS})
+            resolved = cur.rowcount
+            cur.execute(UNOBSERVED, {"outcome": OUTCOME_DAYS})
+            unobserved = cur.rowcount
+            # 3) 発売済み・窓が閉じる前を settling に。
+            cur.execute(SETTLING_OBSERVED, {"outcome": OUTCOME_DAYS})
+            settling = cur.rowcount
+        else:
+            cur.execute(RESOLVE, {"hit": HIT_THRESHOLD, "outcome": OUTCOME_DAYS})
+            resolved = cur.rowcount
+            # 3) 発売済み・窓が閉じる前を settling に。
+            cur.execute(SETTLING, {"outcome": OUTCOME_DAYS})
+            settling = cur.rowcount
 
         # 集計（表示ログ用）。
         cur.execute("SELECT status, count(*), count(*) FILTER (WHERE hit) FROM prediction_log GROUP BY status")
         by_status = {s: (n, h) for s, n, h in cur.fetchall()}
     conn.commit()
-    return logged, resolved, settling, by_status
+    return logged, resolved, settling, unobserved, by_status
 
 
 def main():
@@ -154,11 +235,13 @@ def main():
         try:
             conn = psycopg2.connect(DATABASE_URL)
             conn.autocommit = False
-            logged, resolved, settling, by_status = _run(conn)
+            logged, resolved, settling, unobserved, by_status = _run(conn)
             tot_res = by_status.get("resolved", (0, 0))
-            print(f"[pred-log] 記録 {logged} 件・今回確定 {resolved} 件・settling {settling} 件")
+            print(f"[pred-log] 方式 {RESOLVE_MODE}・記録 {logged} 件・今回確定 {resolved} 件・"
+                  f"観測なし {unobserved} 件・settling {settling} 件")
             print(f"           累計: pending={by_status.get('pending', (0,0))[0]} "
                   f"settling={by_status.get('settling', (0,0))[0]} "
+                  f"unobserved={by_status.get('unobserved', (0,0))[0]} "
                   f"resolved={tot_res[0]}（うち跳ね {tot_res[1]}）")
             return 0
         except psycopg2.Error as e:
