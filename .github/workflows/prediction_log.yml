@@ -32,6 +32,8 @@ jobs:
           WRITE_RETRIES: 10
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           PRED_LIMIT: ${{ github.event.inputs.pred_limit || '800' }}
+          # 0916-2145: 観測がある作品だけ確定し、観測なしは unobserved にする。RESOLVE_MODE の行を消すと従来方式に戻る
+          RESOLVE_MODE: observed
           # OUTCOME_DAYS: "14"   # 発売直後の跳ねを測る窓（model と一致）
           # HIT_THRESHOLD: "1000"
         run: python scripts/prediction_log_sweep.py
