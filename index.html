@@ -228,6 +228,7 @@
   .ctlnote{font-size:11px;color:var(--ink-faint)}
   footer{margin-top:30px;color:var(--ink-faint);font-size:11px}
   footer a{color:var(--ink-faint);text-decoration:none;border-bottom:1px solid var(--line)}
+  footer a:not([href]){border-bottom:0;cursor:default}   /* 9A：飛び先が無いものは下線を出さない＝リンクに見せない */
   @media(max-width:560px){
     .wrap{padding:24px 15px 60px}
     /* ヘッダの塔を潰す：縦積み＋ツールバー折返し＋説明2行はモバイルで隠す（サブ見出しが役割を兼ねる） */
@@ -613,7 +614,7 @@
     <div class="disc" data-i18n="foot.disc2">数値・順位・「推定きっかけ」は公開データから自動算出した観測・実験的な指標であり、正確性・完全性・最新性を保証しません。投資・購入を勧める助言ではありません。「予測」は外れることがあり、原因が特定できないときは「原因不明」と表示します。</div>
     <div class="disc" data-i18n="foot.obs2">「今の人数」はSteamの“ゲーム”を対象に観測しています（ソフトウェア区分・アダルト作品は対象外）。観測が途切れた作品も定期的に再確認して拾い直します。</div>
     <div class="disc dev" id="devLine"></div>
-    <div style="margin-top:12px"><a href="./data/rising_feed.xml" target="_blank" rel="noopener noreferrer" data-i18n="foot.rss">RSS（伸びフィード）</a> · <a href="#" id="ppLink" onclick="return false" data-i18n="foot.pp">プライバシーポリシー（未設定）</a> · <a href="#" id="cookieSettings" data-i18n="foot.cookie">Cookie設定</a> · <span data-i18n="foot.obs">観測記録（Steam公式API）</span></div>
+    <div style="margin-top:12px"><a href="./data/rising_feed.xml" target="_blank" rel="noopener noreferrer" data-i18n="foot.rss">RSS（伸びフィード）</a> · <a href="#" id="ppLink" onclick="return false" data-i18n="foot.pp">プライバシーポリシー（未設定）</a><span id="ckWrap"> · <a href="#" id="cookieSettings" data-i18n="foot.cookie">Cookie設定</a></span> · <span data-i18n="foot.obs">観測記録（Steam公式API）</span></div>
   </footer>
 </div>
 
@@ -767,7 +768,9 @@ const I18N={
  "foot.disc1":{ja:"本サイトは Valve Corporation（Steam）、Twitch、および各ゲームの開発・販売元とは一切提携・関係しておらず、公認・後援も受けていません。「Steam」およびゲーム名等は各権利者の商標です。公開データに基づく非公式の情報サイトです。",en:"This site is not affiliated with, endorsed by, or sponsored by Valve (Steam), Twitch, or any game's developer/publisher. \"Steam\" and game titles are trademarks of their respective owners. An unofficial, data-based information site."},
  "foot.disc2":{ja:"数値・順位・「推定きっかけ」は公開データから自動算出した観測・実験的な指標であり、正確性・完全性・最新性を保証しません。投資・購入を勧める助言ではありません。「予測」は外れることがあり、原因が特定できないときは「原因不明」と表示します。",en:"Figures, rankings, and \"estimated triggers\" are experimental indicators auto-computed from public data; accuracy, completeness, and timeliness are not guaranteed. Not investment or purchase advice. \"Predictions\" can be wrong; when no cause is identified we show \"Cause unknown\"."},
  "foot.rss":{ja:"RSS（伸びフィード）",en:"RSS (rising feed)"},"foot.pp":{ja:"プライバシーポリシー（未設定）",en:"Privacy Policy (not set)"},
- "foot.cookie":{ja:"Cookie設定",en:"Cookie settings"},"foot.obs":{ja:"観測記録（Steam公式API）",en:"Observations (Steam official API)"},
+ "foot.cookie":{ja:"Cookie設定",en:"Cookie settings"},
+ // 9A GA を有効化するまではこちらを出す（「未設定」と書く代わりに、実際に何をしていないかを書く）
+ "foot.priv":{ja:"アクセス解析なし・端末内保存（お気に入り・設定）のみ",en:"No analytics · stored on your device only (favorites & settings)"},"foot.obs":{ja:"観測記録（Steam公式API）",en:"Observations (Steam official API)"},
  "cookie.title":{ja:"Cookieの使用について",en:"About cookies"},
  "cookie.body":{ja:"利用状況の分析(Google Analytics)にCookieを使います。同意する場合のみ有効化します。",en:"We use cookies for usage analytics (Google Analytics), enabled only with your consent."},
  "cookie.accept":{ja:"同意する",en:"Accept"},"cookie.decline":{ja:"拒否する",en:"Decline"},
@@ -1784,15 +1787,26 @@ async function loadRising(){
 const CONSENT_KEY="radar_consent_v1", MEASUREMENT_ID="G-XXXXXXXXXX", PP_URL="";
 // 掲載オプトアウトの連絡先：公開前にオーナーが設定（mailto:xxx@example.com か Googleフォーム等のURL）。未設定なら文言のみ表示。
 const CONTACT_URL="";
+// 9A GA を実際に読み込むだけの設定（測定ID）が入っているか。プレースホルダのままなら「使っていない」。
+//    使っていないものへの同意をバナーで求めるのは、根拠の無い同意取得なので出さない。
+const GA_READY = !!MEASUREMENT_ID && !/^G-X+$/.test(MEASUREMENT_ID);
 let consent=null; try{ consent=JSON.parse(localStorage.getItem(CONSENT_KEY)); }catch(e){}
 const cookieEl=document.getElementById("cookie");
 function loadGA(){ if(!MEASUREMENT_ID||/^G-X+$/.test(MEASUREMENT_ID)){ console.log("[GA] consent=true / 測定ID未設定のため未読込（プレースホルダ）"); return; } /* 本番: gtag.js を注入し config */ }
-function showCookie(force){ cookieEl.hidden=!(force||consent==null); }
+function showCookie(force){ cookieEl.hidden=!(GA_READY && (force||consent==null)); }   // 9A GA未使用ならバナー自体を出さない
 function setConsent(v){ consent={analytics:v,ts:Date.now()}; try{localStorage.setItem(CONSENT_KEY,JSON.stringify(consent));}catch(e){} cookieEl.hidden=true; if(v) loadGA(); }
 document.getElementById("ckAccept").addEventListener("click",()=>setConsent(true));
 document.getElementById("ckDecline").addEventListener("click",()=>setConsent(false));
 document.getElementById("cookieSettings").addEventListener("click",e=>{ e.preventDefault(); showCookie(true); });
 if(PP_URL){ const pp=document.getElementById("ppLink"); pp.href=PP_URL; pp.textContent="プライバシーポリシー"; pp.onclick=null; }
+// 9A GA未使用のあいだは「プライバシーポリシー（未設定）」をやめ、実態を1行で書く。
+//    併せて「Cookie設定」も消す（開いても同意する対象が無い）。GA を入れるときは MEASUREMENT_ID を
+//    実IDにするだけで、バナー・Cookie設定・ポリシー欄がそのまま戻る。
+if(!GA_READY){
+  const ck=document.getElementById("ckWrap"); if(ck) ck.hidden=true;
+  if(!PP_URL){ const pp=document.getElementById("ppLink");
+    if(pp){ pp.setAttribute("data-i18n","foot.priv"); pp.removeAttribute("href"); pp.textContent=t("foot.priv"); } }
+}
 // 開発者オプトアウトのリンク配線は applyI18n()→wireOptout() が担当（言語切替でも再構築するため）。
 
 loadFavs();    // 端末内（localStorage）からお気に入りを復元
