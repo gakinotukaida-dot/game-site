@@ -16,10 +16,14 @@
     --serif:"Fraunces","Hiragino Mincho ProN","Yu Mincho",serif;
     --sans:"Hanken Grotesk","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;
   }
+  /* 14A 明るい配色のコントラスト是正（決定事項8＝明暗切替を残す以上、明るい側も同じ基準で読める必要がある）。
+     実測（WCAG相対輝度）：薄文字 #847c6c/#e4dfd3 = 3.11、チップ文字 #6c655a/#d7d1c2 = 3.78 で
+     いずれも 4.5:1 未満だった。暗い配色は 5.97／9.14 で問題なしのため一切変更しない。 */
   .light{
-    --bg:#e4dfd3; --bg-2:#dcd6c8; --ink:#2b261f; --ink-soft:#5f584d; --ink-faint:#847c6c;
-    --line:#cfc8b8; --accent:#2f6b5e; --accent-weak:#dde7e1; --chip:#d7d1c2; --chip-ink:#6c655a;
-  }
+    --bg:#e4dfd3; --bg-2:#dcd6c8; --ink:#2b261f; --ink-soft:#5f584d; --ink-faint:#635c4d;
+    --line:#cfc8b8; --accent:#2b6255; --accent-weak:#dde7e1; --chip:#d7d1c2; --chip-ink:#5a5348;
+  }   /* --ink-faint 3.11→4.98（--bg-2 上でも 4.57）／--chip-ink 3.78→4.99／--accent は看板の ×N が
+         --bg-2 上で 4.28 だったので #2f6b5e→#2b6255（4.86）。暗い配色の --accent は変えない。 */
   *{box-sizing:border-box} html,body{margin:0}
   body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
     -webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 1;transition:background .4s ease,color .4s ease;}
@@ -352,6 +356,21 @@
   .chip.c-demo{color:#3fa87f;background:rgba(63,168,127,.14);border:1px solid rgba(63,168,127,.36)}          /* 体験版CCU（実測） */
   .chip.c-spike{color:var(--accent);background:var(--accent-weak);border:1px solid color-mix(in srgb,var(--accent) 46%,transparent);font-weight:600}  /* 跳ね予想（核） */
   .chip.c-fac{color:#c98b3f;background:rgba(201,139,63,.12);border:1px solid rgba(201,139,63,.32)}          /* 押し上げ要因 */
+  /* 14A 色付きチップは明るい地で 1.76〜2.52:1 しかなかった（文字色は暗い地向けの明度のまま流用されていた）。
+     明るい配色のときだけ文字色を濃くして 4.5:1 以上にする。背景・枠・暗い配色はそのまま＝色の意味は変えない。 */
+  .light .chip.c-sale{color:#854f14}      /* 2.28 → 4.51 */
+  .light .chip.c-news{color:#3a5a99}      /* 2.18 → 4.56 */
+  .light .chip.c-launch{color:#26664d}    /* 1.99 → 4.55 */
+  .light .chip.c-free{color:#1b665f}      /* 1.81 → 4.58 */
+  .light .chip.c-review{color:#625097}    /* 2.10 → 4.51 */
+  .light .chip.c-b1{color:#8a4363}        /* 2.18 → 4.55 */
+  .light .chip.c-new{color:#26664d}       /* 1.99 → 4.55 */
+  .light .chip.c-revival{color:#81502d}   /* 1.81 → 4.57 */
+  .light .chip.c-jp{color:#904242}        /* 2.52 → 4.57 */
+  .light .chip.c-web{color:#246470}       /* 1.76 → 4.61 */
+  .light .chip.c-expect{color:#7a5419}    /* 1.87 → 4.55 */
+  .light .chip.c-demo{color:#26664d}      /* 1.99 → 4.55 */
+  .light .chip.c-fac{color:#7b5526}       /* 2.00 → 4.58 */
   /* ===== 跳ね予想の答え合わせ（スコアカード） ===== */
   .scorecard{margin:18px 0 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg-2);overflow:hidden}
   .scorecard>summary{list-style:none;cursor:pointer;padding:11px 14px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
@@ -376,6 +395,7 @@
   .sc-ex li{display:flex;align-items:center;gap:8px;font-size:12px}
   .sc-ex .p{font-variant-numeric:tabular-nums;color:var(--ink-faint);min-width:44px;text-align:right}
   .sc-ex .r{font-weight:700;min-width:15px;text-align:center}
+  .light .sc-ex .r.hit{color:#26664d}   /* 14A 答え合わせの「✓」も明るい地では薄すぎた */
   .sc-ex .r.hit{color:#3fa87f}.sc-ex .r.miss{color:var(--ink-faint)}
   .sc-ex .nm{color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .sc-ex .pk{color:var(--ink-faint);font-size:11px;white-space:nowrap;margin-left:auto}
