@@ -71,6 +71,7 @@
   nav.views button{appearance:none;background:none;border:0;cursor:pointer;font-family:var(--sans);
     font-size:13.5px;color:var(--ink-soft);padding:10px 2px;margin-right:18px;position:relative;letter-spacing:.2px;transition:color .2s;white-space:nowrap}
   nav.views button .idx{font-family:var(--serif);font-size:12px;color:var(--ink-faint);margin-right:6px}
+  .navshort{display:none}   /* 12A スマホ用の短い語。PCでは出さない（正式名のまま） */
   nav.views button:hover{color:var(--ink)}
   nav.views button[aria-selected="true"]{color:var(--ink);font-weight:600}
   nav.views button[aria-selected="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--accent)}
@@ -254,8 +255,14 @@
     .heroratio{font-size:24px}
     .heroimg .cover{width:92px;height:43px}
     .herocard{padding:11px 13px;gap:11px}
-    nav.views button{margin-right:13px;font-size:13px;padding:10px 0}
-    nav.views button .idx{margin-right:4px}
+    /* 12A 390px では「04 新着で伸び」が横スクロールの外に出て、スクロールバーも非表示のため
+       04の存在に気づけなかった。スマホでは4等分のグリッドにして4本とも常に見せる。
+       番号を上・短い語を下の2段にすることで、4等分の幅（約85px）に収める。 */
+    nav.views{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));overflow-x:visible}
+    nav.views button{margin-right:0;font-size:13px;padding:8px 2px;text-align:center}
+    nav.views button .idx{display:block;margin-right:0;font-size:11px;line-height:1.35}
+    .navfull{display:none}
+    .navshort{display:inline}
   }
   /* ⑯ 最終更新の1行（ヒーロー直下・0アクション）。fallback は「前回値」であることが読み取れる色分け。 */
   .lastupd{font-size:11px;color:var(--ink-faint);margin:6px 0 0;font-variant-numeric:tabular-nums}
@@ -553,10 +560,10 @@
        直下に同じ名前をもう一度出していた＝純粋な重複。「？（この見方の説明）」はタブ行の右へ移す。 -->
   <div class="navrow">
     <nav class="views" role="tablist" aria-label="表示の切り口">
-      <button role="tab" aria-selected="true"  data-view="3"><span class="idx">01</span><span data-i18n="nav.3">これから来そう</span></button>
-      <button role="tab" aria-selected="false" data-view="1"><span class="idx">02</span><span data-i18n="nav.1">今の人数</span></button>
-      <button role="tab" aria-selected="false" data-view="2"><span class="idx">03</span><span data-i18n="nav.2">いつもより伸び</span></button>
-      <button role="tab" aria-selected="false" data-view="L"><span class="idx">04</span><span data-i18n="nav.L">新着で伸び</span></button>
+      <button role="tab" aria-selected="true"  data-view="3"><span class="idx">01</span><span class="navfull" data-i18n="nav.3">これから来そう</span><span class="navshort" data-i18n="nav.3s">来そう</span></button>
+      <button role="tab" aria-selected="false" data-view="1"><span class="idx">02</span><span class="navfull" data-i18n="nav.1">今の人数</span><span class="navshort" data-i18n="nav.1s">人数</span></button>
+      <button role="tab" aria-selected="false" data-view="2"><span class="idx">03</span><span class="navfull" data-i18n="nav.2">いつもより伸び</span><span class="navshort" data-i18n="nav.2s">伸び</span></button>
+      <button role="tab" aria-selected="false" data-view="L"><span class="idx">04</span><span class="navfull" data-i18n="nav.L">新着で伸び</span><span class="navshort" data-i18n="nav.Ls">新着</span></button>
     </nav>
     <button class="ttlq" id="ttlHelp" type="button" aria-label="この見方の説明" aria-controls="blurb" aria-expanded="false">？</button>
   </div>
@@ -762,6 +769,8 @@ const I18N={
  "fav.all":{ja:"すべて",en:"All"},"fav.star":{ja:"★ お気に入り",en:"★ Favorites"},
  "search.ph":{ja:"🔍 この一覧から作品名でさがす",en:"🔍 Search this list by title"},
  "nav.1":{ja:"今の人数",en:"Now playing"},"nav.2":{ja:"いつもより伸び",en:"Rising"},"nav.L":{ja:"新着で伸び",en:"New & rising"},"nav.3":{ja:"これから来そう",en:"Upcoming"},
+ // 12A スマホで4本とも見せるための短い語（PCでは上の正式名のまま）。tooltip(VIEWTITLE)は両方で同じ。
+ "nav.1s":{ja:"人数",en:"Now"},"nav.2s":{ja:"伸び",en:"Rising"},"nav.Ls":{ja:"新着",en:"New"},"nav.3s":{ja:"来そう",en:"Soon"},
  "back":{ja:"← 一覧へ戻る",en:"← Back to list"},
  "free.hd":{ja:"無料でもらえる",en:"Free to keep"},
  "free.note":{ja:"いま0円で「もらえば永久所有」できるもの（公式ストアの観測・見落とし拾い）。",en:"Currently free to claim and keep forever (spotted on official stores)."},
