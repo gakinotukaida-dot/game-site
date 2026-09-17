@@ -45,6 +45,15 @@
     font-family:var(--sans);font-size:12px;border-radius:999px;padding:6px 12px;cursor:pointer;transition:.2s}
   .pill:hover{border-color:var(--accent);color:var(--accent)}
   .pill[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-weak)}
+  /* 11A 「表示 ▾」の中身。details なので JS 無しで開閉でき、キーボード（Tab→Enter）でも開ける。 */
+  .dispmenu{position:relative;flex-shrink:0}
+  .dispmenu>summary{list-style:none;display:inline-flex;align-items:center;cursor:pointer}
+  .dispmenu>summary::-webkit-details-marker{display:none}
+  .dispmenu[open]>summary{border-color:var(--accent);color:var(--accent);background:var(--accent-weak)}
+  .dispbody{position:absolute;right:0;top:calc(100% + 6px);z-index:30;display:flex;flex-direction:column;
+    align-items:stretch;gap:6px;background:var(--bg-2);border:1px solid var(--line);border-radius:10px;
+    padding:10px;min-width:176px;box-shadow:0 10px 26px rgba(0,0,0,.3)}
+  .dispbody .pill{width:100%;text-align:center}
   .data-note{margin-top:16px;display:inline-flex;align-items:center;gap:8px;font-size:11px;color:var(--ink-soft);
     background:var(--bg-2);border:1px solid var(--line);border-radius:8px;padding:5px 10px}
   .data-note.dummy{border-style:dashed}
@@ -521,12 +530,20 @@
     <div class="brand">
       <div class="wordmark">トレパ<span class="dot">.</span> <span class="sub">Trend Pulse — Steam発見レーダー</span></div>
     </div>
+    <!-- 11A 設定5個が右寄せで2段になり、看板を1画面目の下へ押し下げていた。毎日開く人が最初に見るのは
+         看板か一覧で、設定は月に1回＝順序が逆だった。「？」と「表示 ▾」の2つに畳む。
+         中身（文字サイズ・明暗・画像・EN）は id をそのまま引き継ぐので配線は一切変えない＝決定事項8の機能は全部残る。 -->
     <div class="toolbar">
       <button class="pill" id="helpBtn" type="button" title="このサイトの使い方" data-i18n="help.btn">？ 使い方</button>
-      <button class="pill" id="fontBtn" type="button" title="文字の大きさを変える">文字 標準</button>
-      <button class="pill" id="langBtn" type="button" title="日本語 / English" data-i18n="lang.btn">EN</button>
-      <button class="pill" id="imgBtn" type="button" aria-pressed="true" title="サムネイル画像の表示切り替え">画像 on</button>
-      <button class="pill" id="themeBtn" type="button" title="配色を明るく／暗く">背景を明るく</button>
+      <details class="dispmenu" id="dispMenu">
+        <summary class="pill" title="表示の設定（文字の大きさ・明暗・画像・言語）" data-i18n="disp.btn">表示 ▾</summary>
+        <div class="dispbody">
+          <button class="pill" id="fontBtn" type="button" title="文字の大きさを変える">文字 標準</button>
+          <button class="pill" id="themeBtn" type="button" title="配色を明るく／暗く">背景を明るく</button>
+          <button class="pill" id="imgBtn" type="button" aria-pressed="true" title="サムネイル画像の表示切り替え">画像 on</button>
+          <button class="pill" id="langBtn" type="button" title="日本語 / English" data-i18n="lang.btn">EN</button>
+        </div>
+      </details>
     </div>
   </header>
   <!-- ⑮-任意5 デスクトップのブランド説明2行を1行に統合（モバイルでは元から非表示）。文言は両方とも残す。
@@ -770,6 +787,7 @@ const I18N={
  "search.ph":{ja:"🔍 この一覧から作品名でさがす",en:"🔍 Search this list by title"},
  "nav.1":{ja:"今の人数",en:"Now playing"},"nav.2":{ja:"いつもより伸び",en:"Rising"},"nav.L":{ja:"新着で伸び",en:"New & rising"},"nav.3":{ja:"これから来そう",en:"Upcoming"},
  // 12A スマホで4本とも見せるための短い語（PCでは上の正式名のまま）。tooltip(VIEWTITLE)は両方で同じ。
+ "disp.btn":{ja:"表示 ▾",en:"Display ▾"},
  "nav.1s":{ja:"人数",en:"Now"},"nav.2s":{ja:"伸び",en:"Rising"},"nav.Ls":{ja:"新着",en:"New"},"nav.3s":{ja:"来そう",en:"Soon"},
  "back":{ja:"← 一覧へ戻る",en:"← Back to list"},
  "free.hd":{ja:"無料でもらえる",en:"Free to keep"},
@@ -1538,6 +1556,9 @@ dvBody.addEventListener("click",e=>{
 backBtn.addEventListener("click",()=>{ if(trail.length>0){ history.go(-trail.length); } else { detailEl.hidden=true; mainViewEl.hidden=false; } });
 // Esc キーでも一段戻る（PCのキーボード操作・詳細表示中のみ）。
 document.addEventListener("keydown",e=>{ if(e.key==="Escape" && !detailEl.hidden){ history.back(); } });
+// 11A 「表示 ▾」は外側クリックと Esc で閉じる（開きっぱなしで一覧を隠さない）。
+document.addEventListener("click",e=>{ const dm=document.getElementById("dispMenu"); if(dm&&dm.open&&!dm.contains(e.target)) dm.open=false; });
+document.addEventListener("keydown",e=>{ if(e.key!=="Escape") return; const dm=document.getElementById("dispMenu"); if(dm&&dm.open){ dm.open=false; const s=dm.querySelector("summary"); if(s) s.focus(); } });
 const themeBtn=document.getElementById("themeBtn");
 function syncThemeBtn(){ themeBtn.textContent=document.body.classList.contains("light")?L("背景を暗く","Dark background"):L("背景を明るく","Light background"); }
 themeBtn.addEventListener("click",()=>{ document.body.classList.toggle("light"); syncThemeBtn(); });
