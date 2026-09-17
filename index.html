@@ -1269,7 +1269,7 @@ function upFoldOf(view, all){
   const thr=br*UP_FOLD_MULT;
   let main=all.filter(o=>(o.spike!=null?o.spike:-1)>=thr);
   if(main.length<UP_MIN_MAIN) main=all.slice().sort((a,b)=>(b.spike||-1)-(a.spike||-1)).slice(0,UP_MIN_MAIN);
-  return (main.length<all.length)?{main:main,hidden:all.length-main.length}:null;
+  return (main.length<all.length)?{main:main,hidden:all.length-main.length,thr:thr}:null;   // 17A しきい値も返す（ボタンに数字で書くため）
 }
 // ⑮-2 ★が1件も無いなら切替は出さない（押せば必ず空になるだけ＝初訪問者には常に無意味）。
 // 最後の★を外したときは「★のみ」に取り残されないよう「すべて」へ戻す。
@@ -1325,9 +1325,11 @@ function render(view){
   let mw = moreHas
     ? `<button class="morebtn" id="moreBtn" type="button">${L("もっと見る（+20）","Show more (+20)")}<span class="morecount">${data.length} / ${base.length}</span></button>`
     : "";
+  // 17A 「その他 N件を表示／跳ね予想が基準未満」は、その「基準」が何%なのかどこにも書かれていなかった。
+  //     しきい値（base_rate×UP_FOLD_MULT）をそのまま数字で書けば、添えの1行が要らなくなる。
   if(upFold) mw += folded
-    ? `<button class="morebtn upmore" id="upMoreBtn" type="button">${L("その他 "+upFold.hidden+"件を表示","Show "+upFold.hidden+" more")}<span class="morecount">${L("跳ね予想が基準未満","below baseline")}</span></button>`
-    : `<button class="morebtn upmore" id="upMoreBtn" type="button">${L("その他を隠す","Hide the rest")}<span class="morecount">${L("上位 "+upFold.main.length+"件だけ","top "+upFold.main.length+" only")}</span></button>`;
+    ? `<button class="morebtn upmore" id="upMoreBtn" type="button">${L(`予想 ${scPct(upFold.thr)} 未満の ${upFold.hidden}件を見る`,`Show ${upFold.hidden} predicted below ${scPct(upFold.thr)}`)}</button>`
+    : `<button class="morebtn upmore" id="upMoreBtn" type="button">${L("その他を隠す","Hide the rest")}<span class="morecount">${L(`予想 ${scPct(upFold.thr)} 以上の ${upFold.main.length}件だけ`,`only the ${upFold.main.length} at or above ${scPct(upFold.thr)}`)}</span></button>`;
   moreWrap.innerHTML = mw;
 }
 document.querySelectorAll('nav.views button').forEach(b=>b.addEventListener("click",()=>{
