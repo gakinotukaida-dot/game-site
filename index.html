@@ -531,7 +531,7 @@
     <button class="herocard" id="heroCard" type="button" title="いちばん伸びている作品を見る">
       <span class="heroimg" id="heroImg"></span>
       <span class="herobody">
-        <span class="herokick" data-i18n="hero.kick">いま、いつもより伸びている</span>
+        <span class="herokick" id="heroKick">いま、いつもより伸びている</span><!-- 5A paintHero が「03 いつもより伸び・N位」に差し替える（data-i18n は外す＝言語切替でも paintHero が担当） -->
         <span class="heroname" id="heroName"></span>
         <span class="herowhy" id="heroWhy"></span>
       </span>
@@ -1640,8 +1640,17 @@ function paintHero(top){
     document.getElementById("heroImg").innerHTML=coverImg(top.a);
     document.getElementById("heroName").textContent=top.n;
     const cause=(top.c&&top.c.length)?causeLabel(top.c[0].t):null;
-    const rx=`<b>×${(top.r||1).toFixed(1)}</b>`;
-    document.getElementById("heroWhy").innerHTML=L(`ふだんの ${rx}`,`${rx} of usual`)+(cause?L(`・きっかけは ${esc(cause)}`,` · triggered by ${esc(cause)}`):L("・きっかけは調査中"," · trigger: investigating"));
+    // 5A 看板の「×9.8」は右の大きな数字と本文で2回出ていた（決定事項2の3枠と同型の重複）。
+    //    本文は重複をやめ、「きっかけ」と「平常値」に使う＝同じ面積で情報が増える。
+    //    併せて肩の行に「どのタブの1件か」を書く。看板を押すと03へ飛ぶのに、それがどこにも
+    //    書かれていなかった（初期タブは01のまま＝決定事項9は未決なので触らない）。
+    const idx=(REAL_V2||[]).findIndex(x=>x&&String(x.a)===String(top.a));
+    const rank=(idx>=0)?(idx+1):null;   // 03の並び順はデータ側の順（render は view2 を並べ替えない）＝表示順と一致する
+    const kickEl=document.getElementById("heroKick");
+    if(kickEl) kickEl.textContent=L("03 いつもより伸び","03 Rising vs usual")+(rank?L(`・${rank}位`,` · #${rank}`):"");
+    const bits=[cause?L(`きっかけは ${esc(cause)}`,`Triggered by ${esc(cause)}`):L("きっかけは調査中","Trigger: investigating")];
+    if(top.base!=null && top.base>0) bits.push(L(`平常 ${nf.format(top.base)}人`,`usual ${nf.format(top.base)}`));
+    document.getElementById("heroWhy").innerHTML=bits.join(L("・"," · "));
     document.getElementById("heroRatio").textContent="×"+(top.r||1).toFixed(1);
     el.dataset.appid=top.a||"";
   } else { el.dataset.appid=""; }
