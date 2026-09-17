@@ -24,6 +24,9 @@
     --line:#cfc8b8; --accent:#2b6255; --accent-weak:#dde7e1; --chip:#d7d1c2; --chip-ink:#5a5348;
   }   /* --ink-faint 3.11→4.98（--bg-2 上でも 4.57）／--chip-ink 3.78→4.99／--accent は看板の ×N が
          --bg-2 上で 4.28 だったので #2f6b5e→#2b6255（4.86）。暗い配色の --accent は変えない。 */
+  /* 16A 既定の最小文字サイズは 11px（9〜10.5px を引き上げ）。毎日読む文字としては小さすぎたため。
+     「文字 標準／大／特大」の設定（決定事項8）はそのまま残す＝既定が読める大きさであることが先。
+     装飾用のグリフ（▸ と ↗）だけは文字ではないので元の大きさのまま。 */
   *{box-sizing:border-box} html,body{margin:0}
   body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
     -webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 1;transition:background .4s ease,color .4s ease;}
@@ -120,7 +123,7 @@
   .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
   .tagmuted{opacity:.75;border:1px dashed var(--line);background:transparent;color:var(--ink-faint)}
   .tags-secondary{margin-top:4px}
-  .tags-secondary .chip{font-size:10px;color:var(--ink-faint);background:transparent;border:1px solid var(--line)}
+  .tags-secondary .chip{font-size:11px;color:var(--ink-faint);background:transparent;border:1px solid var(--line)}
   #moreWrap{display:flex;justify-content:center;margin:14px 0 2px}
   .morebtn{appearance:none;background:transparent;border:1px solid var(--line);color:var(--ink-soft);border-radius:999px;padding:8px 18px;font-family:var(--sans);font-size:12.5px;cursor:pointer;transition:.2s;display:inline-flex;gap:10px;align-items:center}
   .morebtn:hover{border-color:var(--accent);color:var(--accent)}
@@ -130,7 +133,7 @@
   .morebtn+.morebtn{margin-left:8px}
   .title{font-size:15.5px;font-weight:500;letter-spacing:.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .sub{font-size:11.5px;color:var(--ink-soft);margin-top:2px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
-  .chip{font-size:10.5px;padding:2px 7px;border-radius:999px;background:var(--chip);color:var(--chip-ink);white-space:nowrap}
+  .chip{font-size:11px;padding:2px 7px;border-radius:999px;background:var(--chip);color:var(--chip-ink);white-space:nowrap}
   .chip.note{background:var(--accent-weak);color:var(--accent)}
   .metric{text-align:right;white-space:nowrap}
   .metric .num{font-size:18px;font-weight:600;letter-spacing:.2px;font-variant-numeric:tabular-nums}
@@ -163,18 +166,18 @@
   /* L1「この作品の見立て」：一覧から外したチップ・タグをここに整列 */
   .assess{display:flex;flex-direction:column;gap:8px}
   .assessrow{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-  .assesstags .chip{font-size:10px;color:var(--ink-faint);background:transparent;border:1px solid var(--line)}
+  .assesstags .chip{font-size:11px;color:var(--ink-faint);background:transparent;border:1px solid var(--line)}
   .go.ghost{background:transparent}
   .metric .mult.r1{color:var(--ink-soft)}                 /* 小さい伸び＝控えめ */
   .metric .mult.r2{color:var(--accent)}                   /* 中 */
   .metric .mult.r3{color:var(--accent);font-size:22px}    /* 大きい伸び＝主役 */
-  .confhi{font-size:9.5px;color:var(--accent);letter-spacing:.06em;margin-top:2px}
+  .confhi{font-size:11px;color:var(--accent);letter-spacing:.06em;margin-top:2px}
   /* 確度メーター（伸びの推定の確からしさ）：●3段階。静かに・色で高低。 */
-  .conf{font-size:9px;line-height:1;margin-top:4px;user-select:none;display:flex;justify-content:flex-end;align-items:center;gap:4px}
+  .conf{font-size:11px;line-height:1;margin-top:4px;user-select:none;display:flex;justify-content:flex-end;align-items:center;gap:4px}
   .conf .dots{display:inline-flex;gap:1.5px}
   .conf .d{opacity:.28}
   .conf .on{color:currentColor}
-  .conflab{font-size:9.5px;letter-spacing:.02em;white-space:nowrap}
+  .conflab{font-size:11px;letter-spacing:.02em;white-space:nowrap}
   .conf-high{color:var(--accent)}
   .conf-mid{color:var(--ink-soft)}
   .conf-low{color:var(--ink-faint)}
@@ -184,7 +187,7 @@
   .exp{text-align:right;white-space:nowrap}
   .exp .dots{letter-spacing:1px;color:var(--accent);font-size:13px}
   .exp .dots .off{color:var(--ink-faint)}
-  .exp .lbl{font-size:10px;color:var(--ink-faint);margin-top:2px}
+  .exp .lbl{font-size:11px;color:var(--ink-faint);margin-top:2px}
   .when{text-align:right;white-space:nowrap;font-size:12px;color:var(--ink-soft)}
   .when b{color:var(--ink);font-variant-numeric:tabular-nums;font-weight:600}
   .go{font-size:12px;color:var(--ink-soft);text-decoration:none;white-space:nowrap;border:1px solid var(--line);border-radius:7px;padding:6px 9px;transition:.2s}
@@ -205,7 +208,7 @@
   .drillbody .dv{color:var(--ink-soft)}
   .drillbody .dv.tags{display:flex;gap:6px;flex-wrap:wrap}
   .drillbody .dv a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--line)}
-  .drillbody .sibnote{color:var(--ink-faint);font-size:10px;margin-top:3px}
+  .drillbody .sibnote{color:var(--ink-faint);font-size:11px;margin-top:3px}
   .ctlbox{margin:10px 0 2px}
   .ctlbox>summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-soft);border:1px solid var(--line);border-radius:999px;padding:6px 12px;width:max-content}
   .ctlbox>summary::-webkit-details-marker{display:none}
@@ -222,7 +225,7 @@
   .fchip[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-weak)}
   .fclear{appearance:none;background:transparent;border:none;color:var(--ink-faint);font-size:11px;cursor:pointer;text-decoration:underline;font-family:var(--sans);padding:4px 6px}
   .fclear:hover{color:var(--accent)}
-  .ctlnote{font-size:10.5px;color:var(--ink-faint)}
+  .ctlnote{font-size:11px;color:var(--ink-faint)}
   footer{margin-top:30px;color:var(--ink-faint);font-size:11px}
   footer a{color:var(--ink-faint);text-decoration:none;border-bottom:1px solid var(--line)}
   @media(max-width:560px){
@@ -243,8 +246,8 @@
     .title{font-size:14.5px}
     .metric .num{font-size:17px}
     .metric .mult.r3{font-size:20px}
-    .metric .base{font-size:10px}
-    .chip{font-size:10px;padding:2px 6px}
+    .metric .base{font-size:11px}
+    .chip{padding:2px 6px}   /* 16A 既定の最小 11px に揃えたのでスマホ用の縮小は外す */
     .tags{gap:5px;margin-top:4px}
     .heroname{font-size:17px}
     .heroratio{font-size:24px}
@@ -311,7 +314,7 @@
   .predbox .pv b{color:var(--ink);font-weight:600}
   .predbox .pnum{font-size:19px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
   .dvsection{margin:16px 0;padding-top:13px;border-top:1px solid var(--line)}
-  .dvlabel{font-size:10.5px;color:var(--ink-faint);letter-spacing:.4px;margin:0 0 8px}
+  .dvlabel{font-size:11px;color:var(--ink-faint);letter-spacing:.4px;margin:0 0 8px}
   .dvhistory{font-size:12px;color:var(--ink-faint)}
   .dvmuted{color:var(--ink-faint);font-size:12px}
   .why{display:flex;flex-direction:column;gap:9px}
@@ -325,7 +328,7 @@
   /* v11：観測の履歴チャート（自己比・平常値ライン・現在ドット） */
   .histstats{display:flex;gap:14px;flex-wrap:wrap;margin:2px 0 8px}
   .histstats .hs{display:flex;flex-direction:column;gap:1px}
-  .histstats .hsk{font-size:10px;color:var(--ink-faint)}
+  .histstats .hsk{font-size:11px;color:var(--ink-faint)}
   .histstats .hsv{font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums}
   .histstats .hsv.accent{color:var(--accent);font-weight:600}
   .histwrap{margin-top:4px}
@@ -333,7 +336,7 @@
   .histsvg .hline{fill:none;stroke:var(--accent);stroke-width:1.8;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
   .histsvg .baseline{stroke:var(--ink-faint);stroke-width:1;stroke-dasharray:4 4;vector-effect:non-scaling-stroke}
   .histsvg .curdot{fill:var(--accent)}
-  .histdates{display:flex;justify-content:space-between;font-size:10px;color:var(--ink-faint);margin-top:3px}
+  .histdates{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-faint);margin-top:3px}
   .histthin{font-size:12px;color:var(--ink-faint)}
   /* ===== 統合追加（v11b骨格＋今セッションの要素） ===== */
   .chip.cause{background:var(--accent-weak);color:var(--accent)}
@@ -399,7 +402,7 @@
   .sc-ex .r.hit{color:#3fa87f}.sc-ex .r.miss{color:var(--ink-faint)}
   .sc-ex .nm{color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .sc-ex .pk{color:var(--ink-faint);font-size:11px;white-space:nowrap;margin-left:auto}
-  .rowsteam{font-size:10.5px;color:var(--ink-faint);text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:1px 7px;white-space:nowrap;margin-left:6px;transition:.2s}
+  .rowsteam{font-size:11px;color:var(--ink-faint);text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:1px 7px;white-space:nowrap;margin-left:6px;transition:.2s}
   .rowsteam:hover{color:var(--accent);border-color:var(--accent)}
   .titlerow{display:flex;align-items:center;gap:2px;min-width:0}
   .titlerow .title{min-width:0}
@@ -411,7 +414,7 @@
   .sparkline{fill:none;stroke:var(--accent);stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
   .sparkbase{stroke:var(--ink-faint);stroke-width:1;stroke-dasharray:3 3;vector-effect:non-scaling-stroke}
   .sparkdot{fill:var(--accent)}
-  .sparklbl{font-size:10px;color:var(--ink-faint);white-space:nowrap}
+  .sparklbl{font-size:11px;color:var(--ink-faint);white-space:nowrap}
   @media(max-width:560px){
     /* 2A 決定事項2：390px幅でチップ行が max-height:46px に切られ、01では要因2が消え要因1の右端が
        欠けていた。原因は棒／折れ線（132px・最大40vw）がチップ行と同じ行に並ぶこと。
@@ -429,7 +432,7 @@
   .surgetrack{position:relative;height:5px;border-radius:3px;background:var(--chip);flex:1;overflow:hidden}
   .surgefill{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,var(--accent-weak),var(--accent))}
   .surgex{font-size:11px;color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
-  .confchip{font-size:10px;color:var(--ink-faint);border:1px solid var(--line);border-radius:999px;padding:1px 7px}
+  .confchip{font-size:11px;color:var(--ink-faint);border:1px solid var(--line);border-radius:999px;padding:1px 7px}
   .confchip.high{color:var(--accent);border-color:var(--accent)}
   .expbanner{margin-top:10px;display:inline-flex;align-items:center;gap:7px;font-size:11px;color:var(--accent);
     background:var(--accent-weak);border:1px solid var(--accent);border-radius:8px;padding:5px 10px}
@@ -448,7 +451,7 @@
   .chip.best{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:600}
   /* ===== つながり（情報の深掘り／rabbit hole）：詳細から別作品・資料へ潜る。たどった道はパンくずで可視化。 ===== */
   .dvtrail{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:2px 0 12px}
-  .dvtrail .trailhd{color:var(--ink-faint);font-size:10px;letter-spacing:.3px;white-space:nowrap;flex-shrink:0}
+  .dvtrail .trailhd{color:var(--ink-faint);font-size:11px;letter-spacing:.3px;white-space:nowrap;flex-shrink:0}
   .dvtrail .crumbs{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;min-width:0;font-variant-numeric:tabular-nums}
   .dvtrail .crumb{appearance:none;background:none;border:0;padding:0;font-family:var(--sans);font-size:11.5px;cursor:pointer;color:var(--accent);max-width:16ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .dvtrail button.crumb:hover{text-decoration:underline}
@@ -457,7 +460,7 @@
   .connhint{font-size:11px;color:var(--ink-faint);margin:-2px 0 12px;line-height:1.5}
   .conngroup{margin:0 0 14px}
   .conngroup:last-child{margin-bottom:0}
-  .conngrouphd{font-size:10.5px;color:var(--ink-faint);letter-spacing:.3px;margin:0 0 7px}
+  .conngrouphd{font-size:11px;color:var(--ink-faint);letter-spacing:.3px;margin:0 0 7px}
   .connlist{display:flex;flex-direction:column;gap:6px}
   .connitem{appearance:none;text-align:left;display:flex;align-items:center;gap:10px;width:100%;
     background:var(--bg-2);border:1px solid var(--line);border-radius:9px;padding:9px 12px;
@@ -465,7 +468,7 @@
   .connitem:hover{border-color:var(--accent)}
   .connitem:active{transform:scale(.996)}
   .connname{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .connwhy{font-size:10.5px;color:var(--ink-faint);white-space:nowrap;flex-shrink:0;max-width:42%;overflow:hidden;text-overflow:ellipsis}
+  .connwhy{font-size:11px;color:var(--ink-faint);white-space:nowrap;flex-shrink:0;max-width:42%;overflow:hidden;text-overflow:ellipsis}
   .conngo{color:var(--accent);font-size:12px;flex-shrink:0}
   .connext .conngo{color:var(--ink-soft)}
   @media(max-width:560px){ .connwhy{display:none} }
@@ -491,7 +494,7 @@
   .introlist .idesc{color:var(--ink-soft)}
 
   /* 共有ボタン（E1）：Steamリンクと並ぶ控えめなアクション */
-  .rowshare{font-size:10.5px;color:var(--ink-faint);background:transparent;border:1px solid var(--line);
+  .rowshare{font-size:11px;color:var(--ink-faint);background:transparent;border:1px solid var(--line);
     border-radius:6px;padding:1px 7px;white-space:nowrap;margin-left:5px;cursor:pointer;
     font-family:inherit;transition:.2s}
   .rowshare:hover{color:var(--accent);border-color:var(--accent)}
