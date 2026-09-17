@@ -392,6 +392,19 @@
   .sparkbase{stroke:var(--ink-faint);stroke-width:1;stroke-dasharray:3 3;vector-effect:non-scaling-stroke}
   .sparkdot{fill:var(--accent)}
   .sparklbl{font-size:10px;color:var(--ink-faint);white-space:nowrap}
+  @media(max-width:560px){
+    /* 2A 決定事項2：390px幅でチップ行が max-height:46px に切られ、01では要因2が消え要因1の右端が
+       欠けていた。原因は棒／折れ線（132px・最大40vw）がチップ行と同じ行に並ぶこと。
+       スマホでは column-reverse で棒／折れ線を右の数字の直下へ寄せ、チップ行を全幅にする。
+       併せて max-height による切り落としをやめる（隠れるチップを無くす）。
+       ★「1行・折り返し禁止＋…」は実測で不採用：390px でチップ行に使える幅は 221px しかなく、
+         01の3チップの自然幅は合計 235〜334px。1行に押し込むと各チップが 31〜37px まで潰れ、
+         「9月…」「▲開…」となって折り返しより読めなくなる。全幅＋折り返し可なら2行で全部読める。 */
+    .r2sub{flex-direction:column-reverse;align-items:stretch;gap:4px}
+    .r2sub .sparkrow,.r2sub .surgebar{align-self:flex-end;flex:none}
+    /* 親を縦積みにしたので flex:1 は「高さ」に効いてしまう（basis:0 で潰れて中身が隠れる）。必ず none に戻す。 */
+    .r2tags{flex:none;width:100%;max-height:none}
+  }
   .surgebar{flex:none;display:flex;align-items:center;gap:9px;width:132px;max-width:40vw}
   .surgetrack{position:relative;height:5px;border-radius:3px;background:var(--chip);flex:1;overflow:hidden}
   .surgefill{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,var(--accent-weak),var(--accent))}
