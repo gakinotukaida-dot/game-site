@@ -396,7 +396,7 @@
   .light .chip.c-demo{color:#26664d}      /* 1.99 → 4.55 */
   .light .chip.c-fac{color:#7b5526}       /* 2.00 → 4.58 */
   /* ===== 跳ね予想の答え合わせ（スコアカード） ===== */
-  .scorecard{margin:18px 0 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg-2);overflow:hidden}
+  .scorecard{margin:10px 0 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg-2);overflow:hidden}
   .scorecard>summary{list-style:none;cursor:pointer;padding:11px 14px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
   .scorecard>summary::-webkit-details-marker{display:none}
   .scorecard>summary::after{content:"▾";color:var(--ink-faint);margin-left:auto;font-size:12px;transition:.2s}
@@ -625,11 +625,14 @@
     <span id="genreChips"></span>
     <button class="fclear" id="fclear" type="button" data-i18n="filter.clear" hidden>クリア</button>
   </div>
+  <!-- 19B 答え合わせは一覧の「直上」へ。決定事項1（予想%に実績を併記）の根拠がここにあるのに、
+       02/03/04 の無限スクロールで一覧の下には事実上たどり着けなかった。01の見立てのすぐ近くに置く。
+       既定は畳んだまま（summary だけ）＝面は浅いままで、開けば掘れる。他ビューでは自動で隠れる。 -->
+  <details id="scoreSec" class="scorecard" hidden></details>
   <ul class="list" id="list"></ul>
   <div id="moreWrap"></div>
   <!-- ⑮-4 「データについて」＝出典と注意書き＝低優先。0アクション圏に置く理由がないので一覧の下（答え合わせの隣）へ。 -->
   <div class="data-note" id="dataNote"><button class="noteToggle" id="noteToggle" type="button" aria-expanded="false" aria-controls="dataNoteText"><span class="sq"></span><span class="noteLbl" id="noteLbl">データについて</span><span class="noteChev" aria-hidden="true">›</span></button><span id="dataNoteText" hidden></span></div>
-  <details id="scoreSec" class="scorecard" hidden></details><!-- 答え合わせ（根拠/L2）は一覧の下＝掘る位置に -->
   </div><!-- /#mainView -->
 
   <section id="detailView" class="detailview" hidden>
