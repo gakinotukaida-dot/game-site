@@ -13,13 +13,24 @@
   :root{
     --bg:#14161a; --bg-2:#181b20; --ink:#e7e4dc; --ink-soft:#b4b9bb; --ink-faint:#8f9599;
     --line:#252a30; --accent:#79c0ab; --accent-weak:#1b2521; --chip:#20252b; --chip-ink:#9aa0a2;
-    --serif:"Fraunces","Hiragino Mincho ProN","Yu Mincho",serif;
-    --sans:"Hanken Grotesk","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;
+    /* 15A Fraunces／Hanken Grotesk を指定していたが、@font-face も外部読み込みも無く、
+       CSP（style-src 'self' / default-src 'self'）でも外部フォントは禁止されている＝実際には
+       一度も適用されていなかった。見えている姿（端末フォント）を正として指定を消す。
+       外部接続は増やさない（増やす案は別枠。フォント読み込みは不採用）。 */
+    --serif:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+    --sans:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",system-ui,sans-serif;
   }
+  /* 14A 明るい配色のコントラスト是正（決定事項8＝明暗切替を残す以上、明るい側も同じ基準で読める必要がある）。
+     実測（WCAG相対輝度）：薄文字 #847c6c/#e4dfd3 = 3.11、チップ文字 #6c655a/#d7d1c2 = 3.78 で
+     いずれも 4.5:1 未満だった。暗い配色は 5.97／9.14 で問題なしのため一切変更しない。 */
   .light{
-    --bg:#e4dfd3; --bg-2:#dcd6c8; --ink:#2b261f; --ink-soft:#5f584d; --ink-faint:#847c6c;
-    --line:#cfc8b8; --accent:#2f6b5e; --accent-weak:#dde7e1; --chip:#d7d1c2; --chip-ink:#6c655a;
-  }
+    --bg:#e4dfd3; --bg-2:#dcd6c8; --ink:#2b261f; --ink-soft:#5f584d; --ink-faint:#635c4d;
+    --line:#cfc8b8; --accent:#2b6255; --accent-weak:#dde7e1; --chip:#d7d1c2; --chip-ink:#5a5348;
+  }   /* --ink-faint 3.11→4.98（--bg-2 上でも 4.57）／--chip-ink 3.78→4.99／--accent は看板の ×N が
+         --bg-2 上で 4.28 だったので #2f6b5e→#2b6255（4.86）。暗い配色の --accent は変えない。 */
+  /* 16A 既定の最小文字サイズは 11px（9〜10.5px を引き上げ）。毎日読む文字としては小さすぎたため。
+     「文字 標準／大／特大」の設定（決定事項8）はそのまま残す＝既定が読める大きさであることが先。
+     装飾用のグリフ（▸ と ↗）だけは文字ではないので元の大きさのまま。 */
   *{box-sizing:border-box} html,body{margin:0}
   body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
     -webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 1;transition:background .4s ease,color .4s ease;}
@@ -38,6 +49,15 @@
     font-family:var(--sans);font-size:12px;border-radius:999px;padding:6px 12px;cursor:pointer;transition:.2s}
   .pill:hover{border-color:var(--accent);color:var(--accent)}
   .pill[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-weak)}
+  /* 11A 「表示 ▾」の中身。details なので JS 無しで開閉でき、キーボード（Tab→Enter）でも開ける。 */
+  .dispmenu{position:relative;flex-shrink:0}
+  .dispmenu>summary{list-style:none;display:inline-flex;align-items:center;cursor:pointer}
+  .dispmenu>summary::-webkit-details-marker{display:none}
+  .dispmenu[open]>summary{border-color:var(--accent);color:var(--accent);background:var(--accent-weak)}
+  .dispbody{position:absolute;right:0;top:calc(100% + 6px);z-index:30;display:flex;flex-direction:column;
+    align-items:stretch;gap:6px;background:var(--bg-2);border:1px solid var(--line);border-radius:10px;
+    padding:10px;min-width:176px;box-shadow:0 10px 26px rgba(0,0,0,.3)}
+  .dispbody .pill{width:100%;text-align:center}
   .data-note{margin-top:16px;display:inline-flex;align-items:center;gap:8px;font-size:11px;color:var(--ink-soft);
     background:var(--bg-2);border:1px solid var(--line);border-radius:8px;padding:5px 10px}
   .data-note.dummy{border-style:dashed}
@@ -64,6 +84,7 @@
   nav.views button{appearance:none;background:none;border:0;cursor:pointer;font-family:var(--sans);
     font-size:13.5px;color:var(--ink-soft);padding:10px 2px;margin-right:18px;position:relative;letter-spacing:.2px;transition:color .2s;white-space:nowrap}
   nav.views button .idx{font-family:var(--serif);font-size:12px;color:var(--ink-faint);margin-right:6px}
+  .navshort{display:none}   /* 12A スマホ用の短い語。PCでは出さない（正式名のまま） */
   nav.views button:hover{color:var(--ink)}
   nav.views button[aria-selected="true"]{color:var(--ink);font-weight:600}
   nav.views button[aria-selected="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--accent)}
@@ -116,7 +137,7 @@
   .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
   .tagmuted{opacity:.75;border:1px dashed var(--line);background:transparent;color:var(--ink-faint)}
   .tags-secondary{margin-top:4px}
-  .tags-secondary .chip{font-size:10px;color:var(--ink-faint);background:transparent;border:1px solid var(--line)}
+  .tags-secondary .chip{font-size:11px;color:var(--ink-faint);background:transparent;border:1px solid var(--line)}
   #moreWrap{display:flex;justify-content:center;margin:14px 0 2px}
   .morebtn{appearance:none;background:transparent;border:1px solid var(--line);color:var(--ink-soft);border-radius:999px;padding:8px 18px;font-family:var(--sans);font-size:12.5px;cursor:pointer;transition:.2s;display:inline-flex;gap:10px;align-items:center}
   .morebtn:hover{border-color:var(--accent);color:var(--accent)}
@@ -126,7 +147,7 @@
   .morebtn+.morebtn{margin-left:8px}
   .title{font-size:15.5px;font-weight:500;letter-spacing:.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .sub{font-size:11.5px;color:var(--ink-soft);margin-top:2px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
-  .chip{font-size:10.5px;padding:2px 7px;border-radius:999px;background:var(--chip);color:var(--chip-ink);white-space:nowrap}
+  .chip{font-size:11px;padding:2px 7px;border-radius:999px;background:var(--chip);color:var(--chip-ink);white-space:nowrap}
   .chip.note{background:var(--accent-weak);color:var(--accent)}
   .metric{text-align:right;white-space:nowrap}
   .metric .num{font-size:18px;font-weight:600;letter-spacing:.2px;font-variant-numeric:tabular-nums}
@@ -146,6 +167,11 @@
   .r2primary .num{font-size:19px;font-weight:700}      /* 主指標＝行の焦点（大きく・太く） */
   .r2primary .num.pct{color:var(--accent)}             /* 跳ね予想%は強調色で視線を誘導 */
   .r2primary .unit{color:var(--ink-soft)}
+  /* 1A 決定事項1：予想%は単独で出さない。すぐ下に「その帯が実際に何%跳ねたか」を必ず添える。
+     値は prediction_scorecard の較正帯から動的に引く（固定文言にしない＝データが動けば表示も動く）。 */
+  .calib{font-size:11px;font-weight:400;color:var(--ink-soft);white-space:nowrap;margin-top:1px;line-height:1.25;letter-spacing:0}
+  .calib b{color:var(--ink);font-weight:600}
+  .calib.thin{color:var(--ink-faint)}
   .rowchev{flex:none;color:var(--ink-faint);font-size:15px;line-height:1}
   .row2:hover{background:var(--bg-2)}
   .row2:hover .rowchev{color:var(--accent)}
@@ -154,18 +180,18 @@
   /* L1「この作品の見立て」：一覧から外したチップ・タグをここに整列 */
   .assess{display:flex;flex-direction:column;gap:8px}
   .assessrow{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-  .assesstags .chip{font-size:10px;color:var(--ink-faint);background:transparent;border:1px solid var(--line)}
+  .assesstags .chip{font-size:11px;color:var(--ink-faint);background:transparent;border:1px solid var(--line)}
   .go.ghost{background:transparent}
   .metric .mult.r1{color:var(--ink-soft)}                 /* 小さい伸び＝控えめ */
   .metric .mult.r2{color:var(--accent)}                   /* 中 */
   .metric .mult.r3{color:var(--accent);font-size:22px}    /* 大きい伸び＝主役 */
-  .confhi{font-size:9.5px;color:var(--accent);letter-spacing:.06em;margin-top:2px}
+  .confhi{font-size:11px;color:var(--accent);letter-spacing:.06em;margin-top:2px}
   /* 確度メーター（伸びの推定の確からしさ）：●3段階。静かに・色で高低。 */
-  .conf{font-size:9px;line-height:1;margin-top:4px;user-select:none;display:flex;justify-content:flex-end;align-items:center;gap:4px}
+  .conf{font-size:11px;line-height:1;margin-top:4px;user-select:none;display:flex;justify-content:flex-end;align-items:center;gap:4px}
   .conf .dots{display:inline-flex;gap:1.5px}
   .conf .d{opacity:.28}
   .conf .on{color:currentColor}
-  .conflab{font-size:9.5px;letter-spacing:.02em;white-space:nowrap}
+  .conflab{font-size:11px;letter-spacing:.02em;white-space:nowrap}
   .conf-high{color:var(--accent)}
   .conf-mid{color:var(--ink-soft)}
   .conf-low{color:var(--ink-faint)}
@@ -175,7 +201,7 @@
   .exp{text-align:right;white-space:nowrap}
   .exp .dots{letter-spacing:1px;color:var(--accent);font-size:13px}
   .exp .dots .off{color:var(--ink-faint)}
-  .exp .lbl{font-size:10px;color:var(--ink-faint);margin-top:2px}
+  .exp .lbl{font-size:11px;color:var(--ink-faint);margin-top:2px}
   .when{text-align:right;white-space:nowrap;font-size:12px;color:var(--ink-soft)}
   .when b{color:var(--ink);font-variant-numeric:tabular-nums;font-weight:600}
   .go{font-size:12px;color:var(--ink-soft);text-decoration:none;white-space:nowrap;border:1px solid var(--line);border-radius:7px;padding:6px 9px;transition:.2s}
@@ -196,13 +222,15 @@
   .drillbody .dv{color:var(--ink-soft)}
   .drillbody .dv.tags{display:flex;gap:6px;flex-wrap:wrap}
   .drillbody .dv a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--line)}
-  .drillbody .sibnote{color:var(--ink-faint);font-size:10px;margin-top:3px}
+  .drillbody .sibnote{color:var(--ink-faint);font-size:11px;margin-top:3px}
+  /* 3A 並び替えは畳まない。選択肢そのものを見せ、いま何の順なのかを横の1文で読めるようにする。
+     （畳んだ中に select があり、開いても選択肢名しか出ないので並びの基準が読めなかった） */
   .ctlbox{margin:10px 0 2px}
-  .ctlbox>summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-soft);border:1px solid var(--line);border-radius:999px;padding:6px 12px;width:max-content}
-  .ctlbox>summary::-webkit-details-marker{display:none}
-  .ctlbox>summary::before{content:"▸";font-size:10px}
-  .ctlbox[open]>summary::before{content:"▾"}
-  .ctlbox[open]>summary{color:var(--accent);border-color:var(--accent)}
+  .sortseg{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .sortbtn{appearance:none;background:transparent;border:1px solid var(--line);color:var(--ink-soft);
+    font-family:var(--sans);font-size:12px;border-radius:999px;padding:5px 11px;cursor:pointer;transition:.2s;white-space:nowrap}
+  .sortbtn:hover{border-color:var(--accent);color:var(--accent)}
+  .sortbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-weak)}
   .controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:10px 0 2px}
   .ctl{font-size:12px;color:var(--ink-soft);display:flex;align-items:center;gap:6px}
   .ctlsel{appearance:none;background:transparent;border:1px solid var(--line);color:var(--ink-soft);border-radius:8px;padding:5px 10px;font-family:var(--sans);font-size:12px;cursor:pointer}
@@ -213,9 +241,10 @@
   .fchip[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-weak)}
   .fclear{appearance:none;background:transparent;border:none;color:var(--ink-faint);font-size:11px;cursor:pointer;text-decoration:underline;font-family:var(--sans);padding:4px 6px}
   .fclear:hover{color:var(--accent)}
-  .ctlnote{font-size:10.5px;color:var(--ink-faint)}
+  .ctlnote{font-size:11px;color:var(--ink-faint)}
   footer{margin-top:30px;color:var(--ink-faint);font-size:11px}
   footer a{color:var(--ink-faint);text-decoration:none;border-bottom:1px solid var(--line)}
+  footer a:not([href]){border-bottom:0;cursor:default}   /* 9A：飛び先が無いものは下線を出さない＝リンクに見せない */
   @media(max-width:560px){
     .wrap{padding:24px 15px 60px}
     /* ヘッダの塔を潰す：縦積み＋ツールバー折返し＋説明2行はモバイルで隠す（サブ見出しが役割を兼ねる） */
@@ -234,15 +263,21 @@
     .title{font-size:14.5px}
     .metric .num{font-size:17px}
     .metric .mult.r3{font-size:20px}
-    .metric .base{font-size:10px}
-    .chip{font-size:10px;padding:2px 6px}
+    .metric .base{font-size:11px}
+    .chip{padding:2px 6px}   /* 16A 既定の最小 11px に揃えたのでスマホ用の縮小は外す */
     .tags{gap:5px;margin-top:4px}
     .heroname{font-size:17px}
     .heroratio{font-size:24px}
     .heroimg .cover{width:92px;height:43px}
     .herocard{padding:11px 13px;gap:11px}
-    nav.views button{margin-right:13px;font-size:13px;padding:10px 0}
-    nav.views button .idx{margin-right:4px}
+    /* 12A 390px では「04 新着で伸び」が横スクロールの外に出て、スクロールバーも非表示のため
+       04の存在に気づけなかった。スマホでは4等分のグリッドにして4本とも常に見せる。
+       番号を上・短い語を下の2段にすることで、4等分の幅（約85px）に収める。 */
+    nav.views{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));overflow-x:visible}
+    nav.views button{margin-right:0;font-size:13px;padding:8px 2px;text-align:center}
+    nav.views button .idx{display:block;margin-right:0;font-size:11px;line-height:1.35}
+    .navfull{display:none}
+    .navshort{display:inline}
   }
   /* ⑯ 最終更新の1行（ヒーロー直下・0アクション）。fallback は「前回値」であることが読み取れる色分け。 */
   .lastupd{font-size:11px;color:var(--ink-faint);margin:6px 0 0;font-variant-numeric:tabular-nums}
@@ -294,8 +329,21 @@
   .dvhead .cover{width:120px;height:56px}
   .dvtitle{font-family:var(--serif);font-weight:500;font-size:22px;color:var(--ink);margin:0;line-height:1.2}
   .dvmetric{margin-top:5px}
+  /* 1C 決定事項1：詳細の見出しも %単独をやめ「跳ね予想／同じ帯の実績／平均との比」の3行にする。
+     「ふつう×N」は分母（発売前作品の平均跳ね率）を必ず併記する＝説明が要らなくなる。 */
+  .predbox{display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 14px;align-items:baseline;font-size:12.5px;margin-top:3px}
+  .predbox .pk{color:var(--ink-faint);white-space:nowrap}
+  .predbox .pv{color:var(--ink-soft);min-width:0}
+  .predbox .pv b{color:var(--ink);font-weight:600}
+  .predbox .pnum{font-size:19px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
   .dvsection{margin:16px 0;padding-top:13px;border-top:1px solid var(--line)}
-  .dvlabel{font-size:10.5px;color:var(--ink-faint);letter-spacing:.4px;margin:0 0 8px}
+  .dvlabel{font-size:11px;color:var(--ink-faint);letter-spacing:.4px;margin:0 0 8px}
+  /* 8A 用語：そのページに出ている語だけを1行ずつ説明する。title属性（ホバー）はスマホで読めないため本文で出す。 */
+  .gloss{display:flex;flex-direction:column;gap:8px}
+  .glrow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 12px;align-items:baseline;font-size:12px}
+  .glk{color:var(--ink);font-weight:600;white-space:nowrap}
+  .glv{color:var(--ink-soft);min-width:0}
+  @media(max-width:560px){ .glrow{grid-template-columns:minmax(0,1fr)} }
   .dvhistory{font-size:12px;color:var(--ink-faint)}
   .dvmuted{color:var(--ink-faint);font-size:12px}
   .why{display:flex;flex-direction:column;gap:9px}
@@ -309,7 +357,7 @@
   /* v11：観測の履歴チャート（自己比・平常値ライン・現在ドット） */
   .histstats{display:flex;gap:14px;flex-wrap:wrap;margin:2px 0 8px}
   .histstats .hs{display:flex;flex-direction:column;gap:1px}
-  .histstats .hsk{font-size:10px;color:var(--ink-faint)}
+  .histstats .hsk{font-size:11px;color:var(--ink-faint)}
   .histstats .hsv{font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums}
   .histstats .hsv.accent{color:var(--accent);font-weight:600}
   .histwrap{margin-top:4px}
@@ -317,7 +365,7 @@
   .histsvg .hline{fill:none;stroke:var(--accent);stroke-width:1.8;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
   .histsvg .baseline{stroke:var(--ink-faint);stroke-width:1;stroke-dasharray:4 4;vector-effect:non-scaling-stroke}
   .histsvg .curdot{fill:var(--accent)}
-  .histdates{display:flex;justify-content:space-between;font-size:10px;color:var(--ink-faint);margin-top:3px}
+  .histdates{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-faint);margin-top:3px}
   .histthin{font-size:12px;color:var(--ink-faint)}
   /* ===== 統合追加（v11b骨格＋今セッションの要素） ===== */
   .chip.cause{background:var(--accent-weak);color:var(--accent)}
@@ -340,8 +388,23 @@
   .chip.c-demo{color:#3fa87f;background:rgba(63,168,127,.14);border:1px solid rgba(63,168,127,.36)}          /* 体験版CCU（実測） */
   .chip.c-spike{color:var(--accent);background:var(--accent-weak);border:1px solid color-mix(in srgb,var(--accent) 46%,transparent);font-weight:600}  /* 跳ね予想（核） */
   .chip.c-fac{color:#c98b3f;background:rgba(201,139,63,.12);border:1px solid rgba(201,139,63,.32)}          /* 押し上げ要因 */
+  /* 14A 色付きチップは明るい地で 1.76〜2.52:1 しかなかった（文字色は暗い地向けの明度のまま流用されていた）。
+     明るい配色のときだけ文字色を濃くして 4.5:1 以上にする。背景・枠・暗い配色はそのまま＝色の意味は変えない。 */
+  .light .chip.c-sale{color:#854f14}      /* 2.28 → 4.51 */
+  .light .chip.c-news{color:#3a5a99}      /* 2.18 → 4.56 */
+  .light .chip.c-launch{color:#26664d}    /* 1.99 → 4.55 */
+  .light .chip.c-free{color:#1b665f}      /* 1.81 → 4.58 */
+  .light .chip.c-review{color:#625097}    /* 2.10 → 4.51 */
+  .light .chip.c-b1{color:#8a4363}        /* 2.18 → 4.55 */
+  .light .chip.c-new{color:#26664d}       /* 1.99 → 4.55 */
+  .light .chip.c-revival{color:#81502d}   /* 1.81 → 4.57 */
+  .light .chip.c-jp{color:#904242}        /* 2.52 → 4.57 */
+  .light .chip.c-web{color:#246470}       /* 1.76 → 4.61 */
+  .light .chip.c-expect{color:#7a5419}    /* 1.87 → 4.55 */
+  .light .chip.c-demo{color:#26664d}      /* 1.99 → 4.55 */
+  .light .chip.c-fac{color:#7b5526}       /* 2.00 → 4.58 */
   /* ===== 跳ね予想の答え合わせ（スコアカード） ===== */
-  .scorecard{margin:18px 0 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg-2);overflow:hidden}
+  .scorecard{margin:10px 0 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg-2);overflow:hidden}
   .scorecard>summary{list-style:none;cursor:pointer;padding:11px 14px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
   .scorecard>summary::-webkit-details-marker{display:none}
   .scorecard>summary::after{content:"▾";color:var(--ink-faint);margin-left:auto;font-size:12px;transition:.2s}
@@ -364,27 +427,44 @@
   .sc-ex li{display:flex;align-items:center;gap:8px;font-size:12px}
   .sc-ex .p{font-variant-numeric:tabular-nums;color:var(--ink-faint);min-width:44px;text-align:right}
   .sc-ex .r{font-weight:700;min-width:15px;text-align:center}
+  .light .sc-ex .r.hit{color:#26664d}   /* 14A 答え合わせの「✓」も明るい地では薄すぎた */
   .sc-ex .r.hit{color:#3fa87f}.sc-ex .r.miss{color:var(--ink-faint)}
   .sc-ex .nm{color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .sc-ex .pk{color:var(--ink-faint);font-size:11px;white-space:nowrap;margin-left:auto}
-  .rowsteam{font-size:10.5px;color:var(--ink-faint);text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:1px 7px;white-space:nowrap;margin-left:6px;transition:.2s}
+  .rowsteam{font-size:11px;color:var(--ink-faint);text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:1px 7px;white-space:nowrap;margin-left:6px;transition:.2s}
   .rowsteam:hover{color:var(--accent);border-color:var(--accent)}
   .titlerow{display:flex;align-items:center;gap:2px;min-width:0}
   .titlerow .title{min-width:0}
   /* 2行目：詳細タグ（左・詰めて表示）＋ミニ折れ線（右・数字の真下に整列）で隙間を埋める */
   .r2sub{display:flex;align-items:center;gap:12px;margin-top:5px;min-width:0}
-  .r2tags{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:5px 6px;max-height:46px;overflow:hidden}
+  /* 2A-PC 切り落とし（max-height:46px + overflow:hidden）は幅を問わず廃止する。
+     PC幅（1280px）でも03タブでチップの下端が3〜4px欠けており、変更前から同じ箇所で起きていた。
+     欠けを無くす代わりにPCでも行が高くなる（チップが3行に及ぶ行がある）＝本人判断で採用。 */
+  .r2tags{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:5px 6px}
   .sparkrow{flex:none;display:flex;justify-content:flex-end;align-items:center}
   .sparksvg{width:132px;max-width:40vw;height:27px;flex:none}
   .sparkline{fill:none;stroke:var(--accent);stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
   .sparkbase{stroke:var(--ink-faint);stroke-width:1;stroke-dasharray:3 3;vector-effect:non-scaling-stroke}
   .sparkdot{fill:var(--accent)}
-  .sparklbl{font-size:10px;color:var(--ink-faint);white-space:nowrap}
+  .sparklbl{font-size:11px;color:var(--ink-faint);white-space:nowrap}
+  @media(max-width:560px){
+    /* 2A 決定事項2：390px幅でチップ行が max-height:46px に切られ、01では要因2が消え要因1の右端が
+       欠けていた。原因は棒／折れ線（132px・最大40vw）がチップ行と同じ行に並ぶこと。
+       スマホでは column-reverse で棒／折れ線を右の数字の直下へ寄せ、チップ行を全幅にする。
+       切り落とし（max-height）は基底ルール側で廃止済み＝ここでは全幅化だけを担う。
+       ★「1行・折り返し禁止＋…」は実測で不採用：390px でチップ行に使える幅は 221px しかなく、
+         01の3チップの自然幅は合計 235〜334px。1行に押し込むと各チップが 31〜37px まで潰れ、
+         「9月…」「▲開…」となって折り返しより読めなくなる。全幅＋折り返し可なら2行で全部読める。 */
+    .r2sub{flex-direction:column-reverse;align-items:stretch;gap:4px}
+    .r2sub .sparkrow,.r2sub .surgebar{align-self:flex-end;flex:none}
+    /* 親を縦積みにしたので flex:1 は「高さ」に効いてしまう（basis:0 で潰れて中身が隠れる）。必ず none に戻す。 */
+    .r2tags{flex:none;width:100%}
+  }
   .surgebar{flex:none;display:flex;align-items:center;gap:9px;width:132px;max-width:40vw}
   .surgetrack{position:relative;height:5px;border-radius:3px;background:var(--chip);flex:1;overflow:hidden}
   .surgefill{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,var(--accent-weak),var(--accent))}
   .surgex{font-size:11px;color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
-  .confchip{font-size:10px;color:var(--ink-faint);border:1px solid var(--line);border-radius:999px;padding:1px 7px}
+  .confchip{font-size:11px;color:var(--ink-faint);border:1px solid var(--line);border-radius:999px;padding:1px 7px}
   .confchip.high{color:var(--accent);border-color:var(--accent)}
   .expbanner{margin-top:10px;display:inline-flex;align-items:center;gap:7px;font-size:11px;color:var(--accent);
     background:var(--accent-weak);border:1px solid var(--accent);border-radius:8px;padding:5px 10px}
@@ -403,7 +483,7 @@
   .chip.best{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:600}
   /* ===== つながり（情報の深掘り／rabbit hole）：詳細から別作品・資料へ潜る。たどった道はパンくずで可視化。 ===== */
   .dvtrail{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:2px 0 12px}
-  .dvtrail .trailhd{color:var(--ink-faint);font-size:10px;letter-spacing:.3px;white-space:nowrap;flex-shrink:0}
+  .dvtrail .trailhd{color:var(--ink-faint);font-size:11px;letter-spacing:.3px;white-space:nowrap;flex-shrink:0}
   .dvtrail .crumbs{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;min-width:0;font-variant-numeric:tabular-nums}
   .dvtrail .crumb{appearance:none;background:none;border:0;padding:0;font-family:var(--sans);font-size:11.5px;cursor:pointer;color:var(--accent);max-width:16ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .dvtrail button.crumb:hover{text-decoration:underline}
@@ -412,7 +492,7 @@
   .connhint{font-size:11px;color:var(--ink-faint);margin:-2px 0 12px;line-height:1.5}
   .conngroup{margin:0 0 14px}
   .conngroup:last-child{margin-bottom:0}
-  .conngrouphd{font-size:10.5px;color:var(--ink-faint);letter-spacing:.3px;margin:0 0 7px}
+  .conngrouphd{font-size:11px;color:var(--ink-faint);letter-spacing:.3px;margin:0 0 7px}
   .connlist{display:flex;flex-direction:column;gap:6px}
   .connitem{appearance:none;text-align:left;display:flex;align-items:center;gap:10px;width:100%;
     background:var(--bg-2);border:1px solid var(--line);border-radius:9px;padding:9px 12px;
@@ -420,7 +500,7 @@
   .connitem:hover{border-color:var(--accent)}
   .connitem:active{transform:scale(.996)}
   .connname{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .connwhy{font-size:10.5px;color:var(--ink-faint);white-space:nowrap;flex-shrink:0;max-width:42%;overflow:hidden;text-overflow:ellipsis}
+  .connwhy{font-size:11px;color:var(--ink-faint);white-space:nowrap;flex-shrink:0;max-width:42%;overflow:hidden;text-overflow:ellipsis}
   .conngo{color:var(--accent);font-size:12px;flex-shrink:0}
   .connext .conngo{color:var(--ink-soft)}
   @media(max-width:560px){ .connwhy{display:none} }
@@ -446,7 +526,7 @@
   .introlist .idesc{color:var(--ink-soft)}
 
   /* 共有ボタン（E1）：Steamリンクと並ぶ控えめなアクション */
-  .rowshare{font-size:10.5px;color:var(--ink-faint);background:transparent;border:1px solid var(--line);
+  .rowshare{font-size:11px;color:var(--ink-faint);background:transparent;border:1px solid var(--line);
     border-radius:6px;padding:1px 7px;white-space:nowrap;margin-left:5px;cursor:pointer;
     font-family:inherit;transition:.2s}
   .rowshare:hover{color:var(--accent);border-color:var(--accent)}
@@ -465,12 +545,20 @@
     <div class="brand">
       <div class="wordmark">トレパ<span class="dot">.</span> <span class="sub">Trend Pulse — Steam発見レーダー</span></div>
     </div>
+    <!-- 11A 設定5個が右寄せで2段になり、看板を1画面目の下へ押し下げていた。毎日開く人が最初に見るのは
+         看板か一覧で、設定は月に1回＝順序が逆だった。「？」と「表示 ▾」の2つに畳む。
+         中身（文字サイズ・明暗・画像・EN）は id をそのまま引き継ぐので配線は一切変えない＝決定事項8の機能は全部残る。 -->
     <div class="toolbar">
       <button class="pill" id="helpBtn" type="button" title="このサイトの使い方" data-i18n="help.btn">？ 使い方</button>
-      <button class="pill" id="fontBtn" type="button" title="文字の大きさを変える">文字 標準</button>
-      <button class="pill" id="langBtn" type="button" title="日本語 / English" data-i18n="lang.btn">EN</button>
-      <button class="pill" id="imgBtn" type="button" aria-pressed="true" title="サムネイル画像の表示切り替え">画像 on</button>
-      <button class="pill" id="themeBtn" type="button" title="配色を明るく／暗く">背景を明るく</button>
+      <details class="dispmenu" id="dispMenu">
+        <summary class="pill" title="表示の設定（文字の大きさ・明暗・画像・言語）" data-i18n="disp.btn">表示 ▾</summary>
+        <div class="dispbody">
+          <button class="pill" id="fontBtn" type="button" title="文字の大きさを変える">文字 標準</button>
+          <button class="pill" id="themeBtn" type="button" title="配色を明るく／暗く">背景を明るく</button>
+          <button class="pill" id="imgBtn" type="button" aria-pressed="true" title="サムネイル画像の表示切り替え">画像 on</button>
+          <button class="pill" id="langBtn" type="button" title="日本語 / English" data-i18n="lang.btn">EN</button>
+        </div>
+      </details>
     </div>
   </header>
   <!-- ⑮-任意5 デスクトップのブランド説明2行を1行に統合（モバイルでは元から非表示）。文言は両方とも残す。
@@ -482,7 +570,7 @@
     <button class="herocard" id="heroCard" type="button" title="いちばん伸びている作品を見る">
       <span class="heroimg" id="heroImg"></span>
       <span class="herobody">
-        <span class="herokick" data-i18n="hero.kick">いま、いつもより伸びている</span>
+        <span class="herokick" id="heroKick">いま、いつもより伸びている</span><!-- 5A paintHero が「03 いつもより伸び・N位」に差し替える（data-i18n は外す＝言語切替でも paintHero が担当） -->
         <span class="heroname" id="heroName"></span>
         <span class="herowhy" id="heroWhy"></span>
       </span>
@@ -504,31 +592,29 @@
        直下に同じ名前をもう一度出していた＝純粋な重複。「？（この見方の説明）」はタブ行の右へ移す。 -->
   <div class="navrow">
     <nav class="views" role="tablist" aria-label="表示の切り口">
-      <button role="tab" aria-selected="true"  data-view="3"><span class="idx">01</span><span data-i18n="nav.3">これから来そう</span></button>
-      <button role="tab" aria-selected="false" data-view="1"><span class="idx">02</span><span data-i18n="nav.1">今の人数</span></button>
-      <button role="tab" aria-selected="false" data-view="2"><span class="idx">03</span><span data-i18n="nav.2">いつもより伸び</span></button>
-      <button role="tab" aria-selected="false" data-view="L"><span class="idx">04</span><span data-i18n="nav.L">新着で伸び</span></button>
+      <button role="tab" aria-selected="true"  data-view="3"><span class="idx">01</span><span class="navfull" data-i18n="nav.3">これから来そう</span><span class="navshort" data-i18n="nav.3s">来そう</span></button>
+      <button role="tab" aria-selected="false" data-view="1"><span class="idx">02</span><span class="navfull" data-i18n="nav.1">今の人数</span><span class="navshort" data-i18n="nav.1s">人数</span></button>
+      <button role="tab" aria-selected="false" data-view="2"><span class="idx">03</span><span class="navfull" data-i18n="nav.2">いつもより伸び</span><span class="navshort" data-i18n="nav.2s">伸び</span></button>
+      <button role="tab" aria-selected="false" data-view="L"><span class="idx">04</span><span class="navfull" data-i18n="nav.L">新着で伸び</span><span class="navshort" data-i18n="nav.Ls">新着</span></button>
     </nav>
     <button class="ttlq" id="ttlHelp" type="button" aria-label="この見方の説明" aria-controls="blurb" aria-expanded="false">？</button>
   </div>
 
   <section id="intro" class="intro" hidden aria-label="このサイトの使い方"></section>
 
-  <details class="ctlbox" id="ctlBox">
-    <summary data-i18n="ctl.summary">並び替え</summary>
+  <div class="ctlbox" id="ctlBox">
     <div class="controls">
-    <label class="ctl"><span data-i18n="ctl.summary">並び替え</span>
-      <select id="sortSel" class="ctlsel">
-        <option value="rank" data-i18n="sort.rank">おすすめ順</option>
-        <option value="ccu" data-i18n="sort.ccu">多い順</option>
-        <option value="momentum" data-i18n="sort.momentum">勢い順（平常比）</option>
-        <option value="new" data-i18n="sort.new">新着順</option>
-        <option value="name" data-i18n="sort.name">名前順</option>
-      </select>
-    </label>
-    <span class="ctlnote">※「今の人数／いつもより伸び／新着で伸び」で有効。「おすすめ順」は各ビュー既定の並び。ジャンル絞り込みは AND（選んだすべてに一致）。</span>
+      <span class="flabel" data-i18n="ctl.summary">並び替え</span>
+      <div class="sortseg" id="sortSeg" role="group" aria-label="並び替え">
+        <button class="sortbtn" type="button" data-sort="rank" aria-pressed="true" data-i18n="sort.rank">おすすめ順</button>
+        <button class="sortbtn" type="button" data-sort="momentum" aria-pressed="false" data-i18n="sort.momentum">勢い順（平常比）</button>
+        <button class="sortbtn" type="button" data-sort="ccu" aria-pressed="false" data-i18n="sort.ccu">多い順</button>
+        <button class="sortbtn" type="button" data-sort="new" aria-pressed="false" data-i18n="sort.new">新着順</button>
+        <button class="sortbtn" type="button" data-sort="name" aria-pressed="false" data-i18n="sort.name">名前順</button>
+      </div>
+      <span class="ctlnote" id="ctlNote"></span>
     </div>
-  </details>
+  </div>
 
   <!-- ⑮-2 お気に入り切替は favs.size>0 のときだけ出す（★が1件も無いなら押せば必ず空になるだけ）。
        ⑮-3 検索窓は🔍に畳む＝「作品名を既に知っている人」の道具＝低優先。開閉は端末内に記憶する
@@ -548,11 +634,14 @@
     <span id="genreChips"></span>
     <button class="fclear" id="fclear" type="button" data-i18n="filter.clear" hidden>クリア</button>
   </div>
+  <!-- 19B 答え合わせは一覧の「直上」へ。決定事項1（予想%に実績を併記）の根拠がここにあるのに、
+       02/03/04 の無限スクロールで一覧の下には事実上たどり着けなかった。01の見立てのすぐ近くに置く。
+       既定は畳んだまま（summary だけ）＝面は浅いままで、開けば掘れる。他ビューでは自動で隠れる。 -->
+  <details id="scoreSec" class="scorecard" hidden></details>
   <ul class="list" id="list"></ul>
   <div id="moreWrap"></div>
   <!-- ⑮-4 「データについて」＝出典と注意書き＝低優先。0アクション圏に置く理由がないので一覧の下（答え合わせの隣）へ。 -->
   <div class="data-note" id="dataNote"><button class="noteToggle" id="noteToggle" type="button" aria-expanded="false" aria-controls="dataNoteText"><span class="sq"></span><span class="noteLbl" id="noteLbl">データについて</span><span class="noteChev" aria-hidden="true">›</span></button><span id="dataNoteText" hidden></span></div>
-  <details id="scoreSec" class="scorecard" hidden></details><!-- 答え合わせ（根拠/L2）は一覧の下＝掘る位置に -->
   </div><!-- /#mainView -->
 
   <section id="detailView" class="detailview" hidden>
@@ -565,7 +654,7 @@
     <div class="disc" data-i18n="foot.disc2">数値・順位・「推定きっかけ」は公開データから自動算出した観測・実験的な指標であり、正確性・完全性・最新性を保証しません。投資・購入を勧める助言ではありません。「予測」は外れることがあり、原因が特定できないときは「原因不明」と表示します。</div>
     <div class="disc" data-i18n="foot.obs2">「今の人数」はSteamの“ゲーム”を対象に観測しています（ソフトウェア区分・アダルト作品は対象外）。観測が途切れた作品も定期的に再確認して拾い直します。</div>
     <div class="disc dev" id="devLine"></div>
-    <div style="margin-top:12px"><a href="./data/rising_feed.xml" target="_blank" rel="noopener noreferrer" data-i18n="foot.rss">RSS（伸びフィード）</a> · <a href="#" id="ppLink" onclick="return false" data-i18n="foot.pp">プライバシーポリシー（未設定）</a> · <a href="#" id="cookieSettings" data-i18n="foot.cookie">Cookie設定</a> · <span data-i18n="foot.obs">観測記録（Steam公式API）</span></div>
+    <div style="margin-top:12px"><a href="./data/rising_feed.xml" target="_blank" rel="noopener noreferrer" data-i18n="foot.rss">RSS（伸びフィード）</a> · <a href="#" id="ppLink" onclick="return false" data-i18n="foot.pp">プライバシーポリシー（未設定）</a><span id="ckWrap"> · <a href="#" id="cookieSettings" data-i18n="foot.cookie">Cookie設定</a></span> · <span data-i18n="foot.obs">観測記録（Steam公式API）</span></div>
   </footer>
 </div>
 
@@ -703,23 +792,45 @@ const nf=new Intl.NumberFormat("ja-JP");
 let lang="ja"; const LANG_KEY="radar_lang_v1"; try{ if(localStorage.getItem(LANG_KEY)==="en") lang="en"; }catch(e){}
 function L(ja,en){ return lang==="en"?en:ja; }                 // 動的文字列（描画時に評価）
 function genreLabel(g){ return lang==="en"?g:(GENRE_JA[g]||g); } // ジャンルは英語キーをそのまま英語表示に
+// 7A 詳細の「カテゴリ」に内部名（#category_playable_at_your_own_pace 等）がそのまま出ていた。
+//    表示するときだけ整形する＝data/ の JSON は一切触らない（決定事項10・外部から読まれている形は保つ）。
+//    未登録の語は英語のまま出す（当てずっぽうの訳を作らない）。
+function catLabel(t){
+  let s=String(t==null?"":t);
+  if(/^#category_/.test(s)) s=s.replace(/^#category_/,"").replace(/_/g," ").replace(/(^|\s)\w/g,c=>c.toUpperCase());
+  return (lang==="en")?s:(CAT_JA[s]||s);
+}
 const I18N={
  "brand.plain":{ja:"いま、いつもより人が増えているPCゲームを、静かに見つけます。",en:"Discover PC games gaining more players than usual — quietly."},
  "brand.tagline":{ja:"頼んでいない情報は出しません。追いたいゲームだけ、静かに。",en:"No noise you didn't ask for — just the games you follow, quietly."},
  "ctl.summary":{ja:"並び替え",en:"Sort"},
- "sort.rank":{ja:"おすすめ順",en:"Recommended"},"sort.ccu":{ja:"多い順",en:"Most players"},
+ "sort.rank":{ja:"おすすめ順",en:"Recommended"},
+ // 3A 「おすすめ順」が何順なのかをビューごとに1文で出す。文言はコードで裏を取ったものだけ書く：
+ //   02 → render() が ccu 降順に並べる／04 → viewItems("L") が平常比の倍率降順で返す／
+ //   03 → データ側（view02_rank_v2.py）の eff 順。eff = 倍率を観測点数で収縮(shrunk)し、統計的な
+ //        有意性(robust_z)で減衰(base_score)させ、きっかけの有無で加点(1+boost)した合成スコア。
+ //        ★点検書の「倍率×確度×人数の合成」は不正確（「人数」ではなく「観測点数」）なので書き換えた。
+ "ctl.rank.1":{ja:"おすすめ順＝いま遊んでいる人数の多い順。",en:"Recommended = most players right now."},
+ "ctl.rank.2":{ja:"おすすめ順＝倍率を観測点数で収縮し、確からしさで減衰させ、きっかけの有無で加点した合成スコア順。倍率だけの順ではないので、下の行のほうが倍率が大きいことがあります。",en:"Recommended = a composite score: the ratio shrunk by how many observations there are, damped by significance, boosted when a trigger was found. Not a pure ratio order, so a lower row can have a bigger ×N."},
+ "ctl.rank.L":{ja:"おすすめ順＝平常比の倍率が大きい順。",en:"Recommended = biggest rise vs its own usual."},
+ "ctl.and":{ja:"ジャンル絞り込みは AND（選んだすべてに一致）。",en:"Genre filter is AND (matches all selected)."},"sort.ccu":{ja:"多い順",en:"Most players"},
  "sort.momentum":{ja:"勢い順（平常比）",en:"Momentum"},"sort.new":{ja:"新着順",en:"Newest"},"sort.name":{ja:"名前順",en:"Name"},
  "filter.genre":{ja:"ジャンル",en:"Genre"},"filter.clear":{ja:"クリア",en:"Clear"},
  "fav.all":{ja:"すべて",en:"All"},"fav.star":{ja:"★ お気に入り",en:"★ Favorites"},
  "search.ph":{ja:"🔍 この一覧から作品名でさがす",en:"🔍 Search this list by title"},
  "nav.1":{ja:"今の人数",en:"Now playing"},"nav.2":{ja:"いつもより伸び",en:"Rising"},"nav.L":{ja:"新着で伸び",en:"New & rising"},"nav.3":{ja:"これから来そう",en:"Upcoming"},
+ // 12A スマホで4本とも見せるための短い語（PCでは上の正式名のまま）。tooltip(VIEWTITLE)は両方で同じ。
+ "disp.btn":{ja:"表示 ▾",en:"Display ▾"},
+ "nav.1s":{ja:"人数",en:"Now"},"nav.2s":{ja:"伸び",en:"Rising"},"nav.Ls":{ja:"新着",en:"New"},"nav.3s":{ja:"来そう",en:"Soon"},
  "back":{ja:"← 一覧へ戻る",en:"← Back to list"},
  "free.hd":{ja:"無料でもらえる",en:"Free to keep"},
  "free.note":{ja:"いま0円で「もらえば永久所有」できるもの（公式ストアの観測・見落とし拾い）。",en:"Currently free to claim and keep forever (spotted on official stores)."},
  "foot.disc1":{ja:"本サイトは Valve Corporation（Steam）、Twitch、および各ゲームの開発・販売元とは一切提携・関係しておらず、公認・後援も受けていません。「Steam」およびゲーム名等は各権利者の商標です。公開データに基づく非公式の情報サイトです。",en:"This site is not affiliated with, endorsed by, or sponsored by Valve (Steam), Twitch, or any game's developer/publisher. \"Steam\" and game titles are trademarks of their respective owners. An unofficial, data-based information site."},
  "foot.disc2":{ja:"数値・順位・「推定きっかけ」は公開データから自動算出した観測・実験的な指標であり、正確性・完全性・最新性を保証しません。投資・購入を勧める助言ではありません。「予測」は外れることがあり、原因が特定できないときは「原因不明」と表示します。",en:"Figures, rankings, and \"estimated triggers\" are experimental indicators auto-computed from public data; accuracy, completeness, and timeliness are not guaranteed. Not investment or purchase advice. \"Predictions\" can be wrong; when no cause is identified we show \"Cause unknown\"."},
  "foot.rss":{ja:"RSS（伸びフィード）",en:"RSS (rising feed)"},"foot.pp":{ja:"プライバシーポリシー（未設定）",en:"Privacy Policy (not set)"},
- "foot.cookie":{ja:"Cookie設定",en:"Cookie settings"},"foot.obs":{ja:"観測記録（Steam公式API）",en:"Observations (Steam official API)"},
+ "foot.cookie":{ja:"Cookie設定",en:"Cookie settings"},
+ // 9A GA を有効化するまではこちらを出す（「未設定」と書く代わりに、実際に何をしていないかを書く）
+ "foot.priv":{ja:"アクセス解析なし・端末内保存（お気に入り・設定）のみ",en:"No analytics · stored on your device only (favorites & settings)"},"foot.obs":{ja:"観測記録（Steam公式API）",en:"Observations (Steam official API)"},
  "cookie.title":{ja:"Cookieの使用について",en:"About cookies"},
  "cookie.body":{ja:"利用状況の分析(Google Analytics)にCookieを使います。同意する場合のみ有効化します。",en:"We use cookies for usage analytics (Google Analytics), enabled only with your consent."},
  "cookie.accept":{ja:"同意する",en:"Accept"},"cookie.decline":{ja:"拒否する",en:"Decline"},
@@ -900,19 +1011,53 @@ function l1Secondary(d){
   if(!g.length) return "";  // 無いときは出さない（「準備中」で行を汚さない）
   return g.slice(0,2).map(t=>`<span class="chip gq">${esc(genreLabel(t))}</span>`).join("")+(g.length>2?`<span class="chip gq more">+${g.length-2}</span>`:"");
 }
+// 8A 「そのページに出ている語」だけを1行ずつ説明する節。説明は title 属性にもあるが、
+//    スマホではホバーできず読めないので本文として出す。
+//    ★決定事項4の呼び方「直近6時間の高いほう（上位10%）」は変えない。説明を足すだけ。
+//    ★▲の記号・色も決定事項2なので変えない。ここで「押し上げ要因」だと書いて意味を通す。
+function glossarySection(o){
+  const rows=[];
+  const add=(k,v)=>rows.push(`<div class="glrow"><span class="glk">${k}</span><span class="glv">${v}</span></div>`);
+  if(o.view==="3"){
+    const P=(SCORE&&SCORE.params)||{}, days=P.outcome_days||14, thr=P.hit_threshold||1000;
+    add(L("跳ね予想","Spike forecast"),
+        L(`発売から${days}日以内に最大同時接続 ${nf.format(thr)}人以上になる確率の推定です。モデルの出力なので外れることがあります。`,
+          `The estimated chance of reaching ${nf.format(thr)}+ peak concurrent players within ${days} days of launch. A model output — it can be wrong.`));
+    add(L("同じ帯の実績","Same band, actual"),
+        L("同じくらいの%を出した過去の予測が、実際に何%跳ねたか。予想をどれくらい割り引いて読めばよいかの目安です。",
+          "Of past predictions in the same percentage band, how many actually spiked. Use it to calibrate how much to trust the forecast."));
+    add("▲", L("この予測を押し上げている要因です（警告ではありません）。","A signal raising this prediction — not a warning."));
+    add(L("確度","Confidence"),
+        L("予測のもとになった実測シグナルの多さ・確かさ。高いほど材料が揃っています。",
+          "How many and how solid the measured signals behind the prediction are."));
+    add(L("平均との比","vs average"),
+        L("発売前作品ぜんぶの平均跳ね率と比べて何倍か。分母は上の行に書いてあります。",
+          "How many times the average spike rate across all pre-release titles. The denominator is shown above."));
+  } else if(o.view==="2"){
+    add(L("直近6時間の高いほう（上位10%）","Recent 6h high (90th percentile)"),
+        L("直近6時間の観測値を並べ、上から10%の位置にある値です。いちばん高い1点だけに引っぱられないための取り方です。",
+          "The value at the 90th percentile of the last 6 hours of observations — so a single spike does not dominate."));
+    add(L("平常","Usual"),
+        L("その作品の「ふだん」＝過去14日の中央値です。できるときは同じ時間帯どうしで揃えます（揃えられなかった日は下に注記が出ます）。",
+          "The title's own baseline: the 14-day median, aligned by time of day when there is enough data (a note appears when it could not be)."));
+  }
+  if(!rows.length) return "";
+  return `<div class="dvsection"><div class="dvlabel">${L("用語","Glossary")}</div><div class="gloss">${rows.join("")}</div></div>`;
+}
 function detailBodyReal(d){
   if(!d) return "";
   const dev=(d.developers||[]).map(esc).join("、");
   const pub=(d.publishers||[]).map(esc).join("、");
   const samePub = pub && pub!==dev;            // 開発元＝販売元(インディーに多い)なら販売元行は省く
-  const cats=(d.categories||[]).map(t=>`<span class="chip">${esc(t)}</span>`).join("");
+  const cats=(d.categories||[]).map(t=>`<span class="chip">${esc(catLabel(t))}</span>`).join("");   // 7A
   const pr=d.price, rv=d.review;
   const hasAny = dev || pub || cats || d.release || (d.dlc_count>0) || (d.siblings&&d.siblings.length) || d.website || pr || rv;
   if(!hasAny) return "";                        // appdetails未到達＝中身なし（rowDetailが「準備中」を出す）
   let rows="";
   if(dev) rows+=`<span class="dk">${L("開発元","Developer")}</span><span class="dv">${dev}</span>`;
   if(samePub) rows+=`<span class="dk">${L("販売元","Publisher")}</span><span class="dv">${pub}</span>`;
-  rows+=`<span class="dk">${L("発売日","Release")}</span><span class="dv">${d.release?esc(d.release):"—"}</span>`;
+  // 7A 発売日が「18 Sep, 2026」のままで一覧の「9月18日」と表記が揃っていなかった。表示時に整形する。
+  rows+=`<span class="dk">${L("発売日","Release")}</span><span class="dv">${d.release?esc(relDateJa(d.release,true)):"—"}</span>`;
   // ⑲ dlc_count が null＝DLCを**まだ調べていない**（appdetails 未到達）。行ごと出さない。
   //    0 と null を同じ「なし」にすると、調べていないものを「無い」と断定することになる（0802E-05）。
   if(d.dlc_count!=null) rows+=`<span class="dk">DLC</span><span class="dv">${d.dlc_count>0?L(`あり（${d.dlc_count}）`,`Yes (${d.dlc_count})`):L("なし","None")}</span>`;
@@ -960,7 +1105,7 @@ const UP_MON_RE=/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i;
 // パースできない表記（"Q3 2026" / "2026" / "January 2027" など）は原文のまま残す＝勝手に丸めない。
 // 英語表示のときは原文（ストア表記）をそのまま出す。年が今年と違うときだけ「2027年2月10日」と年を添える。
 const REL_MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
-function relDateJa(str){
+function relDateJa(str, withYear){
   const s=String(str==null?"":str).trim();
   if(!s||lang==="en") return s;
   if(/^coming\s+soon$/i.test(s)) return "近日";
@@ -969,7 +1114,8 @@ function relDateJa(str){
   else if(mm=s.match(/^(\d{1,2})\s+([A-Za-z]{3,9})\.?,?\s+(\d{4})$/)){ y=+mm[3]; m=REL_MON[mm[2].slice(0,3).toLowerCase()]; d=+mm[1]; }
   else if(mm=s.match(/^([A-Za-z]{3,9})\.?\s+(\d{1,2}),?\s+(\d{4})$/)){ y=+mm[3]; m=REL_MON[mm[1].slice(0,3).toLowerCase()]; d=+mm[2]; }
   if(!y||!m||!d||m<1||m>12||d<1||d>31) return s;   // 日付として読めない＝原文のまま
-  return (y===new Date().getFullYear()?"":y+"年")+m+"月"+d+"日";
+  // 7A withYear=true（詳細ページの「発売日」）では年を必ず付ける。一覧は従来どおり今年なら年を省く。
+  return ((withYear || y!==new Date().getFullYear())?y+"年":"")+m+"月"+d+"日";
 }
 function upIsReleased(g){
   const nowMs=Date.now();
@@ -1065,6 +1211,7 @@ function viewItems(view){
       const ratio=(hasP&&base>0)?(g.spike_prob/base):null; // ふつうの何倍跳ねやすいか
       // 表示%：小さい値でも意味が伝わるよう小数1桁（10%以上は整数）
       const pctTxt=hasP?(pct>=10?Math.round(pct):pct.toFixed(1)):null;
+      const cb=hasP?calibBand(g.spike_prob):null;   // 1A：この予想値が属する帯の実績（動的）
       const cfLabel={high:L("確度 高","Conf: high"),mid:L("確度 中","Conf: med"),low:L("確度 低","Conf: low")}[g.conf]||"";
       const cfClass={high:"c-launch",mid:"c-expect2",low:"c-expect2"}[g.conf]||"c-expect2";
       // ★跳ね予想チップ（核）：跳ね確率＝ふつうの×N。押し上げ要因を続けて出す。
@@ -1114,9 +1261,10 @@ function viewItems(view){
       const tagsRow=rowChips.slice(0,ROW_VIS).join("")+gfb+(hiddenN>0?`<span class="chip more" data-n="${hiddenN}">+${hiddenN}</span>`:"");
       // 発売前は観測履歴が無いのが普通：あれば折れ線、無ければ跳ね予想の強さ（主指標の色と同じ pct/40 の尺度）を伸びバーで。
       const nc=ncByApp[g.appid], ncd=nc&&nc.detail;
+      // 1A：跳ね予想の「伸びバー」は外す（右の % と同じ値を棒でもう一度強調してしまうため）。
+      //     折れ線（実際の観測履歴）は別の情報なので、取れる行では従来どおり出す。
       const spark=sparkline(ncd&&ncd.history,(ncd&&ncd.stats&&ncd.stats.baseline));
-      const spikeFrac=hasP?Math.max(0,Math.min(1,pct/40)):0;
-      const surge=spark || (hasP?`<div class="surgebar"><div class="surgetrack"><div class="surgefill" style="width:${(spikeFrac*100).toFixed(1)}%"></div></div></div>`:"");
+      const surge=spark || "";
       // ⑲ detail は upcoming.json の行が持つもの（開発元・発売日・カテゴリ・同じ開発元…）を使う。
       //    まだ appdetails が届いていない行（detail 無し）は従来どおりジャンルだけ＝壊れない。
       return { key:"U_"+g.appid, appid:g.appid, title:g.name, detail:g.detail||{genres:g.genres||[]}, spike:hasP?g.spike_prob:-1,
@@ -1128,12 +1276,20 @@ function viewItems(view){
         //    infoSec 側で節ごと出ない（嘘の文言を残さない）。ジャンルは detailBodyReal が出さないので
         //    「この作品の見立て」の tagsS と二重にならない。
         detailBody:detailBodyReal(g.detail),
-        primary: hasP ? `<span class="num pct" style="color:color-mix(in srgb, var(--accent) ${Math.round(28+Math.min(1,pct/40)*72)}%, var(--ink-faint))">${pctTxt}</span><span class="unit">%</span>`
+        primary: hasP ? `<span class="num pct" style="color:color-mix(in srgb, var(--accent) ${Math.round(28+Math.min(1,pct/40)*72)}%, var(--ink-faint))">${pctTxt}</span><span class="unit">%</span>`+calibLine(cb)
           : (dc?`<span class="num">${nf.format(dc)}</span><span class="unit">${L("人 体験版","demo")}</span>`
              :`<span class="when">${known?esc(relTxt):L("未定","TBD")}</span>`),  // L0主指標＝跳ね予想%（高いほど濃く＝色スケール／color-mix非対応はCSSで一律accentにフォールバック）
         kicker: (known?L("発売予定 ","Releases ")+esc(relTxt):esc(relTxt))+((g.factors&&g.factors.length)?" ・"+esc(factLabel(g.factors[0].name)):(hasP&&ratio&&ratio>=1.2?" ・"+L("ふつう×"+ratio.toFixed(1),"×"+ratio.toFixed(1)):"")),
+        // 1C 詳細の見出し：%単独をやめ3行に。帯の実績が引けない行ではその行だけ出さない（嘘を書かない）。
+        //     先頭の「・」（文字列連結の癖）もここで消える。
         metric: hasP
-          ? `<span class="num">${pctTxt}</span><span class="unit">%</span><div class="base">${L("跳ね予想","spike")}${ratio&&ratio>=1.2?" ・"+L("ふつう×"+ratio.toFixed(1),"×"+ratio.toFixed(1)):""}</div>`
+          ? `<div class="predbox">`
+            +`<span class="pk">${L("跳ね予想","Spike forecast")}</span><span class="pv"><b class="pnum">${pctTxt}%</b>${cfLabel?` ${esc(cfLabel)}`:""}</span>`
+            +(cb?`<span class="pk">${L("同じ帯の実績","Same band, actual")}</span><span class="pv">`+(cb.thin
+                ? L(`件数不足（${nf.format(cb.n)}件）＝この帯はまだ割合を出せません`,`Too few cases (${nf.format(cb.n)}) — no rate for this band yet`)
+                : L(`<b>${scPct(cb.rate)}</b> が実際に跳ねた（予想 ${cb.lo}〜${cb.hi}% の ${nf.format(cb.n)}件中）`,`<b>${scPct(cb.rate)}</b> actually spiked (of ${nf.format(cb.n)} predicted ${cb.lo}–${cb.hi}%)`))+`</span>`:"")
+            +((base>0&&ratio!=null)?`<span class="pk">${L("平均との比","vs average")}</span><span class="pv">${L(`発売前作品の平均 ${scPct(base)} の <b>×${ratio.toFixed(1)}</b>`,`<b>×${ratio.toFixed(1)}</b> the pre-release average of ${scPct(base)}`)}</span>`:"")
+            +`</div>`
           : (dc?`<span class="num">${nf.format(dc)}</span><span class="unit">${L("人 体験版","demo")}</span><div class="base">${known?esc(relTxt):L("発売日 未定","TBD")}</div>`
              :`<div class="when">${known?esc(relTxt):L("未定","TBD")}</div>`) };
     });
@@ -1155,7 +1311,7 @@ function upFoldOf(view, all){
   const thr=br*UP_FOLD_MULT;
   let main=all.filter(o=>(o.spike!=null?o.spike:-1)>=thr);
   if(main.length<UP_MIN_MAIN) main=all.slice().sort((a,b)=>(b.spike||-1)-(a.spike||-1)).slice(0,UP_MIN_MAIN);
-  return (main.length<all.length)?{main:main,hidden:all.length-main.length}:null;
+  return (main.length<all.length)?{main:main,hidden:all.length-main.length,thr:thr}:null;   // 17A しきい値も返す（ボタンに数字で書くため）
 }
 // ⑮-2 ★が1件も無いなら切替は出さない（押せば必ず空になるだけ＝初訪問者には常に無意味）。
 // 最後の★を外したときは「★のみ」に取り残されないよう「すべて」へ戻す。
@@ -1178,7 +1334,11 @@ function render(view){
   // 全ビュー共通：お気に入り絞り込み → shown件まで → 行（各行に「詳しく」）→ もっと見る（残りがあれば）
   const all=viewItems(view).filter(o=>!favOnly||favs.has(o.key)).filter(o=> (view!=="1"&&view!=="2"&&view!=="L") || genreMatch(o.detail)).filter(o=> !query || String(o.title).toLowerCase().includes(query)); document.getElementById("filters").style.display=(view==="1"||view==="2"||view==="L")?"":"none";
   // 並び替えは view01/02/L だけで効く。view3（これから来そう）では選べてしまうと嘘になるので箱ごと隠す。
-  const ctlBox=document.getElementById("ctlBox"); if(ctlBox){ ctlBox.style.display=(view==="3")?"none":""; if(view==="3") ctlBox.open=false; }
+  const ctlBox=document.getElementById("ctlBox"); if(ctlBox) ctlBox.style.display=(view==="3")?"none":"";
+  // 3A 選択状態を反映し、そのビューの「おすすめ順」が何順なのかを横に1文で出す。
+  document.querySelectorAll("#sortSeg .sortbtn").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.sort===sortMode)));
+  const ctlNote=document.getElementById("ctlNote");
+  if(ctlNote) ctlNote.textContent=(view==="3")?"":((I18N["ctl.rank."+view]?t("ctl.rank."+view)+" ":"")+t("ctl.and"));
   if(view==="1"||view==="2"||view==="L"){  // 並び替えを view01/02/L で有効化（①の指摘）。rank＝各ビュー既定順を維持。
     if(sortMode==="rank"){ if(view==="1") all.sort((a,b)=> (b.ccu||0)-(a.ccu||0)); }
     else all.sort((a,b)=> sortMode==="name" ? String(a.title).localeCompare(b.title,"ja")
@@ -1207,9 +1367,11 @@ function render(view){
   let mw = moreHas
     ? `<button class="morebtn" id="moreBtn" type="button">${L("もっと見る（+20）","Show more (+20)")}<span class="morecount">${data.length} / ${base.length}</span></button>`
     : "";
+  // 17A 「その他 N件を表示／跳ね予想が基準未満」は、その「基準」が何%なのかどこにも書かれていなかった。
+  //     しきい値（base_rate×UP_FOLD_MULT）をそのまま数字で書けば、添えの1行が要らなくなる。
   if(upFold) mw += folded
-    ? `<button class="morebtn upmore" id="upMoreBtn" type="button">${L("その他 "+upFold.hidden+"件を表示","Show "+upFold.hidden+" more")}<span class="morecount">${L("跳ね予想が基準未満","below baseline")}</span></button>`
-    : `<button class="morebtn upmore" id="upMoreBtn" type="button">${L("その他を隠す","Hide the rest")}<span class="morecount">${L("上位 "+upFold.main.length+"件だけ","top "+upFold.main.length+" only")}</span></button>`;
+    ? `<button class="morebtn upmore" id="upMoreBtn" type="button">${L(`予想 ${scPct(upFold.thr)} 未満の ${upFold.hidden}件を見る`,`Show ${upFold.hidden} predicted below ${scPct(upFold.thr)}`)}</button>`
+    : `<button class="morebtn upmore" id="upMoreBtn" type="button">${L("その他を隠す","Hide the rest")}<span class="morecount">${L(`予想 ${scPct(upFold.thr)} 以上の ${upFold.main.length}件だけ`,`only the ${upFold.main.length} at or above ${scPct(upFold.thr)}`)}</span></button>`;
   moreWrap.innerHTML = mw;
 }
 document.querySelectorAll('nav.views button').forEach(b=>b.addEventListener("click",()=>{
@@ -1242,8 +1404,10 @@ function setFavOnly(v){ favOnly=v; favAllEl.setAttribute("aria-pressed",String(!
 favAllEl.addEventListener("click",()=>setFavOnly(false));
 favStarEl.addEventListener("click",()=>setFavOnly(true));
 // 並び替え（view01 で実データ・A1）
-const sortSel=document.getElementById("sortSel");
-sortSel.addEventListener("change",()=>{ sortMode=sortSel.value; shown=20; render(current); });
+// 3A 並び替えはチップ列。選択肢が常に見えるので「いま何順か」「他に何があるか」が一目で読める。
+const sortSeg=document.getElementById("sortSeg");
+sortSeg.addEventListener("click",e=>{ const btn=e.target.closest(".sortbtn"); if(!btn) return;
+  sortMode=btn.dataset.sort; shown=20; render(current); });
 // 詳細ページ（行タップで一本化）＋戻る。履歴チャートは export 拡張後（今は準備中）。
 const detailEl=document.getElementById("detailView"), dvBody=document.getElementById("dvBody");
 const mainViewEl=document.getElementById("mainView"), backBtn=document.getElementById("backBtn");
@@ -1427,6 +1591,7 @@ function showDetail(o){
     +`<div class="dvhead">${cover}<div><h2 class="dvtitle">${esc(o.title)}</h2><div class="dvmetric">${o.metric||""}</div></div></div>`
     +assess
     +(why?`<div class="dvsection"><div class="dvlabel">${L("なぜ拾ったか","Why picked")}</div>${why}</div>`:"")
+    +glossarySection(o)   // 8A そのページに出ている語だけの「用語」
     +histSec+infoSec+conns
     +((steam||dshare)?`<div class="dvactions">${steam}${dshare}</div>`:"");
   mainViewEl.hidden=true; detailEl.hidden=false; try{window.scrollTo({top:0,behavior:"instant"});}catch(e){window.scrollTo(0,0);}
@@ -1468,6 +1633,9 @@ dvBody.addEventListener("click",e=>{
 backBtn.addEventListener("click",()=>{ if(trail.length>0){ history.go(-trail.length); } else { detailEl.hidden=true; mainViewEl.hidden=false; } });
 // Esc キーでも一段戻る（PCのキーボード操作・詳細表示中のみ）。
 document.addEventListener("keydown",e=>{ if(e.key==="Escape" && !detailEl.hidden){ history.back(); } });
+// 11A 「表示 ▾」は外側クリックと Esc で閉じる（開きっぱなしで一覧を隠さない）。
+document.addEventListener("click",e=>{ const dm=document.getElementById("dispMenu"); if(dm&&dm.open&&!dm.contains(e.target)) dm.open=false; });
+document.addEventListener("keydown",e=>{ if(e.key!=="Escape") return; const dm=document.getElementById("dispMenu"); if(dm&&dm.open){ dm.open=false; const s=dm.querySelector("summary"); if(s) s.focus(); } });
 const themeBtn=document.getElementById("themeBtn");
 function syncThemeBtn(){ themeBtn.textContent=document.body.classList.contains("light")?L("背景を暗く","Dark background"):L("背景を明るく","Light background"); }
 themeBtn.addEventListener("click",()=>{ document.body.classList.toggle("light"); syncThemeBtn(); });
@@ -1579,8 +1747,17 @@ function paintHero(top){
     document.getElementById("heroImg").innerHTML=coverImg(top.a);
     document.getElementById("heroName").textContent=top.n;
     const cause=(top.c&&top.c.length)?causeLabel(top.c[0].t):null;
-    const rx=`<b>×${(top.r||1).toFixed(1)}</b>`;
-    document.getElementById("heroWhy").innerHTML=L(`ふだんの ${rx}`,`${rx} of usual`)+(cause?L(`・きっかけは ${esc(cause)}`,` · triggered by ${esc(cause)}`):L("・きっかけは調査中"," · trigger: investigating"));
+    // 5A 看板の「×9.8」は右の大きな数字と本文で2回出ていた（決定事項2の3枠と同型の重複）。
+    //    本文は重複をやめ、「きっかけ」と「平常値」に使う＝同じ面積で情報が増える。
+    //    併せて肩の行に「どのタブの1件か」を書く。看板を押すと03へ飛ぶのに、それがどこにも
+    //    書かれていなかった（初期タブは01のまま＝決定事項9は未決なので触らない）。
+    const idx=(REAL_V2||[]).findIndex(x=>x&&String(x.a)===String(top.a));
+    const rank=(idx>=0)?(idx+1):null;   // 03の並び順はデータ側の順（render は view2 を並べ替えない）＝表示順と一致する
+    const kickEl=document.getElementById("heroKick");
+    if(kickEl) kickEl.textContent=L("03 いつもより伸び","03 Rising vs usual")+(rank?L(`・${rank}位`,` · #${rank}`):"");
+    const bits=[cause?L(`きっかけは ${esc(cause)}`,`Triggered by ${esc(cause)}`):L("きっかけは調査中","Trigger: investigating")];
+    if(top.base!=null && top.base>0) bits.push(L(`平常 ${nf.format(top.base)}人`,`usual ${nf.format(top.base)}`));
+    document.getElementById("heroWhy").innerHTML=bits.join(L("・"," · "));
     document.getElementById("heroRatio").textContent="×"+(top.r||1).toFixed(1);
     el.dataset.appid=top.a||"";
   } else { el.dataset.appid=""; }
@@ -1633,6 +1810,8 @@ async function loadNow(){
   if(current==="1"||current==="2") render(current);
 }
 // ジャンル絞り込み（属性層の先行配線）：detail.genres から自動生成・日本語ラベル・AND（選んだ全てに一致）。export/DB非依存・可逆。
+// 7A Steam のカテゴリ名の対訳（表示時のみ）。未登録は英語のまま出す。
+const CAT_JA={"Single-player":"1人用","Multi-player":"マルチプレイ","Co-op":"協力プレイ","Online Co-op":"オンライン協力","LAN Co-op":"LAN協力","Shared/Split Screen Co-op":"画面分割 協力","PvP":"対人戦","Online PvP":"オンライン対人戦","LAN PvP":"LAN対人戦","Shared/Split Screen PvP":"画面分割 対人戦","Shared/Split Screen":"画面分割","Cross-Platform Multiplayer":"クロスプラットフォーム対戦","MMO":"MMO","Steam Achievements":"実績","Steam Trading Cards":"トレーディングカード","Steam Cloud":"クラウドセーブ","Steam Workshop":"Workshop","Steam Leaderboards":"リーダーボード","Steam Turn Notifications":"ターン通知","Steam Input API Support":"Steam Input対応","SteamVR Collectibles":"SteamVRコレクション","Valve Anti-Cheat enabled":"VAC有効","Family Sharing":"ファミリーシェア","In-App Purchases":"アプリ内課金","Includes level editor":"レベルエディタ同梱","VR Only":"VR専用","Full controller support":"コントローラー完全対応","Partial Controller Support":"コントローラー一部対応","Gamepad Recommended":"ゲームパッド推奨","DualShock Controller Support":"DualShock対応","DualSense Controller Support":"DualSense対応","Tracked Controller Support":"トラッキングコントローラー対応","Remote Play on Phone":"リモートプレイ（スマホ）","Remote Play on Tablet":"リモートプレイ（タブレット）","Remote Play on TV":"リモートプレイ（TV）","Remote Play Together":"リモートプレイ・トゥギャザー","Stereo Sound":"ステレオ音声","Surround Sound":"サラウンド音声","HDR available":"HDR対応","Captions available":"字幕あり","Narrated Game Menus":"メニュー読み上げ","Adjustable Text Size":"文字サイズ調整","Color Alternatives":"色の代替表示","Custom Volume Controls":"音量の個別調整","Camera Comfort":"カメラ酔い対策","Adjustable Difficulty":"難易度調整","Save Anytime":"いつでもセーブ","Playable without Timed Input":"時間制限のある入力なしで遊べる","Playable At Your Own Pace":"自分のペースで遊べる","Contrast Controls":"コントラスト調整","Mouse Only Option":"マウスのみで操作可","Keyboard Only Option":"キーボードのみで操作可","Touch Only Option":"タッチのみで操作可"};
 const GENRE_JA={"Action":"アクション","Adventure":"アドベンチャー","RPG":"RPG","Simulation":"シミュレーション","Strategy":"ストラテジー","Indie":"インディー","Casual":"カジュアル","Sports":"スポーツ","Racing":"レース","Free To Play":"基本無料","Massively Multiplayer":"多人数オンライン","Early Access":"早期アクセス","Violent":"暴力表現","Gore":"ゴア表現","Nudity":"ヌード","Sexual Content":"性的内容","Horror":"ホラー","Puzzle":"パズル","Platformer":"プラットフォーマー","Shooter":"シューター","Fighting":"格闘","Music":"音楽","Education":"教育","Utilities":"ユーティリティ","Design & Illustration":"デザイン・イラスト","Animation & Modeling":"アニメ・モデリング","Web Publishing":"Web制作","Game Development":"ゲーム開発","Audio Production":"音楽制作","Video Production":"動画制作","Photo Editing":"写真編集","Software Training":"ソフト学習"};
 function genreMatch(detail){ if(!activeGenres.size) return true; const gs=(detail&&detail.genres)||[]; for(const g of activeGenres){ if(!gs.includes(g)) return false; } return true; }
 function buildGenreChips(){
@@ -1726,15 +1905,26 @@ async function loadRising(){
 const CONSENT_KEY="radar_consent_v1", MEASUREMENT_ID="G-XXXXXXXXXX", PP_URL="";
 // 掲載オプトアウトの連絡先：公開前にオーナーが設定（mailto:xxx@example.com か Googleフォーム等のURL）。未設定なら文言のみ表示。
 const CONTACT_URL="";
+// 9A GA を実際に読み込むだけの設定（測定ID）が入っているか。プレースホルダのままなら「使っていない」。
+//    使っていないものへの同意をバナーで求めるのは、根拠の無い同意取得なので出さない。
+const GA_READY = !!MEASUREMENT_ID && !/^G-X+$/.test(MEASUREMENT_ID);
 let consent=null; try{ consent=JSON.parse(localStorage.getItem(CONSENT_KEY)); }catch(e){}
 const cookieEl=document.getElementById("cookie");
 function loadGA(){ if(!MEASUREMENT_ID||/^G-X+$/.test(MEASUREMENT_ID)){ console.log("[GA] consent=true / 測定ID未設定のため未読込（プレースホルダ）"); return; } /* 本番: gtag.js を注入し config */ }
-function showCookie(force){ cookieEl.hidden=!(force||consent==null); }
+function showCookie(force){ cookieEl.hidden=!(GA_READY && (force||consent==null)); }   // 9A GA未使用ならバナー自体を出さない
 function setConsent(v){ consent={analytics:v,ts:Date.now()}; try{localStorage.setItem(CONSENT_KEY,JSON.stringify(consent));}catch(e){} cookieEl.hidden=true; if(v) loadGA(); }
 document.getElementById("ckAccept").addEventListener("click",()=>setConsent(true));
 document.getElementById("ckDecline").addEventListener("click",()=>setConsent(false));
 document.getElementById("cookieSettings").addEventListener("click",e=>{ e.preventDefault(); showCookie(true); });
 if(PP_URL){ const pp=document.getElementById("ppLink"); pp.href=PP_URL; pp.textContent="プライバシーポリシー"; pp.onclick=null; }
+// 9A GA未使用のあいだは「プライバシーポリシー（未設定）」をやめ、実態を1行で書く。
+//    併せて「Cookie設定」も消す（開いても同意する対象が無い）。GA を入れるときは MEASUREMENT_ID を
+//    実IDにするだけで、バナー・Cookie設定・ポリシー欄がそのまま戻る。
+if(!GA_READY){
+  const ck=document.getElementById("ckWrap"); if(ck) ck.hidden=true;
+  if(!PP_URL){ const pp=document.getElementById("ppLink");
+    if(pp){ pp.setAttribute("data-i18n","foot.priv"); pp.removeAttribute("href"); pp.textContent=t("foot.priv"); } }
+}
 // 開発者オプトアウトのリンク配線は applyI18n()→wireOptout() が担当（言語切替でも再構築するため）。
 
 loadFavs();    // 端末内（localStorage）からお気に入りを復元
@@ -1754,6 +1944,26 @@ async function loadUpcoming(){ try{ const r=await fetch("./data/upcoming.json?cb
 const SC_KEY="radar_scorecard_open_v1";
 let scOpen=false; try{ if(localStorage.getItem(SC_KEY)==="1") scOpen=true; }catch(e){}
 function scPct(x){ return (x==null)?"—":((x*100>=10?Math.round(x*100):(x*100).toFixed(1))+"%"); }
+// ③-b 較正帯の引き当て（決定事項1の土台）。予測値 p(0..1) が入る帯の「実際に跳ねた割合」と件数を返す。
+// 出どころ・優先順は renderScorecard と同じ（バックテスト優先→実運用）。固定値は一切持たない。
+const CALIB_MIN_N=30;   // この件数未満の帯は割合が暴れる＝数字を出さず「件数不足」と正直に言う
+function calibBand(p){
+  if(typeof p!=="number" || !(p>=0) || !SCORE) return null;
+  const ho=SCORE.holdout, li=SCORE.live;
+  const src=(ho&&ho.ready&&ho.calibration&&ho.calibration.length)?ho.calibration
+           :((li&&li.resolved>0&&li.calibration&&li.calibration.length)?li.calibration:null);
+  if(!src) return null;
+  const b=src.find(x=>x&&Array.isArray(x.range)&&p>=x.range[0]&&(p<x.range[1]||x.range[1]>=1));
+  if(!b||!(b.n>0)) return null;
+  return { rate:b.actual_rate, n:b.n, lo:Math.round(b.range[0]*100), hi:Math.round(Math.min(1,b.range[1])*100), thin:b.n<CALIB_MIN_N };
+}
+// 一覧の主指標の2段目。帯が引けないとき（スコアカード未読込・件数0）は何も出さない＝嘘を書かない。
+function calibLine(cb){
+  if(!cb) return "";
+  return cb.thin
+    ? `<div class="calib thin">${L(`この帯の実績 件数不足（${nf.format(cb.n)}件）`,`This band: too few cases (${nf.format(cb.n)})`)}</div>`
+    : `<div class="calib">${L(`この帯の実績 <b>${scPct(cb.rate)}</b>・${nf.format(cb.n)}件`,`This band <b>${scPct(cb.rate)}</b> · ${nf.format(cb.n)}`)}</div>`;
+}
 function renderScorecard(){
   const sec=document.getElementById("scoreSec"); if(!sec) return;
   const S=SCORE, ho=S&&S.holdout, li=S&&S.live;
@@ -1803,7 +2013,7 @@ function renderScorecard(){
     +`<div class="sc-body">${sum}${calTab}${exList}${foot}</div>`;
   sec.open=scOpen; sec.hidden=false;
 }
-async function loadScorecard(){ try{ const r=await fetch("./data/prediction_scorecard.json?cb="+Date.now(),{cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); if(d&&(d.holdout||d.live)){ SCORE=d; if(current==="3") renderScorecard(); } }catch(e){} }
+async function loadScorecard(){ try{ const r=await fetch("./data/prediction_scorecard.json?cb="+Date.now(),{cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); if(d&&(d.holdout||d.live)){ SCORE=d; if(current==="3") render("3"); } }catch(e){} }   // 1A：行の「この帯の実績」も SCORE 依存なので一覧ごと描き直す
 loadNewRising();
 loadUpcoming();
 loadScorecard();
