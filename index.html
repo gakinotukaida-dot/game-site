@@ -437,7 +437,10 @@
   .titlerow .title{min-width:0}
   /* 2行目：詳細タグ（左・詰めて表示）＋ミニ折れ線（右・数字の真下に整列）で隙間を埋める */
   .r2sub{display:flex;align-items:center;gap:12px;margin-top:5px;min-width:0}
-  .r2tags{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:5px 6px;max-height:46px;overflow:hidden}
+  /* 2A-PC 切り落とし（max-height:46px + overflow:hidden）は幅を問わず廃止する。
+     PC幅（1280px）でも03タブでチップの下端が3〜4px欠けており、変更前から同じ箇所で起きていた。
+     欠けを無くす代わりにPCでも行が高くなる（チップが3行に及ぶ行がある）＝本人判断で採用。 */
+  .r2tags{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:5px 6px}
   .sparkrow{flex:none;display:flex;justify-content:flex-end;align-items:center}
   .sparksvg{width:132px;max-width:40vw;height:27px;flex:none}
   .sparkline{fill:none;stroke:var(--accent);stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
@@ -448,14 +451,14 @@
     /* 2A 決定事項2：390px幅でチップ行が max-height:46px に切られ、01では要因2が消え要因1の右端が
        欠けていた。原因は棒／折れ線（132px・最大40vw）がチップ行と同じ行に並ぶこと。
        スマホでは column-reverse で棒／折れ線を右の数字の直下へ寄せ、チップ行を全幅にする。
-       併せて max-height による切り落としをやめる（隠れるチップを無くす）。
+       切り落とし（max-height）は基底ルール側で廃止済み＝ここでは全幅化だけを担う。
        ★「1行・折り返し禁止＋…」は実測で不採用：390px でチップ行に使える幅は 221px しかなく、
          01の3チップの自然幅は合計 235〜334px。1行に押し込むと各チップが 31〜37px まで潰れ、
          「9月…」「▲開…」となって折り返しより読めなくなる。全幅＋折り返し可なら2行で全部読める。 */
     .r2sub{flex-direction:column-reverse;align-items:stretch;gap:4px}
     .r2sub .sparkrow,.r2sub .surgebar{align-self:flex-end;flex:none}
     /* 親を縦積みにしたので flex:1 は「高さ」に効いてしまう（basis:0 で潰れて中身が隠れる）。必ず none に戻す。 */
-    .r2tags{flex:none;width:100%;max-height:none}
+    .r2tags{flex:none;width:100%}
   }
   .surgebar{flex:none;display:flex;align-items:center;gap:9px;width:132px;max-width:40vw}
   .surgetrack{position:relative;height:5px;border-radius:3px;background:var(--chip);flex:1;overflow:hidden}
