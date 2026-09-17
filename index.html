@@ -146,6 +146,11 @@
   .r2primary .num{font-size:19px;font-weight:700}      /* 主指標＝行の焦点（大きく・太く） */
   .r2primary .num.pct{color:var(--accent)}             /* 跳ね予想%は強調色で視線を誘導 */
   .r2primary .unit{color:var(--ink-soft)}
+  /* 1A 決定事項1：予想%は単独で出さない。すぐ下に「その帯が実際に何%跳ねたか」を必ず添える。
+     値は prediction_scorecard の較正帯から動的に引く（固定文言にしない＝データが動けば表示も動く）。 */
+  .calib{font-size:11px;font-weight:400;color:var(--ink-soft);white-space:nowrap;margin-top:1px;line-height:1.25;letter-spacing:0}
+  .calib b{color:var(--ink);font-weight:600}
+  .calib.thin{color:var(--ink-faint)}
   .rowchev{flex:none;color:var(--ink-faint);font-size:15px;line-height:1}
   .row2:hover{background:var(--bg-2)}
   .row2:hover .rowchev{color:var(--accent)}
@@ -1065,6 +1070,7 @@ function viewItems(view){
       const ratio=(hasP&&base>0)?(g.spike_prob/base):null; // ふつうの何倍跳ねやすいか
       // 表示%：小さい値でも意味が伝わるよう小数1桁（10%以上は整数）
       const pctTxt=hasP?(pct>=10?Math.round(pct):pct.toFixed(1)):null;
+      const cb=hasP?calibBand(g.spike_prob):null;   // 1A：この予想値が属する帯の実績（動的）
       const cfLabel={high:L("確度 高","Conf: high"),mid:L("確度 中","Conf: med"),low:L("確度 低","Conf: low")}[g.conf]||"";
       const cfClass={high:"c-launch",mid:"c-expect2",low:"c-expect2"}[g.conf]||"c-expect2";
       // ★跳ね予想チップ（核）：跳ね確率＝ふつうの×N。押し上げ要因を続けて出す。
@@ -1114,9 +1120,10 @@ function viewItems(view){
       const tagsRow=rowChips.slice(0,ROW_VIS).join("")+gfb+(hiddenN>0?`<span class="chip more" data-n="${hiddenN}">+${hiddenN}</span>`:"");
       // 発売前は観測履歴が無いのが普通：あれば折れ線、無ければ跳ね予想の強さ（主指標の色と同じ pct/40 の尺度）を伸びバーで。
       const nc=ncByApp[g.appid], ncd=nc&&nc.detail;
+      // 1A：跳ね予想の「伸びバー」は外す（右の % と同じ値を棒でもう一度強調してしまうため）。
+      //     折れ線（実際の観測履歴）は別の情報なので、取れる行では従来どおり出す。
       const spark=sparkline(ncd&&ncd.history,(ncd&&ncd.stats&&ncd.stats.baseline));
-      const spikeFrac=hasP?Math.max(0,Math.min(1,pct/40)):0;
-      const surge=spark || (hasP?`<div class="surgebar"><div class="surgetrack"><div class="surgefill" style="width:${(spikeFrac*100).toFixed(1)}%"></div></div></div>`:"");
+      const surge=spark || "";
       // ⑲ detail は upcoming.json の行が持つもの（開発元・発売日・カテゴリ・同じ開発元…）を使う。
       //    まだ appdetails が届いていない行（detail 無し）は従来どおりジャンルだけ＝壊れない。
       return { key:"U_"+g.appid, appid:g.appid, title:g.name, detail:g.detail||{genres:g.genres||[]}, spike:hasP?g.spike_prob:-1,
@@ -1128,7 +1135,7 @@ function viewItems(view){
         //    infoSec 側で節ごと出ない（嘘の文言を残さない）。ジャンルは detailBodyReal が出さないので
         //    「この作品の見立て」の tagsS と二重にならない。
         detailBody:detailBodyReal(g.detail),
-        primary: hasP ? `<span class="num pct" style="color:color-mix(in srgb, var(--accent) ${Math.round(28+Math.min(1,pct/40)*72)}%, var(--ink-faint))">${pctTxt}</span><span class="unit">%</span>`
+        primary: hasP ? `<span class="num pct" style="color:color-mix(in srgb, var(--accent) ${Math.round(28+Math.min(1,pct/40)*72)}%, var(--ink-faint))">${pctTxt}</span><span class="unit">%</span>`+calibLine(cb)
           : (dc?`<span class="num">${nf.format(dc)}</span><span class="unit">${L("人 体験版","demo")}</span>`
              :`<span class="when">${known?esc(relTxt):L("未定","TBD")}</span>`),  // L0主指標＝跳ね予想%（高いほど濃く＝色スケール／color-mix非対応はCSSで一律accentにフォールバック）
         kicker: (known?L("発売予定 ","Releases ")+esc(relTxt):esc(relTxt))+((g.factors&&g.factors.length)?" ・"+esc(factLabel(g.factors[0].name)):(hasP&&ratio&&ratio>=1.2?" ・"+L("ふつう×"+ratio.toFixed(1),"×"+ratio.toFixed(1)):"")),
@@ -1754,6 +1761,26 @@ async function loadUpcoming(){ try{ const r=await fetch("./data/upcoming.json?cb
 const SC_KEY="radar_scorecard_open_v1";
 let scOpen=false; try{ if(localStorage.getItem(SC_KEY)==="1") scOpen=true; }catch(e){}
 function scPct(x){ return (x==null)?"—":((x*100>=10?Math.round(x*100):(x*100).toFixed(1))+"%"); }
+// ③-b 較正帯の引き当て（決定事項1の土台）。予測値 p(0..1) が入る帯の「実際に跳ねた割合」と件数を返す。
+// 出どころ・優先順は renderScorecard と同じ（バックテスト優先→実運用）。固定値は一切持たない。
+const CALIB_MIN_N=30;   // この件数未満の帯は割合が暴れる＝数字を出さず「件数不足」と正直に言う
+function calibBand(p){
+  if(typeof p!=="number" || !(p>=0) || !SCORE) return null;
+  const ho=SCORE.holdout, li=SCORE.live;
+  const src=(ho&&ho.ready&&ho.calibration&&ho.calibration.length)?ho.calibration
+           :((li&&li.resolved>0&&li.calibration&&li.calibration.length)?li.calibration:null);
+  if(!src) return null;
+  const b=src.find(x=>x&&Array.isArray(x.range)&&p>=x.range[0]&&(p<x.range[1]||x.range[1]>=1));
+  if(!b||!(b.n>0)) return null;
+  return { rate:b.actual_rate, n:b.n, lo:Math.round(b.range[0]*100), hi:Math.round(Math.min(1,b.range[1])*100), thin:b.n<CALIB_MIN_N };
+}
+// 一覧の主指標の2段目。帯が引けないとき（スコアカード未読込・件数0）は何も出さない＝嘘を書かない。
+function calibLine(cb){
+  if(!cb) return "";
+  return cb.thin
+    ? `<div class="calib thin">${L(`この帯の実績 件数不足（${nf.format(cb.n)}件）`,`This band: too few cases (${nf.format(cb.n)})`)}</div>`
+    : `<div class="calib">${L(`この帯の実績 <b>${scPct(cb.rate)}</b>・${nf.format(cb.n)}件`,`This band <b>${scPct(cb.rate)}</b> · ${nf.format(cb.n)}`)}</div>`;
+}
 function renderScorecard(){
   const sec=document.getElementById("scoreSec"); if(!sec) return;
   const S=SCORE, ho=S&&S.holdout, li=S&&S.live;
@@ -1803,7 +1830,7 @@ function renderScorecard(){
     +`<div class="sc-body">${sum}${calTab}${exList}${foot}</div>`;
   sec.open=scOpen; sec.hidden=false;
 }
-async function loadScorecard(){ try{ const r=await fetch("./data/prediction_scorecard.json?cb="+Date.now(),{cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); if(d&&(d.holdout||d.live)){ SCORE=d; if(current==="3") renderScorecard(); } }catch(e){} }
+async function loadScorecard(){ try{ const r=await fetch("./data/prediction_scorecard.json?cb="+Date.now(),{cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); if(d&&(d.holdout||d.live)){ SCORE=d; if(current==="3") render("3"); } }catch(e){} }   // 1A：行の「この帯の実績」も SCORE 依存なので一覧ごと描き直す
 loadNewRising();
 loadUpcoming();
 loadScorecard();
