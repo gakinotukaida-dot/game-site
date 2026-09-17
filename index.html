@@ -223,12 +223,14 @@
   .drillbody .dv.tags{display:flex;gap:6px;flex-wrap:wrap}
   .drillbody .dv a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--line)}
   .drillbody .sibnote{color:var(--ink-faint);font-size:11px;margin-top:3px}
+  /* 3A 並び替えは畳まない。選択肢そのものを見せ、いま何の順なのかを横の1文で読めるようにする。
+     （畳んだ中に select があり、開いても選択肢名しか出ないので並びの基準が読めなかった） */
   .ctlbox{margin:10px 0 2px}
-  .ctlbox>summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-soft);border:1px solid var(--line);border-radius:999px;padding:6px 12px;width:max-content}
-  .ctlbox>summary::-webkit-details-marker{display:none}
-  .ctlbox>summary::before{content:"▸";font-size:10px}
-  .ctlbox[open]>summary::before{content:"▾"}
-  .ctlbox[open]>summary{color:var(--accent);border-color:var(--accent)}
+  .sortseg{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .sortbtn{appearance:none;background:transparent;border:1px solid var(--line);color:var(--ink-soft);
+    font-family:var(--sans);font-size:12px;border-radius:999px;padding:5px 11px;cursor:pointer;transition:.2s;white-space:nowrap}
+  .sortbtn:hover{border-color:var(--accent);color:var(--accent)}
+  .sortbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-weak)}
   .controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:10px 0 2px}
   .ctl{font-size:12px;color:var(--ink-soft);display:flex;align-items:center;gap:6px}
   .ctlsel{appearance:none;background:transparent;border:1px solid var(--line);color:var(--ink-soft);border-radius:8px;padding:5px 10px;font-family:var(--sans);font-size:12px;cursor:pointer}
@@ -591,21 +593,19 @@
 
   <section id="intro" class="intro" hidden aria-label="このサイトの使い方"></section>
 
-  <details class="ctlbox" id="ctlBox">
-    <summary data-i18n="ctl.summary">並び替え</summary>
+  <div class="ctlbox" id="ctlBox">
     <div class="controls">
-    <label class="ctl"><span data-i18n="ctl.summary">並び替え</span>
-      <select id="sortSel" class="ctlsel">
-        <option value="rank" data-i18n="sort.rank">おすすめ順</option>
-        <option value="ccu" data-i18n="sort.ccu">多い順</option>
-        <option value="momentum" data-i18n="sort.momentum">勢い順（平常比）</option>
-        <option value="new" data-i18n="sort.new">新着順</option>
-        <option value="name" data-i18n="sort.name">名前順</option>
-      </select>
-    </label>
-    <span class="ctlnote">※「今の人数／いつもより伸び／新着で伸び」で有効。「おすすめ順」は各ビュー既定の並び。ジャンル絞り込みは AND（選んだすべてに一致）。</span>
+      <span class="flabel" data-i18n="ctl.summary">並び替え</span>
+      <div class="sortseg" id="sortSeg" role="group" aria-label="並び替え">
+        <button class="sortbtn" type="button" data-sort="rank" aria-pressed="true" data-i18n="sort.rank">おすすめ順</button>
+        <button class="sortbtn" type="button" data-sort="momentum" aria-pressed="false" data-i18n="sort.momentum">勢い順（平常比）</button>
+        <button class="sortbtn" type="button" data-sort="ccu" aria-pressed="false" data-i18n="sort.ccu">多い順</button>
+        <button class="sortbtn" type="button" data-sort="new" aria-pressed="false" data-i18n="sort.new">新着順</button>
+        <button class="sortbtn" type="button" data-sort="name" aria-pressed="false" data-i18n="sort.name">名前順</button>
+      </div>
+      <span class="ctlnote" id="ctlNote"></span>
     </div>
-  </details>
+  </div>
 
   <!-- ⑮-2 お気に入り切替は favs.size>0 のときだけ出す（★が1件も無いなら押せば必ず空になるだけ）。
        ⑮-3 検索窓は🔍に畳む＝「作品名を既に知っている人」の道具＝低優先。開閉は端末内に記憶する
@@ -787,7 +787,16 @@ const I18N={
  "brand.plain":{ja:"いま、いつもより人が増えているPCゲームを、静かに見つけます。",en:"Discover PC games gaining more players than usual — quietly."},
  "brand.tagline":{ja:"頼んでいない情報は出しません。追いたいゲームだけ、静かに。",en:"No noise you didn't ask for — just the games you follow, quietly."},
  "ctl.summary":{ja:"並び替え",en:"Sort"},
- "sort.rank":{ja:"おすすめ順",en:"Recommended"},"sort.ccu":{ja:"多い順",en:"Most players"},
+ "sort.rank":{ja:"おすすめ順",en:"Recommended"},
+ // 3A 「おすすめ順」が何順なのかをビューごとに1文で出す。文言はコードで裏を取ったものだけ書く：
+ //   02 → render() が ccu 降順に並べる／04 → viewItems("L") が平常比の倍率降順で返す／
+ //   03 → データ側（view02_rank_v2.py）の eff 順。eff = 倍率を観測点数で収縮(shrunk)し、統計的な
+ //        有意性(robust_z)で減衰(base_score)させ、きっかけの有無で加点(1+boost)した合成スコア。
+ //        ★点検書の「倍率×確度×人数の合成」は不正確（「人数」ではなく「観測点数」）なので書き換えた。
+ "ctl.rank.1":{ja:"おすすめ順＝いま遊んでいる人数の多い順。",en:"Recommended = most players right now."},
+ "ctl.rank.2":{ja:"おすすめ順＝倍率を観測点数で収縮し、確からしさで減衰させ、きっかけの有無で加点した合成スコア順。倍率だけの順ではないので、下の行のほうが倍率が大きいことがあります。",en:"Recommended = a composite score: the ratio shrunk by how many observations there are, damped by significance, boosted when a trigger was found. Not a pure ratio order, so a lower row can have a bigger ×N."},
+ "ctl.rank.L":{ja:"おすすめ順＝平常比の倍率が大きい順。",en:"Recommended = biggest rise vs its own usual."},
+ "ctl.and":{ja:"ジャンル絞り込みは AND（選んだすべてに一致）。",en:"Genre filter is AND (matches all selected)."},"sort.ccu":{ja:"多い順",en:"Most players"},
  "sort.momentum":{ja:"勢い順（平常比）",en:"Momentum"},"sort.new":{ja:"新着順",en:"Newest"},"sort.name":{ja:"名前順",en:"Name"},
  "filter.genre":{ja:"ジャンル",en:"Genre"},"filter.clear":{ja:"クリア",en:"Clear"},
  "fav.all":{ja:"すべて",en:"All"},"fav.star":{ja:"★ お気に入り",en:"★ Favorites"},
@@ -1273,7 +1282,11 @@ function render(view){
   // 全ビュー共通：お気に入り絞り込み → shown件まで → 行（各行に「詳しく」）→ もっと見る（残りがあれば）
   const all=viewItems(view).filter(o=>!favOnly||favs.has(o.key)).filter(o=> (view!=="1"&&view!=="2"&&view!=="L") || genreMatch(o.detail)).filter(o=> !query || String(o.title).toLowerCase().includes(query)); document.getElementById("filters").style.display=(view==="1"||view==="2"||view==="L")?"":"none";
   // 並び替えは view01/02/L だけで効く。view3（これから来そう）では選べてしまうと嘘になるので箱ごと隠す。
-  const ctlBox=document.getElementById("ctlBox"); if(ctlBox){ ctlBox.style.display=(view==="3")?"none":""; if(view==="3") ctlBox.open=false; }
+  const ctlBox=document.getElementById("ctlBox"); if(ctlBox) ctlBox.style.display=(view==="3")?"none":"";
+  // 3A 選択状態を反映し、そのビューの「おすすめ順」が何順なのかを横に1文で出す。
+  document.querySelectorAll("#sortSeg .sortbtn").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.sort===sortMode)));
+  const ctlNote=document.getElementById("ctlNote");
+  if(ctlNote) ctlNote.textContent=(view==="3")?"":((I18N["ctl.rank."+view]?t("ctl.rank."+view)+" ":"")+t("ctl.and"));
   if(view==="1"||view==="2"||view==="L"){  // 並び替えを view01/02/L で有効化（①の指摘）。rank＝各ビュー既定順を維持。
     if(sortMode==="rank"){ if(view==="1") all.sort((a,b)=> (b.ccu||0)-(a.ccu||0)); }
     else all.sort((a,b)=> sortMode==="name" ? String(a.title).localeCompare(b.title,"ja")
@@ -1337,8 +1350,10 @@ function setFavOnly(v){ favOnly=v; favAllEl.setAttribute("aria-pressed",String(!
 favAllEl.addEventListener("click",()=>setFavOnly(false));
 favStarEl.addEventListener("click",()=>setFavOnly(true));
 // 並び替え（view01 で実データ・A1）
-const sortSel=document.getElementById("sortSel");
-sortSel.addEventListener("change",()=>{ sortMode=sortSel.value; shown=20; render(current); });
+// 3A 並び替えはチップ列。選択肢が常に見えるので「いま何順か」「他に何があるか」が一目で読める。
+const sortSeg=document.getElementById("sortSeg");
+sortSeg.addEventListener("click",e=>{ const btn=e.target.closest(".sortbtn"); if(!btn) return;
+  sortMode=btn.dataset.sort; shown=20; render(current); });
 // 詳細ページ（行タップで一本化）＋戻る。履歴チャートは export 拡張後（今は準備中）。
 const detailEl=document.getElementById("detailView"), dvBody=document.getElementById("dvBody");
 const mainViewEl=document.getElementById("mainView"), backBtn=document.getElementById("backBtn");
