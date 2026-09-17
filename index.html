@@ -338,6 +338,12 @@
   .predbox .pnum{font-size:19px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
   .dvsection{margin:16px 0;padding-top:13px;border-top:1px solid var(--line)}
   .dvlabel{font-size:11px;color:var(--ink-faint);letter-spacing:.4px;margin:0 0 8px}
+  /* 8A 用語：そのページに出ている語だけを1行ずつ説明する。title属性（ホバー）はスマホで読めないため本文で出す。 */
+  .gloss{display:flex;flex-direction:column;gap:8px}
+  .glrow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 12px;align-items:baseline;font-size:12px}
+  .glk{color:var(--ink);font-weight:600;white-space:nowrap}
+  .glv{color:var(--ink-soft);min-width:0}
+  @media(max-width:560px){ .glrow{grid-template-columns:minmax(0,1fr)} }
   .dvhistory{font-size:12px;color:var(--ink-faint)}
   .dvmuted{color:var(--ink-faint);font-size:12px}
   .why{display:flex;flex-direction:column;gap:9px}
@@ -1002,6 +1008,39 @@ function l1Secondary(d){
   if(!g.length) return "";  // 無いときは出さない（「準備中」で行を汚さない）
   return g.slice(0,2).map(t=>`<span class="chip gq">${esc(genreLabel(t))}</span>`).join("")+(g.length>2?`<span class="chip gq more">+${g.length-2}</span>`:"");
 }
+// 8A 「そのページに出ている語」だけを1行ずつ説明する節。説明は title 属性にもあるが、
+//    スマホではホバーできず読めないので本文として出す。
+//    ★決定事項4の呼び方「直近6時間の高いほう（上位10%）」は変えない。説明を足すだけ。
+//    ★▲の記号・色も決定事項2なので変えない。ここで「押し上げ要因」だと書いて意味を通す。
+function glossarySection(o){
+  const rows=[];
+  const add=(k,v)=>rows.push(`<div class="glrow"><span class="glk">${k}</span><span class="glv">${v}</span></div>`);
+  if(o.view==="3"){
+    const P=(SCORE&&SCORE.params)||{}, days=P.outcome_days||14, thr=P.hit_threshold||1000;
+    add(L("跳ね予想","Spike forecast"),
+        L(`発売から${days}日以内に最大同時接続 ${nf.format(thr)}人以上になる確率の推定です。モデルの出力なので外れることがあります。`,
+          `The estimated chance of reaching ${nf.format(thr)}+ peak concurrent players within ${days} days of launch. A model output — it can be wrong.`));
+    add(L("同じ帯の実績","Same band, actual"),
+        L("同じくらいの%を出した過去の予測が、実際に何%跳ねたか。予想をどれくらい割り引いて読めばよいかの目安です。",
+          "Of past predictions in the same percentage band, how many actually spiked. Use it to calibrate how much to trust the forecast."));
+    add("▲", L("この予測を押し上げている要因です（警告ではありません）。","A signal raising this prediction — not a warning."));
+    add(L("確度","Confidence"),
+        L("予測のもとになった実測シグナルの多さ・確かさ。高いほど材料が揃っています。",
+          "How many and how solid the measured signals behind the prediction are."));
+    add(L("平均との比","vs average"),
+        L("発売前作品ぜんぶの平均跳ね率と比べて何倍か。分母は上の行に書いてあります。",
+          "How many times the average spike rate across all pre-release titles. The denominator is shown above."));
+  } else if(o.view==="2"){
+    add(L("直近6時間の高いほう（上位10%）","Recent 6h high (90th percentile)"),
+        L("直近6時間の観測値を並べ、上から10%の位置にある値です。いちばん高い1点だけに引っぱられないための取り方です。",
+          "The value at the 90th percentile of the last 6 hours of observations — so a single spike does not dominate."));
+    add(L("平常","Usual"),
+        L("その作品の「ふだん」＝過去14日の中央値です。できるときは同じ時間帯どうしで揃えます（揃えられなかった日は下に注記が出ます）。",
+          "The title's own baseline: the 14-day median, aligned by time of day when there is enough data (a note appears when it could not be)."));
+  }
+  if(!rows.length) return "";
+  return `<div class="dvsection"><div class="dvlabel">${L("用語","Glossary")}</div><div class="gloss">${rows.join("")}</div></div>`;
+}
 function detailBodyReal(d){
   if(!d) return "";
   const dev=(d.developers||[]).map(esc).join("、");
@@ -1549,6 +1588,7 @@ function showDetail(o){
     +`<div class="dvhead">${cover}<div><h2 class="dvtitle">${esc(o.title)}</h2><div class="dvmetric">${o.metric||""}</div></div></div>`
     +assess
     +(why?`<div class="dvsection"><div class="dvlabel">${L("なぜ拾ったか","Why picked")}</div>${why}</div>`:"")
+    +glossarySection(o)   // 8A そのページに出ている語だけの「用語」
     +histSec+infoSec+conns
     +((steam||dshare)?`<div class="dvactions">${steam}${dshare}</div>`:"");
   mainViewEl.hidden=true; detailEl.hidden=false; try{window.scrollTo({top:0,behavior:"instant"});}catch(e){window.scrollTo(0,0);}
