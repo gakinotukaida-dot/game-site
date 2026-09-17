@@ -783,6 +783,14 @@ const nf=new Intl.NumberFormat("ja-JP");
 let lang="ja"; const LANG_KEY="radar_lang_v1"; try{ if(localStorage.getItem(LANG_KEY)==="en") lang="en"; }catch(e){}
 function L(ja,en){ return lang==="en"?en:ja; }                 // 動的文字列（描画時に評価）
 function genreLabel(g){ return lang==="en"?g:(GENRE_JA[g]||g); } // ジャンルは英語キーをそのまま英語表示に
+// 7A 詳細の「カテゴリ」に内部名（#category_playable_at_your_own_pace 等）がそのまま出ていた。
+//    表示するときだけ整形する＝data/ の JSON は一切触らない（決定事項10・外部から読まれている形は保つ）。
+//    未登録の語は英語のまま出す（当てずっぽうの訳を作らない）。
+function catLabel(t){
+  let s=String(t==null?"":t);
+  if(/^#category_/.test(s)) s=s.replace(/^#category_/,"").replace(/_/g," ").replace(/(^|\s)\w/g,c=>c.toUpperCase());
+  return (lang==="en")?s:(CAT_JA[s]||s);
+}
 const I18N={
  "brand.plain":{ja:"いま、いつもより人が増えているPCゲームを、静かに見つけます。",en:"Discover PC games gaining more players than usual — quietly."},
  "brand.tagline":{ja:"頼んでいない情報は出しません。追いたいゲームだけ、静かに。",en:"No noise you didn't ask for — just the games you follow, quietly."},
@@ -999,14 +1007,15 @@ function detailBodyReal(d){
   const dev=(d.developers||[]).map(esc).join("、");
   const pub=(d.publishers||[]).map(esc).join("、");
   const samePub = pub && pub!==dev;            // 開発元＝販売元(インディーに多い)なら販売元行は省く
-  const cats=(d.categories||[]).map(t=>`<span class="chip">${esc(t)}</span>`).join("");
+  const cats=(d.categories||[]).map(t=>`<span class="chip">${esc(catLabel(t))}</span>`).join("");   // 7A
   const pr=d.price, rv=d.review;
   const hasAny = dev || pub || cats || d.release || (d.dlc_count>0) || (d.siblings&&d.siblings.length) || d.website || pr || rv;
   if(!hasAny) return "";                        // appdetails未到達＝中身なし（rowDetailが「準備中」を出す）
   let rows="";
   if(dev) rows+=`<span class="dk">${L("開発元","Developer")}</span><span class="dv">${dev}</span>`;
   if(samePub) rows+=`<span class="dk">${L("販売元","Publisher")}</span><span class="dv">${pub}</span>`;
-  rows+=`<span class="dk">${L("発売日","Release")}</span><span class="dv">${d.release?esc(d.release):"—"}</span>`;
+  // 7A 発売日が「18 Sep, 2026」のままで一覧の「9月18日」と表記が揃っていなかった。表示時に整形する。
+  rows+=`<span class="dk">${L("発売日","Release")}</span><span class="dv">${d.release?esc(relDateJa(d.release,true)):"—"}</span>`;
   // ⑲ dlc_count が null＝DLCを**まだ調べていない**（appdetails 未到達）。行ごと出さない。
   //    0 と null を同じ「なし」にすると、調べていないものを「無い」と断定することになる（0802E-05）。
   if(d.dlc_count!=null) rows+=`<span class="dk">DLC</span><span class="dv">${d.dlc_count>0?L(`あり（${d.dlc_count}）`,`Yes (${d.dlc_count})`):L("なし","None")}</span>`;
@@ -1054,7 +1063,7 @@ const UP_MON_RE=/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i;
 // パースできない表記（"Q3 2026" / "2026" / "January 2027" など）は原文のまま残す＝勝手に丸めない。
 // 英語表示のときは原文（ストア表記）をそのまま出す。年が今年と違うときだけ「2027年2月10日」と年を添える。
 const REL_MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
-function relDateJa(str){
+function relDateJa(str, withYear){
   const s=String(str==null?"":str).trim();
   if(!s||lang==="en") return s;
   if(/^coming\s+soon$/i.test(s)) return "近日";
@@ -1063,7 +1072,8 @@ function relDateJa(str){
   else if(mm=s.match(/^(\d{1,2})\s+([A-Za-z]{3,9})\.?,?\s+(\d{4})$/)){ y=+mm[3]; m=REL_MON[mm[2].slice(0,3).toLowerCase()]; d=+mm[1]; }
   else if(mm=s.match(/^([A-Za-z]{3,9})\.?\s+(\d{1,2}),?\s+(\d{4})$/)){ y=+mm[3]; m=REL_MON[mm[1].slice(0,3).toLowerCase()]; d=+mm[2]; }
   if(!y||!m||!d||m<1||m>12||d<1||d>31) return s;   // 日付として読めない＝原文のまま
-  return (y===new Date().getFullYear()?"":y+"年")+m+"月"+d+"日";
+  // 7A withYear=true（詳細ページの「発売日」）では年を必ず付ける。一覧は従来どおり今年なら年を省く。
+  return ((withYear || y!==new Date().getFullYear())?y+"年":"")+m+"月"+d+"日";
 }
 function upIsReleased(g){
   const nowMs=Date.now();
@@ -1755,6 +1765,8 @@ async function loadNow(){
   if(current==="1"||current==="2") render(current);
 }
 // ジャンル絞り込み（属性層の先行配線）：detail.genres から自動生成・日本語ラベル・AND（選んだ全てに一致）。export/DB非依存・可逆。
+// 7A Steam のカテゴリ名の対訳（表示時のみ）。未登録は英語のまま出す。
+const CAT_JA={"Single-player":"1人用","Multi-player":"マルチプレイ","Co-op":"協力プレイ","Online Co-op":"オンライン協力","LAN Co-op":"LAN協力","Shared/Split Screen Co-op":"画面分割 協力","PvP":"対人戦","Online PvP":"オンライン対人戦","LAN PvP":"LAN対人戦","Shared/Split Screen PvP":"画面分割 対人戦","Shared/Split Screen":"画面分割","Cross-Platform Multiplayer":"クロスプラットフォーム対戦","MMO":"MMO","Steam Achievements":"実績","Steam Trading Cards":"トレーディングカード","Steam Cloud":"クラウドセーブ","Steam Workshop":"Workshop","Steam Leaderboards":"リーダーボード","Steam Turn Notifications":"ターン通知","Steam Input API Support":"Steam Input対応","SteamVR Collectibles":"SteamVRコレクション","Valve Anti-Cheat enabled":"VAC有効","Family Sharing":"ファミリーシェア","In-App Purchases":"アプリ内課金","Includes level editor":"レベルエディタ同梱","VR Only":"VR専用","Full controller support":"コントローラー完全対応","Partial Controller Support":"コントローラー一部対応","Gamepad Recommended":"ゲームパッド推奨","DualShock Controller Support":"DualShock対応","DualSense Controller Support":"DualSense対応","Tracked Controller Support":"トラッキングコントローラー対応","Remote Play on Phone":"リモートプレイ（スマホ）","Remote Play on Tablet":"リモートプレイ（タブレット）","Remote Play on TV":"リモートプレイ（TV）","Remote Play Together":"リモートプレイ・トゥギャザー","Stereo Sound":"ステレオ音声","Surround Sound":"サラウンド音声","HDR available":"HDR対応","Captions available":"字幕あり","Narrated Game Menus":"メニュー読み上げ","Adjustable Text Size":"文字サイズ調整","Color Alternatives":"色の代替表示","Custom Volume Controls":"音量の個別調整","Camera Comfort":"カメラ酔い対策","Adjustable Difficulty":"難易度調整","Save Anytime":"いつでもセーブ","Playable without Timed Input":"時間制限のある入力なしで遊べる","Playable At Your Own Pace":"自分のペースで遊べる","Contrast Controls":"コントラスト調整","Mouse Only Option":"マウスのみで操作可","Keyboard Only Option":"キーボードのみで操作可","Touch Only Option":"タッチのみで操作可"};
 const GENRE_JA={"Action":"アクション","Adventure":"アドベンチャー","RPG":"RPG","Simulation":"シミュレーション","Strategy":"ストラテジー","Indie":"インディー","Casual":"カジュアル","Sports":"スポーツ","Racing":"レース","Free To Play":"基本無料","Massively Multiplayer":"多人数オンライン","Early Access":"早期アクセス","Violent":"暴力表現","Gore":"ゴア表現","Nudity":"ヌード","Sexual Content":"性的内容","Horror":"ホラー","Puzzle":"パズル","Platformer":"プラットフォーマー","Shooter":"シューター","Fighting":"格闘","Music":"音楽","Education":"教育","Utilities":"ユーティリティ","Design & Illustration":"デザイン・イラスト","Animation & Modeling":"アニメ・モデリング","Web Publishing":"Web制作","Game Development":"ゲーム開発","Audio Production":"音楽制作","Video Production":"動画制作","Photo Editing":"写真編集","Software Training":"ソフト学習"};
 function genreMatch(detail){ if(!activeGenres.size) return true; const gs=(detail&&detail.genres)||[]; for(const g of activeGenres){ if(!gs.includes(g)) return false; } return true; }
 function buildGenreChips(){
