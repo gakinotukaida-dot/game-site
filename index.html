@@ -13,8 +13,12 @@
   :root{
     --bg:#14161a; --bg-2:#181b20; --ink:#e7e4dc; --ink-soft:#b4b9bb; --ink-faint:#8f9599;
     --line:#252a30; --accent:#79c0ab; --accent-weak:#1b2521; --chip:#20252b; --chip-ink:#9aa0a2;
-    --serif:"Fraunces","Hiragino Mincho ProN","Yu Mincho",serif;
-    --sans:"Hanken Grotesk","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;
+    /* 15A Fraunces／Hanken Grotesk を指定していたが、@font-face も外部読み込みも無く、
+       CSP（style-src 'self' / default-src 'self'）でも外部フォントは禁止されている＝実際には
+       一度も適用されていなかった。見えている姿（端末フォント）を正として指定を消す。
+       外部接続は増やさない（増やす案は別枠。フォント読み込みは不採用）。 */
+    --serif:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+    --sans:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",system-ui,sans-serif;
   }
   /* 14A 明るい配色のコントラスト是正（決定事項8＝明暗切替を残す以上、明るい側も同じ基準で読める必要がある）。
      実測（WCAG相対輝度）：薄文字 #847c6c/#e4dfd3 = 3.11、チップ文字 #6c655a/#d7d1c2 = 3.78 で
