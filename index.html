@@ -299,6 +299,13 @@
   .dvhead .cover{width:120px;height:56px}
   .dvtitle{font-family:var(--serif);font-weight:500;font-size:22px;color:var(--ink);margin:0;line-height:1.2}
   .dvmetric{margin-top:5px}
+  /* 1C 決定事項1：詳細の見出しも %単独をやめ「跳ね予想／同じ帯の実績／平均との比」の3行にする。
+     「ふつう×N」は分母（発売前作品の平均跳ね率）を必ず併記する＝説明が要らなくなる。 */
+  .predbox{display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 14px;align-items:baseline;font-size:12.5px;margin-top:3px}
+  .predbox .pk{color:var(--ink-faint);white-space:nowrap}
+  .predbox .pv{color:var(--ink-soft);min-width:0}
+  .predbox .pv b{color:var(--ink);font-weight:600}
+  .predbox .pnum{font-size:19px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
   .dvsection{margin:16px 0;padding-top:13px;border-top:1px solid var(--line)}
   .dvlabel{font-size:10.5px;color:var(--ink-faint);letter-spacing:.4px;margin:0 0 8px}
   .dvhistory{font-size:12px;color:var(--ink-faint)}
@@ -1139,8 +1146,16 @@ function viewItems(view){
           : (dc?`<span class="num">${nf.format(dc)}</span><span class="unit">${L("人 体験版","demo")}</span>`
              :`<span class="when">${known?esc(relTxt):L("未定","TBD")}</span>`),  // L0主指標＝跳ね予想%（高いほど濃く＝色スケール／color-mix非対応はCSSで一律accentにフォールバック）
         kicker: (known?L("発売予定 ","Releases ")+esc(relTxt):esc(relTxt))+((g.factors&&g.factors.length)?" ・"+esc(factLabel(g.factors[0].name)):(hasP&&ratio&&ratio>=1.2?" ・"+L("ふつう×"+ratio.toFixed(1),"×"+ratio.toFixed(1)):"")),
+        // 1C 詳細の見出し：%単独をやめ3行に。帯の実績が引けない行ではその行だけ出さない（嘘を書かない）。
+        //     先頭の「・」（文字列連結の癖）もここで消える。
         metric: hasP
-          ? `<span class="num">${pctTxt}</span><span class="unit">%</span><div class="base">${L("跳ね予想","spike")}${ratio&&ratio>=1.2?" ・"+L("ふつう×"+ratio.toFixed(1),"×"+ratio.toFixed(1)):""}</div>`
+          ? `<div class="predbox">`
+            +`<span class="pk">${L("跳ね予想","Spike forecast")}</span><span class="pv"><b class="pnum">${pctTxt}%</b>${cfLabel?` ${esc(cfLabel)}`:""}</span>`
+            +(cb?`<span class="pk">${L("同じ帯の実績","Same band, actual")}</span><span class="pv">`+(cb.thin
+                ? L(`件数不足（${nf.format(cb.n)}件）＝この帯はまだ割合を出せません`,`Too few cases (${nf.format(cb.n)}) — no rate for this band yet`)
+                : L(`<b>${scPct(cb.rate)}</b> が実際に跳ねた（予想 ${cb.lo}〜${cb.hi}% の ${nf.format(cb.n)}件中）`,`<b>${scPct(cb.rate)}</b> actually spiked (of ${nf.format(cb.n)} predicted ${cb.lo}–${cb.hi}%)`))+`</span>`:"")
+            +((base>0&&ratio!=null)?`<span class="pk">${L("平均との比","vs average")}</span><span class="pv">${L(`発売前作品の平均 ${scPct(base)} の <b>×${ratio.toFixed(1)}</b>`,`<b>×${ratio.toFixed(1)}</b> the pre-release average of ${scPct(base)}`)}</span>`:"")
+            +`</div>`
           : (dc?`<span class="num">${nf.format(dc)}</span><span class="unit">${L("人 体験版","demo")}</span><div class="base">${known?esc(relTxt):L("発売日 未定","TBD")}</div>`
              :`<div class="when">${known?esc(relTxt):L("未定","TBD")}</div>`) };
     });
