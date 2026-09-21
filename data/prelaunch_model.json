@@ -2,7 +2,7 @@
   "view": "prelaunch_model",
   "schema": "prelaunch_model_v1",
   "note": "羽根予想モデル（自社実績で較正したスコアカード）。跳ね確率は log-odds 合算＝解釈可能・材料が薄いほど基準確率に寄る。強さ指標 top_decile_lift は 70/30 ホールドアウトの out-of-sample。readiness=collecting の間は控えめ運用。",
-  "generated_at": "2026-09-21T09:56:55.656233+00:00",
+  "generated_at": "2026-09-21T20:25:46.260710+00:00",
   "params": {
     "lookback_days": 180,
     "outcome_days": 14,
@@ -11,9 +11,9 @@
     "min_pairs": 300
   },
   "readiness": "validated",
-  "n_pairs": 6305,
+  "n_pairs": 6307,
   "hits": 273,
-  "base_rate": 0.043299,
+  "base_rate": 0.043285,
   "features": [
     "demo_ccu",
     "twitch_peak",
@@ -29,112 +29,122 @@
   ],
   "woe": {
     "demo_ccu": {
-      "none": -0.11358,
-      "low": -1.26387,
-      "mid": 2.17129,
-      "high": 4.16685
+      "none": -0.11345,
+      "low": -1.26451,
+      "mid": 2.17162,
+      "high": 4.16716
     },
     "twitch_peak": {
+      "high": 2.40703,
       "none": -0.02954,
-      "mid": 1.91306,
-      "high": 2.40673,
-      "low": 1.91306
+      "mid": 1.91333,
+      "low": 1.91333
     },
     "streamers": {
+      "high": 2.14555,
       "none": -0.01458,
-      "high": 2.14527,
-      "low": 1.35761
+      "low": 1.35785
     },
     "news_count": {
-      "none": -1.27285,
-      "low": 0.1634,
-      "high": 1.22698
+      "high": 1.22731,
+      "none": -1.27305,
+      "low": 0.16373
     },
     "web_news": {
-      "none": -0.04631,
-      "high": 1.01931,
-      "low": 1.4876,
-      "mid": 1.05856
+      "none": -0.04632,
+      "high": 1.01961,
+      "low": 1.48792,
+      "mid": 1.05885
     },
     "web_views": {
-      "none": -0.15492,
-      "low": 0.22492,
-      "mid": 1.27474,
-      "high": 2.58204
+      "mid": 1.27506,
+      "none": -0.15496,
+      "low": 0.22524,
+      "high": 2.58237
     },
     "web_reach": {
       "none": -0.07229,
-      "mid": 2.32924,
-      "low": 2.36404,
-      "high": 0.91366
+      "mid": 2.32955,
+      "low": 2.36436,
+      "high": 0.91396
     },
     "dev_best_peak": {
-      "none": -0.44094,
-      "low": 0.25691,
-      "mid": 2.92213,
-      "high": 2.44909
+      "mid": 2.92246,
+      "none": -0.44085,
+      "low": 0.2567,
+      "high": 2.44941
     },
     "dev_best_reviews": {
-      "none": -0.45868,
-      "low": -0.22277,
-      "high": 1.8919
+      "high": 1.89223,
+      "none": -0.45858,
+      "low": -0.22308
     },
     "is_free": {
-      "free": -0.63128,
-      "paid": 0.1255
+      "paid": 0.12541,
+      "free": -0.63096
     },
     "genre": {
-      "warm": -0.24696,
-      "hot": 0.72011,
-      "cold": -0.79262,
-      "na": -2.10244
+      "hot": 0.72044,
+      "warm": -0.24687,
+      "cold": -0.79395,
+      "na": -2.10243
     }
   },
   "genre_rates": {
-    "Indie": {
-      "n": 4502,
-      "hits": 148,
-      "rate": 0.03289
-    },
-    "Strategy": {
-      "n": 1712,
-      "hits": 74,
-      "rate": 0.04322
-    },
-    "Free To Play": {
-      "n": 817,
-      "hits": 29,
-      "rate": 0.03557
+    "Action": {
+      "n": 1944,
+      "hits": 119,
+      "rate": 0.06114
     },
     "Adventure": {
       "n": 1978,
       "hits": 96,
       "rate": 0.04851
     },
-    "Casual": {
-      "n": 2862,
-      "hits": 94,
-      "rate": 0.03287
-    },
-    "Action": {
-      "n": 1943,
-      "hits": 119,
-      "rate": 0.06117
-    },
     "RPG": {
       "n": 1264,
       "hits": 105,
       "rate": 0.08282
+    },
+    "Indie": {
+      "n": 4504,
+      "hits": 148,
+      "rate": 0.03288
+    },
+    "Audio Production": {
+      "n": 13,
+      "hits": 0,
+      "rate": 0.01649
+    },
+    "Utilities": {
+      "n": 63,
+      "hits": 2,
+      "rate": 0.03305
+    },
+    "Early Access": {
+      "n": 885,
+      "hits": 43,
+      "rate": 0.04854
+    },
+    "Casual": {
+      "n": 2864,
+      "hits": 94,
+      "rate": 0.03285
+    },
+    "Free To Play": {
+      "n": 817,
+      "hits": 29,
+      "rate": 0.03557
     },
     "Simulation": {
       "n": 1999,
       "hits": 128,
       "rate": 0.06395
     },
-    "Early Access": {
-      "n": 885,
-      "hits": 43,
-      "rate": 0.04854
+    "Strategy": {
+      "n": 1712,
+      "hits": 74,
+      "rate": 0.04322
     },
     "Massively Multiplayer": {
       "n": 161,
@@ -151,20 +161,10 @@
       "hits": 5,
       "rate": 0.03739
     },
-    "Utilities": {
-      "n": 63,
-      "hits": 2,
-      "rate": 0.03305
-    },
-    "Audio Production": {
-      "n": 13,
-      "hits": 0,
-      "rate": 0.01649
-    },
     "Animation & Modeling": {
       "n": 14,
       "hits": 1,
-      "rate": 0.0612
+      "rate": 0.06119
     },
     "Design & Illustration": {
       "n": 18,
@@ -174,32 +174,32 @@
     "Video Production": {
       "n": 9,
       "hits": 0,
-      "rate": 0.02038
+      "rate": 0.02037
     },
     "Game Development": {
       "n": 14,
       "hits": 1,
-      "rate": 0.0612
+      "rate": 0.06119
     },
     "Web Publishing": {
       "n": 2,
       "hits": 1,
-      "rate": 0.13464
+      "rate": 0.13463
     },
     "Education": {
       "n": 8,
       "hits": 0,
-      "rate": 0.02165
-    },
-    "Software Training": {
-      "n": 2,
-      "hits": 0,
-      "rate": 0.03464
+      "rate": 0.02164
     },
     "Photo Editing": {
       "n": 5,
       "hits": 0,
-      "rate": 0.02665
+      "rate": 0.02664
+    },
+    "Software Training": {
+      "n": 2,
+      "hits": 0,
+      "rate": 0.03463
     }
   },
   "validation_oos": {
@@ -207,8 +207,8 @@
     "eval_base": 0.03577,
     "top_decile_rate": 0.22283,
     "top_decile_lift": 6.23,
-    "mean_prob_hit": 0.41595,
-    "mean_prob_miss": 0.05191
+    "mean_prob_hit": 0.41584,
+    "mean_prob_miss": 0.05186
   },
   "feature_report": {
     "demo_ccu": {
@@ -216,25 +216,25 @@
         "n": 22,
         "hits": 22,
         "rate": 1.0,
-        "woe": 4.16685
+        "woe": 4.16716
       },
       "low": {
-        "n": 1049,
+        "n": 1050,
         "hits": 13,
         "rate": 0.0124,
-        "woe": -1.26387
+        "woe": -1.26451
       },
       "mid": {
         "n": 134,
         "hits": 40,
         "rate": 0.2985,
-        "woe": 2.17129
+        "woe": 2.17162
       },
       "none": {
-        "n": 5100,
+        "n": 5101,
         "hits": 198,
         "rate": 0.0388,
-        "woe": -0.11358
+        "woe": -0.11345
       }
     },
     "twitch_peak": {
@@ -242,22 +242,22 @@
         "n": 5,
         "hits": 4,
         "rate": 0.8,
-        "woe": 2.40673
+        "woe": 2.40703
       },
       "low": {
         "n": 2,
         "hits": 2,
         "rate": 1.0,
-        "woe": 1.91306
+        "woe": 1.91333
       },
       "mid": {
         "n": 2,
         "hits": 2,
         "rate": 1.0,
-        "woe": 1.91306
+        "woe": 1.91333
       },
       "none": {
-        "n": 6296,
+        "n": 6298,
         "hits": 265,
         "rate": 0.0421,
         "woe": -0.02954
@@ -268,16 +268,16 @@
         "n": 4,
         "hits": 3,
         "rate": 0.75,
-        "woe": 2.14527
+        "woe": 2.14555
       },
       "low": {
         "n": 1,
         "hits": 1,
         "rate": 1.0,
-        "woe": 1.35761
+        "woe": 1.35785
       },
       "none": {
-        "n": 6300,
+        "n": 6302,
         "hits": 269,
         "rate": 0.0427,
         "woe": -0.01458
@@ -288,19 +288,19 @@
         "n": 1206,
         "hits": 162,
         "rate": 0.1343,
-        "woe": 1.22698
+        "woe": 1.22731
       },
       "low": {
         "n": 1244,
         "hits": 63,
         "rate": 0.0506,
-        "woe": 0.1634
+        "woe": 0.16373
       },
       "none": {
-        "n": 3855,
+        "n": 3857,
         "hits": 48,
-        "rate": 0.0125,
-        "woe": -1.27285
+        "rate": 0.0124,
+        "woe": -1.27305
       }
     },
     "web_news": {
@@ -308,25 +308,25 @@
         "n": 31,
         "hits": 4,
         "rate": 0.129,
-        "woe": 1.01931
+        "woe": 1.01961
       },
       "low": {
         "n": 48,
         "hits": 9,
         "rate": 0.1875,
-        "woe": 1.4876
+        "woe": 1.48792
       },
       "mid": {
         "n": 21,
         "hits": 3,
         "rate": 0.1429,
-        "woe": 1.05856
+        "woe": 1.05885
       },
       "none": {
-        "n": 6205,
+        "n": 6207,
         "hits": 257,
         "rate": 0.0414,
-        "woe": -0.04631
+        "woe": -0.04632
       }
     },
     "web_views": {
@@ -334,25 +334,25 @@
         "n": 41,
         "hits": 18,
         "rate": 0.439,
-        "woe": 2.58204
+        "woe": 2.58237
       },
       "low": {
         "n": 390,
         "hits": 21,
         "rate": 0.0538,
-        "woe": 0.22492
+        "woe": 0.22524
       },
       "mid": {
         "n": 138,
         "hits": 20,
         "rate": 0.1449,
-        "woe": 1.27474
+        "woe": 1.27506
       },
       "none": {
-        "n": 5736,
+        "n": 5738,
         "hits": 214,
         "rate": 0.0373,
-        "woe": -0.15492
+        "woe": -0.15496
       }
     },
     "web_reach": {
@@ -360,22 +360,22 @@
         "n": 25,
         "hits": 3,
         "rate": 0.12,
-        "woe": 0.91366
+        "woe": 0.91396
       },
       "low": {
         "n": 30,
         "hits": 12,
         "rate": 0.4,
-        "woe": 2.36404
+        "woe": 2.36436
       },
       "mid": {
         "n": 12,
         "hits": 6,
         "rate": 0.5,
-        "woe": 2.32924
+        "woe": 2.32955
       },
       "none": {
-        "n": 6238,
+        "n": 6240,
         "hits": 252,
         "rate": 0.0404,
         "woe": -0.07229
@@ -386,25 +386,25 @@
         "n": 25,
         "hits": 11,
         "rate": 0.44,
-        "woe": 2.44909
+        "woe": 2.44941
       },
       "low": {
-        "n": 1970,
+        "n": 1971,
         "hits": 109,
         "rate": 0.0553,
-        "woe": 0.25691
+        "woe": 0.2567
       },
       "mid": {
         "n": 65,
         "hits": 33,
         "rate": 0.5077,
-        "woe": 2.92213
+        "woe": 2.92246
       },
       "none": {
-        "n": 4245,
+        "n": 4246,
         "hits": 120,
         "rate": 0.0283,
-        "woe": -0.44094
+        "woe": -0.44085
       }
     },
     "dev_best_reviews": {
@@ -412,19 +412,19 @@
         "n": 418,
         "hits": 98,
         "rate": 0.2344,
-        "woe": 1.8919
+        "woe": 1.89223
       },
       "low": {
-        "n": 1604,
+        "n": 1605,
         "hits": 56,
         "rate": 0.0349,
-        "woe": -0.22277
+        "woe": -0.22308
       },
       "none": {
-        "n": 4283,
+        "n": 4284,
         "hits": 119,
         "rate": 0.0278,
-        "woe": -0.45868
+        "woe": -0.45858
       }
     },
     "is_free": {
@@ -432,39 +432,39 @@
         "n": 1368,
         "hits": 32,
         "rate": 0.0234,
-        "woe": -0.63128
+        "woe": -0.63096
       },
       "paid": {
-        "n": 4937,
+        "n": 4939,
         "hits": 241,
         "rate": 0.0488,
-        "woe": 0.1255
+        "woe": 0.12541
       }
     },
     "genre": {
       "cold": {
-        "n": 607,
+        "n": 608,
         "hits": 12,
-        "rate": 0.0198,
-        "woe": -0.79262
+        "rate": 0.0197,
+        "woe": -0.79395
       },
       "hot": {
         "n": 1336,
         "hits": 114,
         "rate": 0.0853,
-        "woe": 0.72011
+        "woe": 0.72044
       },
       "na": {
         "n": 55,
         "hits": 0,
         "rate": 0.0,
-        "woe": -2.10244
+        "woe": -2.10243
       },
       "warm": {
-        "n": 4307,
+        "n": 4308,
         "hits": 147,
         "rate": 0.0341,
-        "woe": -0.24696
+        "woe": -0.24687
       }
     }
   }
