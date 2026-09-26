@@ -3,22 +3,22 @@
   "schema": "upcoming_v5",
   "source": "games(coming_soon/release_date) + 実測シグナル(体験版/Twitch/告知/開発元実績/ジャンル) + prelaunch_model",
   "note": "発売前の羽根予想。spike_prob=跳ね確率＝自社実績で較正したモデルの出力（参考・外れうる）。モデルが無い場合は expect のみ（実測シグナルの有無）。発売日が今日以前の作品は除外（coming_soon フラグが古い“居座り”も落とす）。",
-  "generated_at": "2026-09-26T09:30:34.069811+00:00",
+  "generated_at": "2026-09-26T19:21:55.009452+00:00",
   "model": {
     "schema": "prelaunch_model_v1",
     "readiness": "validated",
-    "base_rate": 0.039463,
-    "n_pairs": 6335,
+    "base_rate": 0.039414,
+    "n_pairs": 6343,
     "hit_threshold": 1000,
     "validation_oos": {
-      "eval_n": 1842,
-      "eval_base": 0.03149,
+      "eval_n": 1846,
+      "eval_base": 0.03142,
       "top_decile_rate": 0.21739,
-      "top_decile_lift": 6.9,
-      "mean_prob_hit": 0.41901,
-      "mean_prob_miss": 0.05241
+      "top_decile_lift": 6.92,
+      "mean_prob_hit": 0.42618,
+      "mean_prob_miss": 0.05263
     },
-    "generated_at": "2026-09-26T09:21:45.349991+00:00"
+    "generated_at": "2026-09-26T19:13:31.846820+00:00"
   },
   "params": {
     "limit": 200,
@@ -30,111 +30,19 @@
   "count": 200,
   "rows": [
     {
-      "appid": 3832490,
-      "name": "Antivirus Survivors 2003 Professional",
-      "release": "28 Sep, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.6936,
-      "expect": "high",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "demo_ccu",
-          "dir": "up",
-          "bucket": "mid"
-        },
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "hot"
-        }
-      ],
-      "active_signals": 5,
-      "demo_ccu": 60,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 3,
-      "has_news": true,
-      "dev_best_peak": 60,
-      "dev_best_reviews": 529,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": 0,
-      "is_free": false,
-      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3832490/19ec8cf9c754e295d6bc29870e1ed65f04b69988/header.jpg?t=1790030785",
-      "has_japanese": false,
-      "genres": [
-        "Action",
-        "Casual",
-        "Indie",
-        "RPG"
-      ],
-      "price": null,
-      "review": {
-        "positive": 0,
-        "total": 0,
-        "pct": null
-      },
-      "detail": {
-        "developers": [
-          "Shaun Hammond Business Solutions Limited"
-        ],
-        "publishers": [
-          "Shaun Hammond Business Solutions Limited"
-        ],
-        "genres": [
-          "Action",
-          "Casual",
-          "Indie",
-          "RPG"
-        ],
-        "categories": [
-          "Single-player",
-          "Steam Achievements",
-          "Full controller support",
-          "Keyboard Only Option",
-          "DualShock Controller Support",
-          "DualShock Controller Support",
-          "DualSense Controller Support"
-        ],
-        "dlc_count": 0,
-        "release": "28 Sep, 2026",
-        "website": "https://avs03.com",
-        "siblings": [
-          {
-            "appid": 4320630,
-            "name": "Antivirus Survivors 2003 Professional (Demo)",
-            "ccu": 27
-          }
-        ],
-        "price": null,
-        "review": {
-          "positive": 0,
-          "total": 0,
-          "pct": null
-        }
-      }
-    },
-    {
       "appid": 4623570,
       "name": "Deskrawl: Idle ARPG",
       "release": "28 Sep, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.6936,
+      "spike_prob": 0.9408,
       "expect": "high",
       "conf": "high",
       "factors": [
         {
           "name": "demo_ccu",
           "dir": "up",
-          "bucket": "mid"
+          "bucket": "high"
         },
         {
           "name": "news_count",
@@ -148,12 +56,12 @@
         }
       ],
       "active_signals": 5,
-      "demo_ccu": 481,
+      "demo_ccu": 534,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 9,
       "has_news": true,
-      "dev_best_peak": 481,
+      "dev_best_peak": 534,
       "dev_best_reviews": 399,
       "web_news": null,
       "web_views": null,
@@ -205,7 +113,7 @@
           {
             "appid": 4765010,
             "name": "Deskrawl: Idle ARPG (Demo)",
-            "ccu": 481
+            "ccu": 464
           },
           {
             "appid": 3843360,
@@ -227,12 +135,104 @@
       }
     },
     {
+      "appid": 3832490,
+      "name": "Antivirus Survivors 2003 Professional",
+      "release": "28 Sep, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.6921,
+      "expect": "high",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "demo_ccu",
+          "dir": "up",
+          "bucket": "mid"
+        },
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "high"
+        },
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "hot"
+        }
+      ],
+      "active_signals": 5,
+      "demo_ccu": 91,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 3,
+      "has_news": true,
+      "dev_best_peak": 91,
+      "dev_best_reviews": 529,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": 0,
+      "is_free": false,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3832490/19ec8cf9c754e295d6bc29870e1ed65f04b69988/header.jpg?t=1790030785",
+      "has_japanese": false,
+      "genres": [
+        "Action",
+        "Casual",
+        "Indie",
+        "RPG"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "Shaun Hammond Business Solutions Limited"
+        ],
+        "publishers": [
+          "Shaun Hammond Business Solutions Limited"
+        ],
+        "genres": [
+          "Action",
+          "Casual",
+          "Indie",
+          "RPG"
+        ],
+        "categories": [
+          "Single-player",
+          "Steam Achievements",
+          "Full controller support",
+          "Keyboard Only Option",
+          "DualShock Controller Support",
+          "DualShock Controller Support",
+          "DualSense Controller Support"
+        ],
+        "dlc_count": 0,
+        "release": "28 Sep, 2026",
+        "website": "https://avs03.com",
+        "siblings": [
+          {
+            "appid": 4320630,
+            "name": "Antivirus Survivors 2003 Professional (Demo)",
+            "ccu": 83
+          }
+        ],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
       "appid": 3917700,
       "name": "DiceVaders",
       "release": "29 Sep, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.1674,
+      "spike_prob": 0.1664,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -253,7 +253,7 @@
         }
       ],
       "active_signals": 5,
-      "demo_ccu": 32,
+      "demo_ccu": 37,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 9,
@@ -310,7 +310,7 @@
           {
             "appid": 4172390,
             "name": "Dicevaders (Demo)",
-            "ccu": 22
+            "ccu": 28
           }
         ],
         "price": null,
@@ -327,7 +327,7 @@
       "release": "28 Sep, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.1636,
+      "spike_prob": 0.1624,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -431,7 +431,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0942,
+      "spike_prob": 0.0934,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -525,7 +525,7 @@
       "release": "29 Oct, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0901,
+      "spike_prob": 0.0894,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -594,18 +594,13 @@
         "website": "https://www.alkamegames.com",
         "siblings": [
           {
-            "appid": 4348350,
-            "name": "Drive With Friends (Demo)",
-            "ccu": 4
-          },
-          {
             "appid": 4091920,
             "name": "Schedule Store Simulator",
             "ccu": 4
           },
           {
-            "appid": 3354260,
-            "name": "TCG Multiplayer Card Shop Simulator",
+            "appid": 3119780,
+            "name": "Drive Thru Miami - Restaurant Simulator",
             "ccu": 1
           },
           {
@@ -614,8 +609,13 @@
             "ccu": 1
           },
           {
-            "appid": 3119780,
-            "name": "Drive Thru Miami - Restaurant Simulator",
+            "appid": 3354260,
+            "name": "TCG Multiplayer Card Shop Simulator",
+            "ccu": 1
+          },
+          {
+            "appid": 4348350,
+            "name": "Drive With Friends (Demo)",
             "ccu": 1
           },
           {
@@ -624,13 +624,13 @@
             "ccu": null
           },
           {
-            "appid": 3481370,
-            "name": "Firewheels Shop Simulator",
+            "appid": 4316750,
+            "name": "Roadside Reseal",
             "ccu": null
           },
           {
-            "appid": 4348060,
-            "name": "RV Still Friends?",
+            "appid": 3481370,
+            "name": "Firewheels Shop Simulator",
             "ccu": null
           }
         ],
@@ -648,7 +648,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0731,
+      "spike_prob": 0.073,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -729,7 +729,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0731,
+      "spike_prob": 0.073,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -811,7 +811,7 @@
       "release": "29 Sep, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0619,
+      "spike_prob": 0.0614,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -832,7 +832,7 @@
         }
       ],
       "active_signals": 5,
-      "demo_ccu": 3,
+      "demo_ccu": 4,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 2,
@@ -887,13 +887,13 @@
             "ccu": 12
           },
           {
-            "appid": 1424290,
-            "name": "MARS 2120",
-            "ccu": 2
-          },
-          {
             "appid": 4332880,
             "name": "Blades & Battles (Demo)",
+            "ccu": 4
+          },
+          {
+            "appid": 1424290,
+            "name": "MARS 2120",
             "ccu": 2
           },
           {
@@ -1018,7 +1018,7 @@
       "release": "Q3 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0464,
+      "spike_prob": 0.0463,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1171,85 +1171,6 @@
         "dlc_count": 0,
         "release": "Coming soon",
         "website": "https://deadzonegame.net",
-        "siblings": [],
-        "price": null,
-        "review": {
-          "positive": 0,
-          "total": 0,
-          "pct": null
-        }
-      }
-    },
-    {
-      "appid": 3910670,
-      "name": "AE: Archeological Expedition",
-      "release": "28 Sep, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.027,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "high"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 4,
-      "has_news": true,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": 0,
-      "is_free": false,
-      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3910670/d455d212c046812e46037ffcece3858b742f7856/header.jpg?t=1788366086",
-      "has_japanese": false,
-      "genres": [
-        "Casual",
-        "Indie",
-        "Strategy"
-      ],
-      "price": null,
-      "review": {
-        "positive": 0,
-        "total": 0,
-        "pct": null
-      },
-      "detail": {
-        "developers": [
-          "AKKA"
-        ],
-        "publishers": [
-          "AKKA"
-        ],
-        "genres": [
-          "Casual",
-          "Indie",
-          "Strategy"
-        ],
-        "categories": [
-          "Single-player",
-          "Steam Achievements",
-          "Full controller support",
-          "Adjustable Text Size",
-          "Camera Comfort",
-          "Custom Volume Controls",
-          "Keyboard Only Option"
-        ],
-        "dlc_count": 0,
-        "release": "28 Sep, 2026",
-        "website": "https://akkadev.games/",
         "siblings": [],
         "price": null,
         "review": {
@@ -1508,93 +1429,12 @@
       }
     },
     {
-      "appid": 4303680,
-      "name": "Car Factory Tycoon",
-      "release": "29 Sep, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0252,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "hot"
-        },
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 1,
-      "has_news": true,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4303680/66911d087c19f06221ae0f5fa32f1df6694f4b28/header.jpg?t=1790130016",
-      "has_japanese": false,
-      "genres": [
-        "Indie",
-        "Simulation",
-        "Strategy",
-        "Early Access"
-      ],
-      "price": null,
-      "review": {
-        "positive": 0,
-        "total": 0,
-        "pct": null
-      },
-      "detail": {
-        "developers": [
-          "Jomica"
-        ],
-        "publishers": [
-          "Jomica"
-        ],
-        "genres": [
-          "Indie",
-          "Simulation",
-          "Strategy",
-          "Early Access"
-        ],
-        "categories": [
-          "Single-player",
-          "Family Sharing"
-        ],
-        "dlc_count": 0,
-        "release": "29 Sep, 2026",
-        "website": "https://carfactorytycoon.com/",
-        "siblings": [],
-        "price": null,
-        "review": {
-          "positive": 0,
-          "total": 0,
-          "pct": null
-        }
-      }
-    },
-    {
       "appid": 4287480,
       "name": "Backrooms Protocol",
       "release": "September 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0241,
+      "spike_prob": 0.0239,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1679,12 +1519,89 @@
       }
     },
     {
+      "appid": 4008070,
+      "name": "Caravane",
+      "release": "Coming soon",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.022,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "web_reach",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": 0,
+      "web_views": null,
+      "web_reach": 2,
+      "is_free": false,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4008070/8122903c1c5b3d90c1da02f7971d33cab5b0b210/header.jpg?t=1770015326",
+      "has_japanese": false,
+      "genres": [
+        "Action",
+        "Casual"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "BloodyHand"
+        ],
+        "publishers": [
+          "BloodyHand"
+        ],
+        "genres": [
+          "Action",
+          "Casual"
+        ],
+        "categories": [
+          "Single-player",
+          "Steam Achievements",
+          "Keyboard Only Option",
+          "Playable without Timed Input",
+          "Save Anytime",
+          "Steam Cloud",
+          "Family Sharing"
+        ],
+        "dlc_count": 0,
+        "release": "Coming soon",
+        "website": null,
+        "siblings": [],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
       "appid": 3582120,
       "name": "Cohen 1939",
       "release": "29 Sep, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0221,
+      "spike_prob": 0.0219,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1777,7 +1694,7 @@
       "release": "29 Sep, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0221,
+      "spike_prob": 0.0219,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1864,89 +1781,12 @@
       }
     },
     {
-      "appid": 4008070,
-      "name": "Caravane",
-      "release": "Coming soon",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.022,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "web_reach",
-          "dir": "up",
-          "bucket": "low"
-        },
-        {
-          "name": "is_free",
-          "dir": "up",
-          "bucket": "paid"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": 0,
-      "web_views": null,
-      "web_reach": 2,
-      "is_free": false,
-      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4008070/8122903c1c5b3d90c1da02f7971d33cab5b0b210/header.jpg?t=1770015326",
-      "has_japanese": false,
-      "genres": [
-        "Action",
-        "Casual"
-      ],
-      "price": null,
-      "review": {
-        "positive": 0,
-        "total": 0,
-        "pct": null
-      },
-      "detail": {
-        "developers": [
-          "BloodyHand"
-        ],
-        "publishers": [
-          "BloodyHand"
-        ],
-        "genres": [
-          "Action",
-          "Casual"
-        ],
-        "categories": [
-          "Single-player",
-          "Steam Achievements",
-          "Keyboard Only Option",
-          "Playable without Timed Input",
-          "Save Anytime",
-          "Steam Cloud",
-          "Family Sharing"
-        ],
-        "dlc_count": 0,
-        "release": "Coming soon",
-        "website": null,
-        "siblings": [],
-        "price": null,
-        "review": {
-          "positive": 0,
-          "total": 0,
-          "pct": null
-        }
-      }
-    },
-    {
       "appid": 4853710,
       "name": "Borrow or Rob",
       "release": "Q3 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0185,
+      "spike_prob": 0.0183,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2034,7 +1874,7 @@
       "release": "28 Sep, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0172,
+      "spike_prob": 0.017,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2119,7 +1959,7 @@
       "release": "28 Sep, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0172,
+      "spike_prob": 0.017,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2192,7 +2032,7 @@
           {
             "appid": 5040030,
             "name": "Crawler 3D Demo",
-            "ccu": 1
+            "ccu": 3
           }
         ],
         "price": null,
@@ -2209,7 +2049,7 @@
       "release": "September 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0172,
+      "spike_prob": 0.017,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2299,7 +2139,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0172,
+      "spike_prob": 0.017,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2386,7 +2226,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0126,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2513,7 +2353,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0126,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2604,7 +2444,7 @@
       "release": "September 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0126,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2692,7 +2532,7 @@
       "release": "Q3 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0126,
+      "spike_prob": 0.0125,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2807,12 +2647,91 @@
       }
     },
     {
+      "appid": 3910670,
+      "name": "AE: Archeological Expedition",
+      "release": "28 Sep, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0099,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "high"
+        },
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 3,
+      "demo_ccu": 1,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 4,
+      "has_news": true,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": 0,
+      "is_free": false,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3910670/d455d212c046812e46037ffcece3858b742f7856/header.jpg?t=1788366086",
+      "has_japanese": false,
+      "genres": [
+        "Casual",
+        "Indie",
+        "Strategy"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "AKKA"
+        ],
+        "publishers": [
+          "AKKA"
+        ],
+        "genres": [
+          "Casual",
+          "Indie",
+          "Strategy"
+        ],
+        "categories": [
+          "Single-player",
+          "Steam Achievements",
+          "Full controller support",
+          "Adjustable Text Size",
+          "Camera Comfort",
+          "Custom Volume Controls",
+          "Keyboard Only Option"
+        ],
+        "dlc_count": 0,
+        "release": "28 Sep, 2026",
+        "website": "https://akkadev.games/",
+        "siblings": [],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
       "appid": 4895210,
       "name": "Crossfall",
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0096,
+      "spike_prob": 0.0095,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2892,6 +2811,87 @@
             "ccu": 1
           }
         ],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
+      "appid": 4303680,
+      "name": "Car Factory Tycoon",
+      "release": "29 Sep, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0092,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "hot"
+        },
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "is_free",
+          "dir": "up",
+          "bucket": "paid"
+        }
+      ],
+      "active_signals": 3,
+      "demo_ccu": 1,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 1,
+      "has_news": true,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4303680/66911d087c19f06221ae0f5fa32f1df6694f4b28/header.jpg?t=1790130016",
+      "has_japanese": false,
+      "genres": [
+        "Indie",
+        "Simulation",
+        "Strategy",
+        "Early Access"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "Jomica"
+        ],
+        "publishers": [
+          "Jomica"
+        ],
+        "genres": [
+          "Indie",
+          "Simulation",
+          "Strategy",
+          "Early Access"
+        ],
+        "categories": [
+          "Single-player",
+          "Family Sharing"
+        ],
+        "dlc_count": 0,
+        "release": "29 Sep, 2026",
+        "website": "https://carfactorytycoon.com/",
+        "siblings": [],
         "price": null,
         "review": {
           "positive": 0,
@@ -3445,7 +3445,7 @@
           {
             "appid": 4829240,
             "name": "BUDGE (Demo)",
-            "ccu": 4
+            "ccu": 2
           }
         ],
         "price": null,
@@ -3623,7 +3623,7 @@
           {
             "appid": 3245620,
             "name": "Color Fear (Demo)",
-            "ccu": 2
+            "ccu": 7
           }
         ],
         "price": null,
@@ -3699,7 +3699,7 @@
       "release": "Q3 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0053,
+      "spike_prob": 0.0052,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -5853,7 +5853,7 @@
           {
             "appid": 4348350,
             "name": "Drive With Friends (Demo)",
-            "ccu": 4
+            "ccu": 1
           },
           {
             "appid": 3119780,
@@ -6443,7 +6443,7 @@
       "release": "27 Sep, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0046,
+      "spike_prob": 0.0045,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -6532,7 +6532,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0045,
+      "spike_prob": 0.0044,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -6615,7 +6615,7 @@
       "release": "29 Sep, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0045,
+      "spike_prob": 0.0044,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -6695,7 +6695,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0045,
+      "spike_prob": 0.0044,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -6776,7 +6776,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0045,
+      "spike_prob": 0.0044,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -6892,7 +6892,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0045,
+      "spike_prob": 0.0044,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -7083,7 +7083,7 @@
       "release": "30 Sep, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0035,
+      "spike_prob": 0.0034,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -7175,7 +7175,7 @@
       "release": "Q3 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0035,
+      "spike_prob": 0.0034,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -14566,7 +14566,7 @@
           {
             "appid": 5265370,
             "name": "Cosmo Cat: A Cozy Desktop Idler (Demo)",
-            "ccu": 6
+            "ccu": 2
           }
         ],
         "price": null,
