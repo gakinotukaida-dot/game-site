@@ -2,7 +2,7 @@
   "view": "prediction_scorecard",
   "schema": "prediction_scorecard_v1",
   "note": "羽根予想の答え合わせ（as-of・リーク無し）。holdout=過去を70/30分割しtrainだけで学習しtestを採点（honestなバックテスト）。live=発売前に記録した予測→発売後の結果（最も硬い真のout-of-sample・日々増える）。calibration は「◯%と予測した群が実際に何%跳ねたか」＝予測と実測が近いほど信頼できる。",
-  "generated_at": "2026-09-27T11:05:23.516813+00:00",
+  "generated_at": "2026-09-28T12:26:43.850029+00:00",
   "params": {
     "lookback_days": 180,
     "outcome_days": 14,
@@ -18,20 +18,20 @@
     ]
   },
   "holdout": {
-    "n_pairs": 6148,
-    "train_n": 4366,
-    "test_n": 1782,
+    "n_pairs": 6172,
+    "train_n": 4386,
+    "test_n": 1786,
     "ready": true,
     "metrics": {
-      "n": 1782,
-      "hits": 47,
-      "base_rate": 0.02637,
+      "n": 1786,
+      "hits": 48,
+      "base_rate": 0.02688,
       "top_decile_n": 178,
-      "top_decile_rate": 0.19101,
-      "top_decile_lift": 7.24,
-      "brier": 0.02941,
-      "high_conf_n": 262,
-      "high_conf_rate": 0.13359
+      "top_decile_rate": 0.19663,
+      "top_decile_lift": 7.32,
+      "brier": 0.02915,
+      "high_conf_n": 261,
+      "high_conf_rate": 0.13793
     },
     "calibration": [
       {
@@ -39,8 +39,8 @@
           0.0,
           0.02
         ],
-        "n": 1081,
-        "pred_mean": 0.0077,
+        "n": 1084,
+        "pred_mean": 0.0078,
         "actual_rate": 0.0037
       },
       {
@@ -48,36 +48,36 @@
           0.02,
           0.05
         ],
-        "n": 251,
-        "pred_mean": 0.0312,
-        "actual_rate": 0.0159
+        "n": 235,
+        "pred_mean": 0.03,
+        "actual_rate": 0.017
       },
       {
         "range": [
           0.05,
           0.1
         ],
-        "n": 207,
-        "pred_mean": 0.0693,
-        "actual_rate": 0.0193
+        "n": 223,
+        "pred_mean": 0.0677,
+        "actual_rate": 0.0179
       },
       {
         "range": [
           0.1,
           0.2
         ],
-        "n": 134,
-        "pred_mean": 0.1528,
-        "actual_rate": 0.0597
+        "n": 139,
+        "pred_mean": 0.1561,
+        "actual_rate": 0.0576
       },
       {
         "range": [
           0.2,
           0.4
         ],
-        "n": 44,
-        "pred_mean": 0.2721,
-        "actual_rate": 0.1591
+        "n": 40,
+        "pred_mean": 0.2805,
+        "actual_rate": 0.175
       },
       {
         "range": [
@@ -85,8 +85,8 @@
           1.0
         ],
         "n": 65,
-        "pred_mean": 0.7371,
-        "actual_rate": 0.3077
+        "pred_mean": 0.7359,
+        "actual_rate": 0.3231
       }
     ],
     "examples": [
@@ -102,7 +102,7 @@
         "appid": 2764460,
         "name": "Sandustry",
         "release": "2026-08-13",
-        "pred": 0.9985,
+        "pred": 0.9984,
         "hit": true,
         "launch_peak": 12531
       },
@@ -110,7 +110,7 @@
         "appid": 3276050,
         "name": "SpaceCraft",
         "release": "2026-06-11",
-        "pred": 0.9929,
+        "pred": 0.9927,
         "hit": true,
         "launch_peak": 7685
       },
@@ -118,23 +118,15 @@
         "appid": 3219630,
         "name": "Halloween: The Game",
         "release": "2026-09-08",
-        "pred": 0.9809,
+        "pred": 0.9801,
         "hit": true,
         "launch_peak": 33611
-      },
-      {
-        "appid": 3070070,
-        "name": "TCG Card Shop Simulator",
-        "release": "2026-09-14",
-        "pred": 0.9742,
-        "hit": true,
-        "launch_peak": 12680
       },
       {
         "appid": 2001760,
         "name": "Beast of Reincarnation",
         "release": "2026-08-03",
-        "pred": 0.9721,
+        "pred": 0.9711,
         "hit": true,
         "launch_peak": 14995
       },
@@ -142,7 +134,7 @@
         "appid": 3971730,
         "name": "Donutal",
         "release": "2026-09-03",
-        "pred": 0.9705,
+        "pred": 0.9704,
         "hit": false,
         "launch_peak": 25
       },
@@ -150,7 +142,7 @@
         "appid": 2417470,
         "name": "Beastro",
         "release": "2026-06-11",
-        "pred": 0.9705,
+        "pred": 0.9704,
         "hit": false,
         "launch_peak": 657
       },
@@ -158,7 +150,7 @@
         "appid": 3804370,
         "name": "The Piper of Dawn",
         "release": "2026-09-22",
-        "pred": 0.9371,
+        "pred": 0.937,
         "hit": true,
         "launch_peak": 5043
       },
@@ -166,7 +158,7 @@
         "appid": 3199870,
         "name": "Road Diner Simulator: Prologue",
         "release": "2026-07-27",
-        "pred": 0.936,
+        "pred": 0.9347,
         "hit": false,
         "launch_peak": 185
       },
@@ -174,15 +166,23 @@
         "appid": 4259190,
         "name": "Kingdom Rush 6: Genesis TD",
         "release": "2026-09-24",
-        "pred": 0.9171,
+        "pred": 0.9152,
         "hit": true,
         "launch_peak": 15270
+      },
+      {
+        "appid": 3070070,
+        "name": "TCG Card Shop Simulator",
+        "release": "2026-09-14",
+        "pred": 0.8956,
+        "hit": true,
+        "launch_peak": 12680
       },
       {
         "appid": 3152750,
         "name": "Taival",
         "release": "2026-07-14",
-        "pred": 0.8965,
+        "pred": 0.8944,
         "hit": false,
         "launch_peak": 65
       },
@@ -190,7 +190,7 @@
         "appid": 3880400,
         "name": "FRUKT",
         "release": "2026-09-24",
-        "pred": 0.892,
+        "pred": 0.8882,
         "hit": false,
         "launch_peak": 154
       },
@@ -198,7 +198,7 @@
         "appid": 3576070,
         "name": "Sudden Attack Zero Point",
         "release": "2026-07-29",
-        "pred": 0.8641,
+        "pred": 0.8593,
         "hit": true,
         "launch_peak": 6855
       },
@@ -206,7 +206,7 @@
         "appid": 3939700,
         "name": "Treasure Beach",
         "release": "2026-06-20",
-        "pred": 0.8525,
+        "pred": 0.8521,
         "hit": false,
         "launch_peak": 416
       }
@@ -215,35 +215,35 @@
   "live": {
     "counts": {
       "settling": {
-        "n": 951,
+        "n": 844,
         "hits": 0
       },
       "pending": {
-        "n": 1406,
+        "n": 1428,
         "hits": 0
       },
       "resolved": {
-        "n": 2976,
-        "hits": 132
+        "n": 3051,
+        "hits": 134
       },
       "unobserved": {
-        "n": 1257,
+        "n": 1308,
         "hits": 0
       }
     },
-    "pending": 1406,
-    "settling": 951,
-    "resolved": 2976,
+    "pending": 1428,
+    "settling": 844,
+    "resolved": 3051,
     "metrics": {
-      "n": 2976,
-      "hits": 132,
-      "base_rate": 0.04435,
-      "top_decile_n": 297,
-      "top_decile_rate": 0.26936,
-      "top_decile_lift": 6.07,
-      "brier": 0.03387,
-      "high_conf_n": 226,
-      "high_conf_rate": 0.33186
+      "n": 3051,
+      "hits": 134,
+      "base_rate": 0.04392,
+      "top_decile_n": 305,
+      "top_decile_rate": 0.26557,
+      "top_decile_lift": 6.05,
+      "brier": 0.03359,
+      "high_conf_n": 231,
+      "high_conf_rate": 0.329
     },
     "calibration": [
       {
@@ -251,27 +251,27 @@
           0.0,
           0.02
         ],
-        "n": 2125,
+        "n": 2187,
         "pred_mean": 0.0054,
-        "actual_rate": 0.0108
+        "actual_rate": 0.011
       },
       {
         "range": [
           0.02,
           0.05
         ],
-        "n": 421,
+        "n": 425,
         "pred_mean": 0.0311,
-        "actual_rate": 0.0428
+        "actual_rate": 0.0424
       },
       {
         "range": [
           0.05,
           0.1
         ],
-        "n": 175,
+        "n": 179,
         "pred_mean": 0.0745,
-        "actual_rate": 0.08
+        "actual_rate": 0.0782
       },
       {
         "range": [
@@ -287,18 +287,18 @@
           0.2,
           0.4
         ],
-        "n": 62,
-        "pred_mean": 0.2781,
-        "actual_rate": 0.1935
+        "n": 64,
+        "pred_mean": 0.277,
+        "actual_rate": 0.1875
       },
       {
         "range": [
           0.4,
           1.0
         ],
-        "n": 122,
-        "pred_mean": 0.6824,
-        "actual_rate": 0.4836
+        "n": 125,
+        "pred_mean": 0.6792,
+        "actual_rate": 0.48
       }
     ],
     "examples": [
