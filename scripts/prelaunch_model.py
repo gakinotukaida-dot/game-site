@@ -50,7 +50,11 @@ if MODEL_KIND not in ("nb", "lr"):
     MODEL_KIND = "nb"   # 想定外の値は保守側（従来）へ倒す
 SHADOW_COMPARE = (os.environ.get("SHADOW_COMPARE") or "").strip().lower() in ("1", "true", "yes")
 # lr の正則化の候補（交差検証で1つ選ぶ）。大きいほど重みを0へ縮める＝材料の薄い区切りを控えめにする。
-LR_L2_GRID = [float(x) for x in (os.environ.get("LR_L2_GRID") or "0.3,1,3,10,30,100").split(",") if x.strip()]
+LR_L2_GRID = [float(x) for x in (os.environ.get("LR_L2_GRID") or "0.03,0.1,0.3,1,3,10,30,100").split(",") if x.strip()]
+# lr の係数をそろえる基準区切り（＝「材料なし」）。各特徴量でこの区切りの係数を0にし、差分は切片へ移す。
+# 予測値は変わらない（どの行も各特徴量でちょうど1つの区切りに入るため）。サイトの「押し上げ要因」が
+# 「材料なしとの差」を表すようにするため（1002-2042-G4：none に大きな係数が付き ▲ 表示が誤る）。
+LR_BASELINE_BUCKETS = ("none", "na", "paid")
 LR_FOLDS = int(os.environ.get("LR_FOLDS") or "5")
 # 較正帯（export_scorecard.CALIB_EDGES と同じ区切り＝サイトの較正表と同じ物差しで比べる）。
 CALIB_EDGES = [0.0, 0.02, 0.05, 0.10, 0.20, 0.40, 1.01]
@@ -260,9 +264,20 @@ def _fit_lr(rows, genre_rates, base, l2):
             break
     woe = {name: {} for name in F.FEATURE_NAMES}
     for (name, b), i in cols.items():
-        woe[name][b] = round(beta[i], 5)
+        woe[name][b] = beta[i]
+    # 基準区切り（材料なし）を0にそろえる。差分は切片へ。予測値は不変（各行は各特徴量でちょうど1区切り）。
+    intercept = beta[0]
+    for name, coefs in woe.items():
+        ref = next((b for b in LR_BASELINE_BUCKETS if b in coefs), None)
+        if ref is None:
+            continue
+        shift = coefs[ref]
+        for b in coefs:
+            coefs[b] -= shift
+        intercept += shift
+    woe = {name: {b: round(v, 5) for b, v in coefs.items()} for name, coefs in woe.items()}
     return {"kind": "lr", "base_rate": round(base, 6), "genre_rates": genre_rates, "woe": woe,
-            "intercept": round(beta[0], 6), "l2": l2, "iters": iters}
+            "intercept": round(intercept, 6), "l2": l2, "iters": iters}
 
 
 def _fold_of(appid, k):
@@ -479,10 +494,13 @@ def main():
     }
     # lr のときだけ足す（nb の JSON は従来と1バイトも変えない）。
     if model.get("kind") == "lr":
+        payload["schema"] = "prelaunch_model_v2"   # woe 欄の意味が変わる（命中率由来 → 回帰係数・材料なし＝0）ため版を上げる
         payload["kind"] = "lr"
         payload["intercept"] = model["intercept"]
         payload["l2"] = model["l2"]
         payload["cv"] = model.get("cv")
+        # 選ばれた正則化が候補の端なら、候補をさらに広げる価値がある（1002-2042-G4）。
+        payload["l2_at_edge"] = bool(LR_L2_GRID) and model["l2"] in (min(LR_L2_GRID), max(LR_L2_GRID))
         payload["note"] = ("羽根予想モデル（ロジスティック回帰・L2正則化・自社実績で学習）。全特徴量を同時に当てはめ、"
                            "重なった特徴量の効き目を分け合う。woe 欄は回帰係数（切片は intercept）。"
                            "強さ指標 top_decile_lift は 70/30 ホールドアウトの out-of-sample。readiness=collecting の間は控えめ運用。")

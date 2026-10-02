@@ -27,6 +27,9 @@ jobs:
       - name: Learn prelaunch model (DB read-only / JSON書き出し)
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # 1002-2042（本人承認）：ロジスティック回帰へ切り替え。影比較の初回は事前登録の条件で合格（土台 1002-2042-G4）。
+          # 戻し方＝この1行を消す（nb＝従来のスコアカードに戻る）。prediction_scorecard.yml の同じ行も一緒に消すこと。
+          MODEL_KIND: lr
           # LOOKBACK_DAYS: "180"
           # OUTCOME_DAYS: "14"
           # HIT_THRESHOLD: "1000"
