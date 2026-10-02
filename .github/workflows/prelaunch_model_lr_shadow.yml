@@ -1,0 +1,47 @@
+# 羽根予想モデルの「影」比較（ロジスティック回帰 lr を、いまのモデル nb の横に並べる）── 2026-10-02 追加
+# 置き場所: .github/workflows/prelaunch_model_lr_shadow.yml
+# 役割: 同じ 70/30 分割で nb と lr を学習し、test の較正帯・指標と事前登録の合格条件の判定を
+#       data/prelaunch_model_lr.json（shadow_compare 欄）に書き出す。サイト表示・答え合わせの記録は一切変えない
+#       （それらは data/prelaunch_model.json＝nb を読み続ける）。
+# 守る線: DBは読み取り専用（SELECTのみ）。書き込みは data/prelaunch_model_lr.json 1ファイルだけ・毎回上書き＝可逆。
+# 戻し方: このファイルと data/prelaunch_model_lr.json を消すだけ（他に影響なし）。
+# 切り替えるとき（本人確認のうえ・別PR）: prelaunch_model.yml と prediction_scorecard.yml の env に MODEL_KIND: lr を足す。
+name: prelaunch model shadow (lr vs nb)
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    # 1日1回 4:35 UTC（本番の学習 4:20 の後・export_upcoming 4:45 の前。本番の JSON には触らない）
+    - cron: "35 4 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  shadow:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install "psycopg2-binary>=2.9"
+      - name: Learn lr + compare with nb (DB read-only / 別JSONに書き出し)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          MODEL_KIND: lr
+          SHADOW_COMPARE: "1"
+          OUT_PATH: data/prelaunch_model_lr.json
+        run: python scripts/prelaunch_model.py
+      - name: Commit JSON（変更があるときだけ）
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/prelaunch_model_lr.json
+          if git diff --cached --quiet; then echo "変更なし＝コミットしない"; exit 0; fi
+          git commit -m "data: update prelaunch_model_lr.json (shadow)"
+          for i in 1 2 3; do
+            if git push; then echo "push成功"; exit 0; fi
+            echo "push失敗 → 取り込み直して再試行 ($i/3)"; git pull --rebase
+          done
+          echo "3回失敗。同時pushの衝突が続いている可能性 → ログ共有を"; exit 1
