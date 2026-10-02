@@ -26,6 +26,8 @@ jobs:
       - name: Build prediction scorecard (DB read-only / JSON書き出し)
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # holdout の採点を、サイトに出しているモデルと同じ方式にそろえる（prelaunch_model.yml の MODEL_KIND と必ず一致させる）。
+          MODEL_KIND: lr
           # LOOKBACK_DAYS: "180"
           # OUTCOME_DAYS: "14"
           # HIT_THRESHOLD: "1000"

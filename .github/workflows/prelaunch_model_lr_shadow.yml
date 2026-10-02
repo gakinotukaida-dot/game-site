@@ -2,10 +2,11 @@
 # 置き場所: .github/workflows/prelaunch_model_lr_shadow.yml
 # 役割: 同じ 70/30 分割で nb と lr を学習し、test の較正帯・指標と事前登録の合格条件の判定を
 #       data/prelaunch_model_lr.json（shadow_compare 欄）に書き出す。サイト表示・答え合わせの記録は一切変えない
-#       （それらは data/prelaunch_model.json＝nb を読み続ける）。
+#       （それらは data/prelaunch_model.json を読む。2026-10-02 の切り替え後はそちらも lr。本ワークフローは
+#        切り替え後も「nb と比べてまだ勝っているか」の見張りとして残す）。
 # 守る線: DBは読み取り専用（SELECTのみ）。書き込みは data/prelaunch_model_lr.json 1ファイルだけ・毎回上書き＝可逆。
 # 戻し方: このファイルと data/prelaunch_model_lr.json を消すだけ（他に影響なし）。
-# 切り替えるとき（本人確認のうえ・別PR）: prelaunch_model.yml と prediction_scorecard.yml の env に MODEL_KIND: lr を足す。
+# 切り替え（2026-10-02・別PR）: prelaunch_model.yml と prediction_scorecard.yml の env に MODEL_KIND: lr。戻すときは両方の行を消す。
 name: prelaunch model shadow (lr vs nb)
 
 on:
