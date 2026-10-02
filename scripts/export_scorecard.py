@@ -160,7 +160,7 @@ def holdout_scorecard(cur):
         return {"n_pairs": n_pairs, "train_n": len(train), "test_n": len(test),
                 "ready": False, "note": "分割後の件数が少なく honest な採点に不足（収集中）。"}
 
-    m_tr = M.learn(train, base=base)   # ★train だけで学習（test はモデルが未知＝OOS）
+    m_tr = M.learn_model(train, base=base)   # ★train だけで学習（test はモデルが未知＝OOS）。方式は MODEL_KIND に従う（既定 nb＝従来どおり）
     scored = []
     examples = []
     for r in test:

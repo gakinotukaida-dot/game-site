@@ -208,7 +208,12 @@ def score(model, sql_values, genres):
     base = model.get("base_rate") or 0.0
     woe = model.get("woe") or {}
     genre_rates = model.get("genre_rates") or {}
-    lg = logit(base)
+    # kind=lr（ロジスティック回帰・MODEL_KIND=lr で学習）のときは切片から始める。woe 欄には同じ形
+    # （特徴量→bucket→重み）で回帰係数が入っている＝以降の合算・内訳の出し方は共通。kind が無ければ従来（nb）。
+    if model.get("kind") == "lr" and model.get("intercept") is not None:
+        lg = float(model["intercept"])
+    else:
+        lg = logit(base)
     factors = []
     active = 0
     for name in FEATURE_NAMES:
