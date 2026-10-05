@@ -2,7 +2,7 @@
   "view": "prelaunch_model",
   "schema": "prelaunch_model_v2",
   "note": "羽根予想モデル（ロジスティック回帰・L2正則化・自社実績で学習）。全特徴量を同時に当てはめ、重なった特徴量の効き目を分け合う。woe 欄は回帰係数（切片は intercept）。強さ指標 top_decile_lift は 70/30 ホールドアウトの out-of-sample。readiness=collecting の間は控えめ運用。",
-  "generated_at": "2026-10-04T10:43:11.577042+00:00",
+  "generated_at": "2026-10-05T11:45:54.973084+00:00",
   "params": {
     "lookback_days": 180,
     "outcome_days": 14,
@@ -11,9 +11,9 @@
     "min_pairs": 300
   },
   "readiness": "validated",
-  "n_pairs": 7207,
-  "hits": 306,
-  "base_rate": 0.042459,
+  "n_pairs": 7270,
+  "hits": 310,
+  "base_rate": 0.042641,
   "features": [
     "demo_ccu",
     "twitch_peak",
@@ -29,209 +29,209 @@
   ],
   "woe": {
     "demo_ccu": {
-      "high": 4.4001,
-      "low": -1.58217,
-      "mid": 1.36518,
+      "high": 4.42084,
+      "low": -1.59716,
+      "mid": 1.35838,
       "none": 0.0
     },
     "twitch_peak": {
-      "high": 3.3394,
-      "low": 3.13742,
-      "mid": 3.43903,
+      "high": 3.32538,
+      "low": 3.13504,
+      "mid": 3.41442,
       "none": 0.0
     },
     "streamers": {
       "none": 0.0
     },
     "news_count": {
-      "high": 2.16017,
-      "low": 1.38271,
+      "high": 2.16342,
+      "low": 1.33921,
       "none": 0.0
     },
     "web_news": {
-      "high": -0.58175,
-      "low": 0.05338,
-      "mid": -1.19062,
+      "high": -0.54112,
+      "low": 0.08112,
+      "mid": -1.10702,
       "none": 0.0
     },
     "web_views": {
-      "high": 2.5654,
-      "low": -0.10997,
-      "mid": 0.71862,
+      "high": 2.58312,
+      "low": -0.05277,
+      "mid": 0.74796,
       "none": 0.0
     },
     "web_reach": {
-      "high": 0.1439,
-      "low": 1.84504,
-      "mid": 1.73005,
+      "high": 0.08754,
+      "low": 1.63774,
+      "mid": 1.64628,
       "none": 0.0
     },
     "dev_best_peak": {
-      "high": 1.19013,
-      "low": -0.16204,
-      "mid": 0.70105,
+      "high": 1.19236,
+      "low": -0.0971,
+      "mid": 0.83606,
       "none": 0.0
     },
     "dev_best_reviews": {
-      "high": 1.80561,
-      "low": 0.32607,
+      "high": 1.73725,
+      "low": 0.24689,
       "none": 0.0
     },
     "is_free": {
-      "free": -0.10482,
+      "free": -0.12219,
       "paid": 0.0
     },
     "genre": {
-      "cold": 0.85418,
-      "hot": 2.05814,
+      "cold": 0.9446,
+      "hot": 2.05598,
       "na": 0.0,
-      "warm": 1.07265
+      "warm": 1.08151
     }
   },
   "genre_rates": {
-    "Adventure": {
-      "n": 2258,
-      "hits": 112,
-      "rate": 0.04958
-    },
     "Casual": {
-      "n": 3256,
-      "hits": 107,
-      "rate": 0.03289
-    },
-    "Simulation": {
-      "n": 2297,
-      "hits": 144,
-      "rate": 0.06262
+      "n": 3286,
+      "hits": 109,
+      "rate": 0.03319
     },
     "Action": {
-      "n": 2229,
+      "n": 2248,
       "hits": 134,
-      "rate": 0.06005
+      "rate": 0.05955
     },
     "Indie": {
-      "n": 5163,
-      "hits": 164,
-      "rate": 0.03178
+      "n": 5210,
+      "hits": 167,
+      "rate": 0.03207
+    },
+    "Simulation": {
+      "n": 2318,
+      "hits": 146,
+      "rate": 0.06292
     },
     "Strategy": {
-      "n": 1960,
-      "hits": 83,
-      "rate": 0.04235
-    },
-    "Sports": {
-      "n": 268,
-      "hits": 18,
-      "rate": 0.06645
-    },
-    "Early Access": {
-      "n": 984,
-      "hits": 45,
-      "rate": 0.04571
-    },
-    "Massively Multiplayer": {
-      "n": 180,
-      "hits": 21,
-      "rate": 0.11351
-    },
-    "Free To Play": {
-      "n": 904,
-      "hits": 30,
-      "rate": 0.03327
+      "n": 1979,
+      "hits": 84,
+      "rate": 0.04245
     },
     "RPG": {
-      "n": 1432,
-      "hits": 121,
-      "rate": 0.08426
+      "n": 1439,
+      "hits": 123,
+      "rate": 0.08524
     },
-    "Racing": {
-      "n": 156,
-      "hits": 6,
-      "rate": 0.03866
+    "Early Access": {
+      "n": 992,
+      "hits": 45,
+      "rate": 0.04534
     },
-    "Utilities": {
-      "n": 78,
-      "hits": 2,
-      "rate": 0.02721
-    },
-    "Video Production": {
-      "n": 11,
-      "hits": 0,
-      "rate": 0.01788
+    "Free To Play": {
+      "n": 908,
+      "hits": 30,
+      "rate": 0.03312
     },
     "Animation & Modeling": {
       "n": 18,
       "hits": 1,
-      "rate": 0.05153
+      "rate": 0.05158
     },
     "Audio Production": {
       "n": 14,
       "hits": 0,
-      "rate": 0.01544
+      "rate": 0.01551
     },
-    "Education": {
-      "n": 8,
+    "Video Production": {
+      "n": 11,
       "hits": 0,
-      "rate": 0.02123
+      "rate": 0.01795
     },
-    "Software Training": {
-      "n": 2,
-      "hits": 0,
-      "rate": 0.03397
+    "Adventure": {
+      "n": 2270,
+      "hits": 113,
+      "rate": 0.04975
+    },
+    "Utilities": {
+      "n": 78,
+      "hits": 2,
+      "rate": 0.02722
+    },
+    "Sports": {
+      "n": 271,
+      "hits": 18,
+      "rate": 0.06574
+    },
+    "Racing": {
+      "n": 157,
+      "hits": 6,
+      "rate": 0.03843
+    },
+    "Massively Multiplayer": {
+      "n": 181,
+      "hits": 21,
+      "rate": 0.11292
     },
     "Design & Illustration": {
       "n": 21,
       "hits": 0,
-      "rate": 0.01171
+      "rate": 0.01176
     },
-    "Game Development": {
-      "n": 17,
-      "hits": 1,
-      "rate": 0.05359
+    "Education": {
+      "n": 8,
+      "hits": 0,
+      "rate": 0.02132
     },
     "Photo Editing": {
       "n": 5,
       "hits": 0,
-      "rate": 0.02613
+      "rate": 0.02624
+    },
+    "Game Development": {
+      "n": 17,
+      "hits": 1,
+      "rate": 0.05365
     },
     "Web Publishing": {
       "n": 2,
       "hits": 1,
-      "rate": 0.13397
+      "rate": 0.13411
+    },
+    "Software Training": {
+      "n": 2,
+      "hits": 0,
+      "rate": 0.03411
     }
   },
   "validation_oos": {
-    "eval_n": 2079,
-    "eval_base": 0.03656,
-    "top_decile_rate": 0.23188,
-    "top_decile_lift": 6.34,
-    "mean_prob_hit": 0.27965,
-    "mean_prob_miss": 0.03278
+    "eval_n": 2101,
+    "eval_base": 0.03665,
+    "top_decile_rate": 0.23333,
+    "top_decile_lift": 6.37,
+    "mean_prob_hit": 0.28318,
+    "mean_prob_miss": 0.03289
   },
   "feature_report": {
     "demo_ccu": {
       "high": {
-        "n": 24,
-        "hits": 23,
-        "rate": 0.9583,
-        "woe": 4.4001
+        "n": 25,
+        "hits": 24,
+        "rate": 0.96,
+        "woe": 4.42084
       },
       "low": {
-        "n": 1183,
+        "n": 1197,
         "hits": 17,
-        "rate": 0.0144,
-        "woe": -1.58217
+        "rate": 0.0142,
+        "woe": -1.59716
       },
       "mid": {
         "n": 162,
         "hits": 50,
         "rate": 0.3086,
-        "woe": 1.36518
+        "woe": 1.35838
       },
       "none": {
-        "n": 5838,
-        "hits": 216,
-        "rate": 0.037,
+        "n": 5886,
+        "hits": 219,
+        "rate": 0.0372,
         "woe": 0.0
       }
     },
@@ -240,52 +240,52 @@
         "n": 4,
         "hits": 4,
         "rate": 1.0,
-        "woe": 3.3394
+        "woe": 3.32538
       },
       "low": {
         "n": 1,
         "hits": 1,
         "rate": 1.0,
-        "woe": 3.13742
+        "woe": 3.13504
       },
       "mid": {
         "n": 2,
         "hits": 2,
         "rate": 1.0,
-        "woe": 3.43903
+        "woe": 3.41442
       },
       "none": {
-        "n": 7200,
-        "hits": 299,
-        "rate": 0.0415,
+        "n": 7263,
+        "hits": 303,
+        "rate": 0.0417,
         "woe": 0.0
       }
     },
     "streamers": {
       "none": {
-        "n": 7207,
-        "hits": 306,
-        "rate": 0.0425,
+        "n": 7270,
+        "hits": 310,
+        "rate": 0.0426,
         "woe": 0.0
       }
     },
     "news_count": {
       "high": {
-        "n": 1333,
-        "hits": 184,
-        "rate": 0.138,
-        "woe": 2.16017
+        "n": 1348,
+        "hits": 189,
+        "rate": 0.1402,
+        "woe": 2.16342
       },
       "low": {
-        "n": 1405,
-        "hits": 71,
-        "rate": 0.0505,
-        "woe": 1.38271
+        "n": 1412,
+        "hits": 69,
+        "rate": 0.0489,
+        "woe": 1.33921
       },
       "none": {
-        "n": 4469,
-        "hits": 51,
-        "rate": 0.0114,
+        "n": 4510,
+        "hits": 52,
+        "rate": 0.0115,
         "woe": 0.0
       }
     },
@@ -294,24 +294,24 @@
         "n": 32,
         "hits": 5,
         "rate": 0.1562,
-        "woe": -0.58175
+        "woe": -0.54112
       },
       "low": {
         "n": 55,
         "hits": 11,
         "rate": 0.2,
-        "woe": 0.05338
+        "woe": 0.08112
       },
       "mid": {
         "n": 24,
         "hits": 4,
         "rate": 0.1667,
-        "woe": -1.19062
+        "woe": -1.10702
       },
       "none": {
-        "n": 7096,
-        "hits": 286,
-        "rate": 0.0403,
+        "n": 7159,
+        "hits": 290,
+        "rate": 0.0405,
         "woe": 0.0
       }
     },
@@ -320,24 +320,24 @@
         "n": 45,
         "hits": 20,
         "rate": 0.4444,
-        "woe": 2.5654
+        "woe": 2.58312
       },
       "low": {
-        "n": 439,
-        "hits": 24,
-        "rate": 0.0547,
-        "woe": -0.10997
+        "n": 441,
+        "hits": 25,
+        "rate": 0.0567,
+        "woe": -0.05277
       },
       "mid": {
         "n": 150,
         "hits": 22,
         "rate": 0.1467,
-        "woe": 0.71862
+        "woe": 0.74796
       },
       "none": {
-        "n": 6573,
-        "hits": 240,
-        "rate": 0.0365,
+        "n": 6634,
+        "hits": 243,
+        "rate": 0.0366,
         "woe": 0.0
       }
     },
@@ -346,175 +346,175 @@
         "n": 29,
         "hits": 5,
         "rate": 0.1724,
-        "woe": 0.1439
+        "woe": 0.08754
       },
       "low": {
-        "n": 32,
+        "n": 33,
         "hits": 12,
-        "rate": 0.375,
-        "woe": 1.84504
+        "rate": 0.3636,
+        "woe": 1.63774
       },
       "mid": {
         "n": 16,
         "hits": 8,
         "rate": 0.5,
-        "woe": 1.73005
+        "woe": 1.64628
       },
       "none": {
-        "n": 7130,
-        "hits": 281,
-        "rate": 0.0394,
+        "n": 7192,
+        "hits": 285,
+        "rate": 0.0396,
         "woe": 0.0
       }
     },
     "dev_best_peak": {
       "high": {
-        "n": 29,
+        "n": 30,
         "hits": 15,
-        "rate": 0.5172,
-        "woe": 1.19013
+        "rate": 0.5,
+        "woe": 1.19236
       },
       "low": {
-        "n": 2254,
-        "hits": 126,
-        "rate": 0.0559,
-        "woe": -0.16204
+        "n": 2278,
+        "hits": 127,
+        "rate": 0.0558,
+        "woe": -0.0971
       },
       "mid": {
-        "n": 76,
-        "hits": 33,
-        "rate": 0.4342,
-        "woe": 0.70105
+        "n": 77,
+        "hits": 34,
+        "rate": 0.4416,
+        "woe": 0.83606
       },
       "none": {
-        "n": 4848,
-        "hits": 132,
-        "rate": 0.0272,
+        "n": 4885,
+        "hits": 134,
+        "rate": 0.0274,
         "woe": 0.0
       }
     },
     "dev_best_reviews": {
       "high": {
-        "n": 467,
-        "hits": 112,
-        "rate": 0.2398,
-        "woe": 1.80561
+        "n": 474,
+        "hits": 114,
+        "rate": 0.2405,
+        "woe": 1.73725
       },
       "low": {
-        "n": 1826,
+        "n": 1846,
         "hits": 63,
-        "rate": 0.0345,
-        "woe": 0.32607
+        "rate": 0.0341,
+        "woe": 0.24689
       },
       "none": {
-        "n": 4914,
-        "hits": 131,
-        "rate": 0.0267,
+        "n": 4950,
+        "hits": 133,
+        "rate": 0.0269,
         "woe": 0.0
       }
     },
     "is_free": {
       "free": {
-        "n": 1667,
+        "n": 1684,
         "hits": 32,
-        "rate": 0.0192,
-        "woe": -0.10482
+        "rate": 0.019,
+        "woe": -0.12219
       },
       "paid": {
-        "n": 5540,
-        "hits": 274,
-        "rate": 0.0495,
+        "n": 5586,
+        "hits": 278,
+        "rate": 0.0498,
         "woe": 0.0
       }
     },
     "genre": {
       "cold": {
-        "n": 801,
-        "hits": 11,
-        "rate": 0.0137,
-        "woe": 0.85418
+        "n": 810,
+        "hits": 12,
+        "rate": 0.0148,
+        "woe": 0.9446
       },
       "hot": {
-        "n": 1748,
-        "hits": 144,
-        "rate": 0.0824,
-        "woe": 2.05814
+        "n": 1758,
+        "hits": 146,
+        "rate": 0.083,
+        "woe": 2.05598
       },
       "na": {
-        "n": 67,
+        "n": 69,
         "hits": 0,
         "rate": 0.0,
         "woe": 0.0
       },
       "warm": {
-        "n": 4591,
-        "hits": 151,
-        "rate": 0.0329,
-        "woe": 1.07265
+        "n": 4633,
+        "hits": 152,
+        "rate": 0.0328,
+        "woe": 1.08151
       }
     }
   },
   "kind": "lr",
-  "intercept": -6.015349,
+  "intercept": -6.010503,
   "l2": 0.3,
   "cv": [
     {
       "l2": 0.03,
-      "logloss": 0.121263
+      "logloss": 0.121323
     },
     {
       "l2": 0.1,
-      "logloss": 0.121137
+      "logloss": 0.121198
     },
     {
       "l2": 0.3,
-      "logloss": 0.121067
+      "logloss": 0.121123
     },
     {
       "l2": 1.0,
-      "logloss": 0.121266
+      "logloss": 0.121292
     },
     {
       "l2": 3.0,
-      "logloss": 0.122266
+      "logloss": 0.12223
     },
     {
       "l2": 10.0,
-      "logloss": 0.125198
+      "logloss": 0.125108
     },
     {
       "l2": 30.0,
-      "logloss": 0.130788
+      "logloss": 0.13069
     },
     {
       "l2": 100.0,
-      "logloss": 0.142724
+      "logloss": 0.142668
     }
   ],
   "l2_at_edge": false,
   "shadow_compare": {
     "split": {
-      "train_n": 5128,
-      "test_n": 2079
+      "train_n": 5169,
+      "test_n": 2101
     },
     "models": {
       "nb": {
         "metrics": {
-          "n": 2079,
-          "hits": 76,
-          "base_rate": 0.03656,
-          "top_decile_lift": 6.21,
-          "brier": 0.036863,
+          "n": 2101,
+          "hits": 77,
+          "base_rate": 0.03665,
+          "top_decile_lift": 6.63,
+          "brier": 0.03667,
           "top_band": {
-            "n": 95,
-            "pred_mean": 0.7617,
-            "actual_rate": 0.3579,
-            "abs_gap": 0.4038
+            "n": 96,
+            "pred_mean": 0.7689,
+            "actual_rate": 0.3646,
+            "abs_gap": 0.4044
           },
           "top_decile_ref": {
-            "n": 207,
-            "pred_mean": 0.4648,
-            "actual_rate": 0.2271
+            "n": 210,
+            "pred_mean": 0.4695,
+            "actual_rate": 0.2429
           }
         },
         "calibration": [
@@ -523,18 +523,18 @@
               0.0,
               0.02
             ],
-            "n": 1361,
-            "pred_mean": 0.0065,
-            "actual_rate": 0.0066
+            "n": 1376,
+            "pred_mean": 0.0066,
+            "actual_rate": 0.0065
           },
           {
             "range": [
               0.02,
               0.05
             ],
-            "n": 333,
-            "pred_mean": 0.0376,
-            "actual_rate": 0.03
+            "n": 335,
+            "pred_mean": 0.0375,
+            "actual_rate": 0.0299
           },
           {
             "range": [
@@ -542,7 +542,7 @@
               0.1
             ],
             "n": 74,
-            "pred_mean": 0.0701,
+            "pred_mean": 0.0704,
             "actual_rate": 0.0135
           },
           {
@@ -550,47 +550,47 @@
               0.1,
               0.2
             ],
-            "n": 164,
-            "pred_mean": 0.1299,
-            "actual_rate": 0.0793
+            "n": 156,
+            "pred_mean": 0.1283,
+            "actual_rate": 0.0769
           },
           {
             "range": [
               0.2,
               0.4
             ],
-            "n": 52,
-            "pred_mean": 0.2861,
-            "actual_rate": 0.1731
+            "n": 64,
+            "pred_mean": 0.275,
+            "actual_rate": 0.1562
           },
           {
             "range": [
               0.4,
               1.0
             ],
-            "n": 95,
-            "pred_mean": 0.7617,
-            "actual_rate": 0.3579
+            "n": 96,
+            "pred_mean": 0.7689,
+            "actual_rate": 0.3646
           }
         ]
       },
       "lr": {
         "metrics": {
-          "n": 2079,
-          "hits": 76,
-          "base_rate": 0.03656,
-          "top_decile_lift": 6.34,
-          "brier": 0.028009,
+          "n": 2101,
+          "hits": 77,
+          "base_rate": 0.03665,
+          "top_decile_lift": 6.37,
+          "brier": 0.027894,
           "top_band": {
-            "n": 44,
-            "pred_mean": 0.6172,
-            "actual_rate": 0.5,
-            "abs_gap": 0.1172
+            "n": 43,
+            "pred_mean": 0.6249,
+            "actual_rate": 0.5116,
+            "abs_gap": 0.1133
           },
           "top_decile_ref": {
-            "n": 207,
-            "pred_mean": 0.2556,
-            "actual_rate": 0.2319
+            "n": 210,
+            "pred_mean": 0.2586,
+            "actual_rate": 0.2333
           }
         },
         "calibration": [
@@ -599,8 +599,8 @@
               0.0,
               0.02
             ],
-            "n": 1392,
-            "pred_mean": 0.0093,
+            "n": 1414,
+            "pred_mean": 0.0095,
             "actual_rate": 0.0057
           },
           {
@@ -609,7 +609,7 @@
               0.05
             ],
             "n": 279,
-            "pred_mean": 0.0295,
+            "pred_mean": 0.0303,
             "actual_rate": 0.0358
           },
           {
@@ -617,71 +617,71 @@
               0.05,
               0.1
             ],
-            "n": 196,
-            "pred_mean": 0.0625,
-            "actual_rate": 0.0459
+            "n": 193,
+            "pred_mean": 0.0604,
+            "actual_rate": 0.0466
           },
           {
             "range": [
               0.1,
               0.2
             ],
-            "n": 133,
-            "pred_mean": 0.1232,
-            "actual_rate": 0.1203
+            "n": 134,
+            "pred_mean": 0.1249,
+            "actual_rate": 0.1194
           },
           {
             "range": [
               0.2,
               0.4
             ],
-            "n": 35,
-            "pred_mean": 0.2827,
-            "actual_rate": 0.3143
+            "n": 38,
+            "pred_mean": 0.2951,
+            "actual_rate": 0.3158
           },
           {
             "range": [
               0.4,
               1.0
             ],
-            "n": 44,
-            "pred_mean": 0.6172,
-            "actual_rate": 0.5
+            "n": 43,
+            "pred_mean": 0.6249,
+            "actual_rate": 0.5116
           }
         ],
         "l2": 0.3,
         "cv": [
           {
             "l2": 0.03,
-            "logloss": 0.125944
+            "logloss": 0.126081
           },
           {
             "l2": 0.1,
-            "logloss": 0.125701
+            "logloss": 0.125851
           },
           {
             "l2": 0.3,
-            "logloss": 0.125562
+            "logloss": 0.125728
           },
           {
             "l2": 1.0,
-            "logloss": 0.125933
+            "logloss": 0.126111
           },
           {
             "l2": 3.0,
-            "logloss": 0.127525
+            "logloss": 0.127705
           },
           {
             "l2": 10.0,
-            "logloss": 0.131678
+            "logloss": 0.131883
           },
           {
             "l2": 30.0,
-            "logloss": 0.138965
+            "logloss": 0.139189
           },
           {
             "l2": 100.0,
-            "logloss": 0.152902
+            "logloss": 0.153162
           }
         ]
       }
