@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- 多層防御：XSS成立時の外部送信/改ざんを制限（本体のXSS対策は esc()/safeUrl()）。GA有効化時は script-src/connect-src に測定ドメインを追加すること。 -->
 <!-- frame-ancestors はメタでは無視されるため除外（Pagesはヘッダ不可＝クリックジャッキング対策は前段CDNで別途）。 -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; img-src 'self' data: https://cdn.cloudflare.steamstatic.com https://shared.cloudflare.steamstatic.com https://*.steamstatic.com https://*.akamaihd.net; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; img-src 'self' data: https://cdn.cloudflare.steamstatic.com https://shared.cloudflare.steamstatic.com https://*.steamstatic.com https://*.akamaihd.net; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com">
 <meta name="referrer" content="no-referrer">
 <title>トレパ / Trend Pulse — Steam発見レーダー</title>
 <link rel="alternate" type="application/rss+xml" title="トレパ — いつもより伸びているPCゲーム" href="./data/rising_feed.xml">
@@ -830,7 +830,7 @@ const I18N={
  "foot.rss":{ja:"RSS（伸びフィード）",en:"RSS (rising feed)"},"foot.pp":{ja:"プライバシーポリシー（未設定）",en:"Privacy Policy (not set)"},
  "foot.cookie":{ja:"Cookie設定",en:"Cookie settings"},
  // 9A GA を有効化するまではこちらを出す（「未設定」と書く代わりに、実際に何をしていないかを書く）
- "foot.priv":{ja:"アクセス解析なし・端末内保存（お気に入り・設定）のみ",en:"No analytics · stored on your device only (favorites & settings)"},"foot.obs":{ja:"観測記録（Steam公式API）",en:"Observations (Steam official API)"},
+ "foot.priv":{ja:"アクセス解析（Cloudflare Web Analytics）・端末内保存（お気に入り・設定）",en:"Analytics (Cloudflare Web Analytics) · stored on your device (favorites & settings)"},"foot.ppset":{ja:"プライバシーとアクセス解析について",en:"Privacy & analytics"},"foot.obs":{ja:"観測記録（Steam公式API）",en:"Observations (Steam official API)"},
  "cookie.title":{ja:"Cookieの使用について",en:"About cookies"},
  "cookie.body":{ja:"利用状況の分析(Google Analytics)にCookieを使います。同意する場合のみ有効化します。",en:"We use cookies for usage analytics (Google Analytics), enabled only with your consent."},
  "cookie.accept":{ja:"同意する",en:"Accept"},"cookie.decline":{ja:"拒否する",en:"Decline"},
@@ -1902,7 +1902,7 @@ async function loadRising(){
   if(current==="2"){ buildGenreChips(); render("2"); }
 }
 // === Cookie 同意（オプトイン：同意まで GA を読み込まない） ===
-const CONSENT_KEY="radar_consent_v1", MEASUREMENT_ID="G-XXXXXXXXXX", PP_URL="";
+const CONSENT_KEY="radar_consent_v1", MEASUREMENT_ID="G-XXXXXXXXXX", PP_URL="./privacy.html";
 // 掲載オプトアウトの連絡先：公開前にオーナーが設定（mailto:xxx@example.com か Googleフォーム等のURL）。未設定なら文言のみ表示。
 const CONTACT_URL="";
 // 9A GA を実際に読み込むだけの設定（測定ID）が入っているか。プレースホルダのままなら「使っていない」。
@@ -1916,7 +1916,7 @@ function setConsent(v){ consent={analytics:v,ts:Date.now()}; try{localStorage.se
 document.getElementById("ckAccept").addEventListener("click",()=>setConsent(true));
 document.getElementById("ckDecline").addEventListener("click",()=>setConsent(false));
 document.getElementById("cookieSettings").addEventListener("click",e=>{ e.preventDefault(); showCookie(true); });
-if(PP_URL){ const pp=document.getElementById("ppLink"); pp.href=PP_URL; pp.textContent="プライバシーポリシー"; pp.onclick=null; }
+if(PP_URL){ const pp=document.getElementById("ppLink"); pp.href=PP_URL; pp.setAttribute("data-i18n","foot.ppset"); pp.textContent=t("foot.ppset"); pp.onclick=null; pp.removeAttribute("onclick"); }
 // 9A GA未使用のあいだは「プライバシーポリシー（未設定）」をやめ、実態を1行で書く。
 //    併せて「Cookie設定」も消す（開いても同意する対象が無い）。GA を入れるときは MEASUREMENT_ID を
 //    実IDにするだけで、バナー・Cookie設定・ポリシー欄がそのまま戻る。
@@ -2020,5 +2020,6 @@ loadScorecard();
 if(consent&&consent.analytics) loadGA();
 showCookie(false);   // 初回のみ Cookie バナー表示（同意まで GA 非読込）
 </script>
+<!-- Cloudflare Web Analytics（閲覧数の集計・説明は privacy.html）。外すときはこの1行と CSP の2語を消す --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "84c714689a234400baa65095f713e17b"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
