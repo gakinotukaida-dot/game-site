@@ -256,6 +256,11 @@
     .row2{gap:0 9px;padding:11px 0}
     .r2rank{min-width:16px;font-size:12px}
     .r2top .title{font-size:14.5px}
+    /* 1006-0746：スマホでは作品名が10字前後で切れて読めなかった。2行まで折り返し、それでも長ければ2行目の末尾で切る。 */
+    .r2top{flex-wrap:wrap;row-gap:2px}
+    .r2top .title{flex-basis:100%}            /* 作品名に行の幅をまるごと使わせる。数値は次の行の右に回る */
+    .r2top .r2primary{margin-left:auto}
+    .title,.heroname{white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;overflow-wrap:anywhere;line-height:1.3}
     .r2top{gap:7px}
     .cover{width:60px;height:28px}
     .coverthumb{width:60px;height:28px}
@@ -306,7 +311,9 @@
   /* ⑮ ビュー見出し（h2）を廃してタブに統合したので、この行は
      「お気に入り切替（★があるときだけ）＋🔍」の道具の行になる。 */
   .viewhead{display:flex;align-items:center;gap:12px;margin:8px 0 2px;min-height:26px}
-  .viewhead #qToggle{margin-left:auto}
+  /* 1006-0746：🔍はタブ行へ移した。お気に入りが無いときこの行は空になるので畳む（1行ぶん一覧が上がる）。 */
+  .viewhead:has(> #favSeg[hidden]){display:none}
+  .navrow #qToggle{margin:0 0 5px}
   .qtoggle{appearance:none;background:transparent;border:1px solid var(--line);border-radius:999px;color:var(--ink-faint);
     font-size:12px;line-height:1;padding:6px 10px;cursor:pointer;transition:.2s;flex-shrink:0}
   .qtoggle:hover,.qtoggle[aria-expanded="true"]{color:var(--accent);border-color:var(--accent)}
@@ -598,6 +605,7 @@
       <button role="tab" aria-selected="false" data-view="L"><span class="idx">04</span><span class="navfull" data-i18n="nav.L">新着で伸び</span><span class="navshort" data-i18n="nav.Ls">新着</span></button>
     </nav>
     <button class="ttlq" id="ttlHelp" type="button" aria-label="この見方の説明" aria-controls="blurb" aria-expanded="false">？</button>
+    <button class="qtoggle" id="qToggle" type="button" aria-controls="searchBar" aria-expanded="false" aria-label="作品名でさがす">🔍</button>
   </div>
 
   <section id="intro" class="intro" hidden aria-label="このサイトの使い方"></section>
@@ -624,7 +632,6 @@
       <button class="favsegbtn" id="favAll" type="button" aria-pressed="true" data-i18n="fav.all">すべて</button>
       <button class="favsegbtn" id="favStar" type="button" aria-pressed="false" data-i18n="fav.star">★ お気に入り</button>
     </div>
-    <button class="qtoggle" id="qToggle" type="button" aria-controls="searchBar" aria-expanded="false" aria-label="作品名でさがす">🔍</button>
   </div>
   <div class="obs" id="obs"></div>
   <div class="blurb" id="blurb"></div>
@@ -654,7 +661,7 @@
     <div class="disc" data-i18n="foot.disc2">数値・順位・「推定きっかけ」は公開データから自動算出した観測・実験的な指標であり、正確性・完全性・最新性を保証しません。投資・購入を勧める助言ではありません。「予測」は外れることがあり、原因が特定できないときは「原因不明」と表示します。</div>
     <div class="disc" data-i18n="foot.obs2">「今の人数」はSteamの“ゲーム”を対象に観測しています（ソフトウェア区分・アダルト作品は対象外）。観測が途切れた作品も定期的に再確認して拾い直します。</div>
     <div class="disc dev" id="devLine"></div>
-    <div style="margin-top:12px"><a href="./data/rising_feed.xml" target="_blank" rel="noopener noreferrer" data-i18n="foot.rss">RSS（伸びフィード）</a> · <a href="#" id="ppLink" onclick="return false" data-i18n="foot.pp">プライバシーポリシー（未設定）</a><span id="ckWrap"> · <a href="#" id="cookieSettings" data-i18n="foot.cookie">Cookie設定</a></span><span id="ntWrap" hidden> · <span data-i18n="foot.notrack">この端末は集計から除外中</span></span> · <span data-i18n="foot.obs">観測記録（Steam公式API）</span></div>
+    <div style="margin-top:12px"><a href="./data/rising_feed.xml" target="_blank" rel="noopener noreferrer" data-i18n="foot.rss">RSS（伸びフィード）</a> · <a href="#" id="ppLink" onclick="return false" data-i18n="foot.pp">プライバシーポリシー（未設定）</a><span id="ckWrap"> · <a href="#" id="cookieSettings" data-i18n="foot.cookie">Cookie設定</a></span> · <span data-i18n="foot.obs">観測記録（Steam公式API）</span></div>
   </footer>
 </div>
 
@@ -830,7 +837,7 @@ const I18N={
  "foot.rss":{ja:"RSS（伸びフィード）",en:"RSS (rising feed)"},"foot.pp":{ja:"プライバシーポリシー（未設定）",en:"Privacy Policy (not set)"},
  "foot.cookie":{ja:"Cookie設定",en:"Cookie settings"},
  // 9A GA を有効化するまではこちらを出す（「未設定」と書く代わりに、実際に何をしていないかを書く）
- "foot.priv":{ja:"アクセス解析（Cloudflare Web Analytics）・端末内保存（お気に入り・設定）",en:"Analytics (Cloudflare Web Analytics) · stored on your device (favorites & settings)"},"foot.ppset":{ja:"プライバシーとアクセス解析について",en:"Privacy & analytics"},"foot.notrack":{ja:"この端末は集計から除外中",en:"This device is excluded from analytics"},"foot.obs":{ja:"観測記録（Steam公式API）",en:"Observations (Steam official API)"},
+ "foot.priv":{ja:"アクセス解析（Cloudflare Web Analytics）・端末内保存（お気に入り・設定）",en:"Analytics (Cloudflare Web Analytics) · stored on your device (favorites & settings)"},"foot.ppset":{ja:"プライバシーとアクセス解析について",en:"Privacy & analytics"},"foot.obs":{ja:"観測記録（Steam公式API）",en:"Observations (Steam official API)"},
  "cookie.title":{ja:"Cookieの使用について",en:"About cookies"},
  "cookie.body":{ja:"利用状況の分析(Google Analytics)にCookieを使います。同意する場合のみ有効化します。",en:"We use cookies for usage analytics (Google Analytics), enabled only with your consent."},
  "cookie.accept":{ja:"同意する",en:"Accept"},"cookie.decline":{ja:"拒否する",en:"Decline"},
@@ -2021,7 +2028,7 @@ if(consent&&consent.analytics) loadGA();
 showCookie(false);   // 初回のみ Cookie バナー表示（同意まで GA 非読込）
 </script>
 <!-- Cloudflare Web Analytics（閲覧数の集計・説明は privacy.html）。外すときはこの script と CSP の2語を消す。
-     除外：アドレスに ?notrack=1 を付けて1回開くと、その端末では読み込まない（?notrack=0 で解除・印は localStorage）。
+     除外：アドレスに ?notrack=1 を付けて1回開くと、その端末では読み込まない（?notrack=0 で解除・印は localStorage）。画面には何も出さない（本人選択 1006-0746）。
      後から差し込むため、トークンは公式 FAQ（タグマネージャー経由）の形＝URL の ?token= で渡す。 -->
 <script>
 (function(){
@@ -2032,7 +2039,6 @@ showCookie(false);   // 初回のみ Cookie バナー表示（同意まで GA �
     off = localStorage.getItem(KEY)==="1";
   }catch(e){ off = (q==="1"); }   // 端末内保存が使えないときは、その1回だけ従う
   if(q!==null){ try{ var u=new URL(location.href); u.searchParams.delete("notrack"); history.replaceState(null,"",u.pathname+u.search+u.hash); }catch(e){} }   // 合図をアドレスから消す（共有・ブックマークに残さない）
-  var nt=document.getElementById("ntWrap"); if(nt) nt.hidden=!off;
   if(off) return;
   var s=document.createElement("script"); s.defer=true;
   s.src="https://static.cloudflareinsights.com/beacon.min.js?token="+TOKEN;
