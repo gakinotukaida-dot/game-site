@@ -3,22 +3,22 @@
   "schema": "upcoming_v5",
   "source": "games(coming_soon/release_date) + 実測シグナル(体験版/Twitch/告知/開発元実績/ジャンル) + prelaunch_model",
   "note": "発売前の羽根予想。spike_prob=跳ね確率＝自社実績で較正したモデルの出力（参考・外れうる）。モデルが無い場合は expect のみ（実測シグナルの有無）。発売日が今日以前の作品は除外（coming_soon フラグが古い“居座り”も落とす）。",
-  "generated_at": "2026-10-05T22:54:02.350285+00:00",
+  "generated_at": "2026-10-06T11:29:57.830297+00:00",
   "model": {
     "schema": "prelaunch_model_v2",
     "readiness": "validated",
-    "base_rate": 0.042612,
-    "n_pairs": 7275,
+    "base_rate": 0.042454,
+    "n_pairs": 7302,
     "hit_threshold": 1000,
     "validation_oos": {
-      "eval_n": 2104,
-      "eval_base": 0.0366,
-      "top_decile_rate": 0.23333,
-      "top_decile_lift": 6.38,
-      "mean_prob_hit": 0.28319,
-      "mean_prob_miss": 0.03285
+      "eval_n": 2111,
+      "eval_base": 0.03648,
+      "top_decile_rate": 0.23223,
+      "top_decile_lift": 6.37,
+      "mean_prob_hit": 0.28254,
+      "mean_prob_miss": 0.03267
     },
-    "generated_at": "2026-10-05T22:38:21.654517+00:00"
+    "generated_at": "2026-10-06T11:17:31.499402+00:00"
   },
   "params": {
     "limit": 200,
@@ -64,7 +64,7 @@
       "dev_best_peak": 36533,
       "dev_best_reviews": 262800,
       "web_news": null,
-      "web_views": 44650,
+      "web_views": 43052,
       "web_reach": 6,
       "is_free": false,
       "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1551980/d1e7111b93b6a8b3eb029908887648348c2c55e6/header.jpg?t=1790374784",
@@ -109,22 +109,17 @@
           {
             "appid": 2183900,
             "name": "Warhammer 40,000: Space Marine 2",
-            "ccu": 17197
+            "ccu": 18714
           },
           {
             "appid": 1465360,
             "name": "SnowRunner",
-            "ccu": 2940
+            "ccu": 3231
           },
           {
             "appid": 976730,
             "name": "Halo: The Master Chief Collection",
             "ccu": 1666
-          },
-          {
-            "appid": 5184670,
-            "name": "Clive Barker's Hellraiser: Revival (Demo)",
-            "ccu": 523
           },
           {
             "appid": 2104890,
@@ -137,14 +132,19 @@
             "ccu": 309
           },
           {
-            "appid": 780290,
-            "name": "Gloomhaven",
-            "ccu": 143
+            "appid": 5184670,
+            "name": "Clive Barker's Hellraiser: Revival (Demo)",
+            "ccu": 295
           },
           {
-            "appid": 2096610,
-            "name": "Crysis 3 Remastered",
-            "ccu": 97
+            "appid": 780290,
+            "name": "Gloomhaven",
+            "ccu": 166
+          },
+          {
+            "appid": 2157830,
+            "name": "John Carpenter's Toxic Commando",
+            "ccu": 136
           }
         ],
         "price": {
@@ -166,7 +166,7 @@
       "release": "8 Oct, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.4591,
+      "spike_prob": 0.4627,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -263,7 +263,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.1429,
+      "spike_prob": 0.1418,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -339,8 +339,8 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.1286,
-      "expect": "high",
+      "spike_prob": 0.127,
+      "expect": "mid",
       "conf": "high",
       "factors": [
         {
@@ -422,7 +422,7 @@
       "release": "7 Oct, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.1246,
+      "spike_prob": 0.1241,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -547,7 +547,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0804,
+      "spike_prob": 0.0791,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -635,12 +635,91 @@
       }
     },
     {
+      "appid": 4112840,
+      "name": "Demon General Kristen",
+      "release": "8 Oct, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0775,
+      "expect": "mid",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "hot"
+        },
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "dev_best_reviews",
+          "dir": "up",
+          "bucket": "low"
+        }
+      ],
+      "active_signals": 4,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 2,
+      "has_news": true,
+      "dev_best_peak": 14,
+      "dev_best_reviews": 190,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4112840/249ab9fa0317c7b571df59b855fe3f219d6ea5b8/header.jpg?t=1790045682",
+      "has_japanese": true,
+      "genres": [
+        "Casual",
+        "Indie",
+        "RPG"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "シコルスキー大佐"
+        ],
+        "publishers": [
+          "072 Project"
+        ],
+        "genres": [
+          "Casual",
+          "Indie",
+          "RPG"
+        ],
+        "categories": [
+          "Single-player",
+          "Family Sharing"
+        ],
+        "dlc_count": 0,
+        "release": "8 Oct, 2026",
+        "website": "https://072project.com/?source=steam_senkikris&amp;utm_source=steam&amp;utm_medium=senkikris&amp;utm_campaign=store_link",
+        "siblings": [],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
       "appid": 4774610,
       "name": "Anabiosis",
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0682,
+      "spike_prob": 0.0681,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -722,7 +801,7 @@
       "release": "9 Oct, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0682,
+      "spike_prob": 0.0681,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -805,7 +884,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0682,
+      "spike_prob": 0.0681,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -980,7 +1059,7 @@
       "release": "9 Oct, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0592,
+      "spike_prob": 0.059,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1055,12 +1134,85 @@
       }
     },
     {
+      "appid": 4841390,
+      "name": "Curse of Baghdad",
+      "release": "9 Oct, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.059,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "high"
+        },
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "warm"
+        }
+      ],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 3,
+      "has_news": true,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4841390/52bb773bd400c9c915f2bccbfae2e3ba8df17d30/header.jpg?t=1791143723",
+      "has_japanese": false,
+      "genres": [
+        "Action",
+        "Indie"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "Hexonine Games"
+        ],
+        "publishers": [
+          "Hexonine games"
+        ],
+        "genres": [
+          "Action",
+          "Indie"
+        ],
+        "categories": [
+          "Single-player",
+          "Steam Achievements",
+          "Family Sharing"
+        ],
+        "dlc_count": 1,
+        "release": "9 Oct, 2026",
+        "website": "https://www.hexonine.ca/",
+        "siblings": [],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
       "appid": 4853710,
       "name": "Borrow or Rob",
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.054,
+      "spike_prob": 0.0536,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1143,7 +1295,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0391,
+      "spike_prob": 0.0398,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1228,7 +1380,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0358,
+      "spike_prob": 0.0362,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1305,7 +1457,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0358,
+      "spike_prob": 0.0362,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1377,12 +1529,100 @@
       }
     },
     {
+      "appid": 4791170,
+      "name": "Cats & Rhythmical Restaurant",
+      "release": "Coming soon",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0309,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "low"
+        },
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "warm"
+        },
+        {
+          "name": "dev_best_reviews",
+          "dir": "up",
+          "bucket": "low"
+        }
+      ],
+      "active_signals": 4,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 1,
+      "has_news": true,
+      "dev_best_peak": 1,
+      "dev_best_reviews": 13,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4791170/5d95c7db63b9eb06956325875053145159caccc4/header.jpg?t=1790834631",
+      "has_japanese": true,
+      "genres": [
+        "Casual",
+        "Simulation"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "2phase"
+        ],
+        "publishers": [
+          "2phase"
+        ],
+        "genres": [
+          "Casual",
+          "Simulation"
+        ],
+        "categories": [
+          "Single-player",
+          "Steam Achievements",
+          "Camera Comfort",
+          "Custom Volume Controls",
+          "Mouse Only Option",
+          "#category_playable_at_your_own_pace",
+          "Playable without Timed Input"
+        ],
+        "dlc_count": 1,
+        "release": "Coming soon",
+        "website": null,
+        "siblings": [
+          {
+            "appid": 4341300,
+            "name": "AutoDice",
+            "ccu": 1
+          }
+        ],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
       "appid": 5221860,
       "name": "Chessfolk",
       "release": "7 Oct, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0311,
+      "spike_prob": 0.0309,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1468,7 +1708,7 @@
       "release": "To be announced",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0269,
+      "spike_prob": 0.027,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1542,7 +1782,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0269,
+      "spike_prob": 0.027,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1613,7 +1853,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0269,
+      "spike_prob": 0.027,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1689,7 +1929,7 @@
       "release": "8 Oct, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0269,
+      "spike_prob": 0.027,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1763,7 +2003,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0269,
+      "spike_prob": 0.027,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1842,7 +2082,7 @@
       "release": "8 Oct, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0269,
+      "spike_prob": 0.027,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1916,12 +2156,12 @@
       }
     },
     {
-      "appid": 4791170,
-      "name": "Cats & Rhythmical Restaurant",
+      "appid": 4487470,
+      "name": "Defuse or u ded",
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0269,
+      "spike_prob": 0.0238,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1936,7 +2176,7 @@
           "bucket": "warm"
         }
       ],
-      "active_signals": 2,
+      "active_signals": 3,
       "demo_ccu": null,
       "twitch_peak": null,
       "streamers": 0,
@@ -1947,12 +2187,14 @@
       "web_news": null,
       "web_views": null,
       "web_reach": null,
-      "is_free": false,
-      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4791170/5d95c7db63b9eb06956325875053145159caccc4/header.jpg?t=1790834631",
-      "has_japanese": true,
+      "is_free": true,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4487470/99dd061d3609790b2119fd67d8c2b75f752e44eb/header.jpg?t=1787075796",
+      "has_japanese": false,
       "genres": [
+        "Action",
         "Casual",
-        "Simulation"
+        "Indie",
+        "Free To Play"
       ],
       "price": null,
       "review": {
@@ -1962,25 +2204,27 @@
       },
       "detail": {
         "developers": [
-          "2phase"
+          "Tarociarz z Macedonii"
         ],
         "publishers": [
-          "2phase"
+          "Tarociarz z Macedonii"
         ],
         "genres": [
+          "Action",
           "Casual",
-          "Simulation"
+          "Indie",
+          "Free To Play"
         ],
         "categories": [
-          "Single-player",
-          "Steam Achievements",
-          "Camera Comfort",
-          "Custom Volume Controls",
-          "Mouse Only Option",
-          "#category_playable_at_your_own_pace",
-          "Playable without Timed Input"
+          "Multi-player",
+          "PvP",
+          "Online PvP",
+          "LAN PvP",
+          "Shared/Split Screen PvP",
+          "Shared/Split Screen",
+          "Steam Achievements"
         ],
-        "dlc_count": 1,
+        "dlc_count": 0,
         "release": "Coming soon",
         "website": null,
         "siblings": [],
@@ -1998,7 +2242,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0218,
+      "spike_prob": 0.0215,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2120,7 +2364,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0218,
+      "spike_prob": 0.0215,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2206,7 +2450,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0218,
+      "spike_prob": 0.0215,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2320,7 +2564,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0188,
+      "spike_prob": 0.0187,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2398,7 +2642,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0188,
+      "spike_prob": 0.0187,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2486,7 +2730,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0188,
+      "spike_prob": 0.0187,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2558,7 +2802,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0188,
+      "spike_prob": 0.0187,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2634,7 +2878,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0188,
+      "spike_prob": 0.0187,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2710,7 +2954,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0188,
+      "spike_prob": 0.0187,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2788,7 +3032,7 @@
       "release": "5 Nov, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0188,
+      "spike_prob": 0.0187,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2868,7 +3112,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0188,
+      "spike_prob": 0.0187,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -2946,7 +3190,7 @@
       "release": "January 2027",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0188,
+      "spike_prob": 0.0187,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3020,7 +3264,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0188,
+      "spike_prob": 0.0187,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3095,7 +3339,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0188,
+      "spike_prob": 0.0187,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3177,7 +3421,7 @@
       "release": "2027",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0188,
+      "spike_prob": 0.0187,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3253,7 +3497,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0188,
+      "spike_prob": 0.0187,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3327,7 +3571,7 @@
       "release": "9 Oct, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0188,
+      "spike_prob": 0.0187,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3398,7 +3642,7 @@
       "release": "Q3 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0188,
+      "spike_prob": 0.0187,
       "expect": "low",
       "conf": "mid",
       "factors": [
@@ -3469,7 +3713,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0171,
+      "spike_prob": 0.017,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3553,7 +3797,7 @@
       "release": "8 Oct, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0167,
+      "spike_prob": 0.0165,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3616,12 +3860,86 @@
       }
     },
     {
+      "appid": 5170320,
+      "name": "BumpBall",
+      "release": "9 Oct, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0165,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "hot"
+        }
+      ],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": true,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5170320/cded55dedc69941d547ead6a3e785dd2bac6e1a4/header.jpg?t=1789340070",
+      "has_japanese": false,
+      "genres": [
+        "Casual",
+        "Sports",
+        "Free To Play"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "SometimesGood"
+        ],
+        "publishers": [
+          "SometimesGood"
+        ],
+        "genres": [
+          "Casual",
+          "Sports",
+          "Free To Play"
+        ],
+        "categories": [
+          "Multi-player",
+          "PvP",
+          "Online PvP",
+          "Co-op",
+          "Online Co-op",
+          "Cross-Platform Multiplayer",
+          "In-App Purchases"
+        ],
+        "dlc_count": 0,
+        "release": "9 Oct, 2026",
+        "website": "https://www.bumpballgame.com/",
+        "siblings": [],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
       "appid": 3161350,
       "name": "COSETTE: THE UNTITLED GAME",
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0167,
+      "spike_prob": 0.0165,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3692,7 +4010,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0167,
+      "spike_prob": 0.0165,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3760,12 +4078,232 @@
       }
     },
     {
+      "appid": 4757660,
+      "name": "Demon Ark: Idle RPG",
+      "release": "Q3 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0165,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "hot"
+        }
+      ],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": true,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4757660/fad4c129415fd5ace5eceb44ff1803ff57b6ae67/header.jpg?t=1780580927",
+      "has_japanese": false,
+      "genres": [
+        "Casual",
+        "RPG",
+        "Free To Play"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "GravityStarGames"
+        ],
+        "publishers": [
+          "GravityStarGames"
+        ],
+        "genres": [
+          "Casual",
+          "RPG",
+          "Free To Play"
+        ],
+        "categories": [
+          "Single-player",
+          "Family Sharing"
+        ],
+        "dlc_count": 0,
+        "release": "Q3 2026",
+        "website": null,
+        "siblings": [],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
+      "appid": 4199970,
+      "name": "Degen Idle",
+      "release": "10 Oct, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.015,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "hot"
+        }
+      ],
+      "active_signals": 3,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": 20,
+      "dev_best_reviews": 0,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": true,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4199970/4136842b31ed6749b813e3fbb1db1edb3ef7e467/header.jpg?t=1790878231",
+      "has_japanese": false,
+      "genres": [
+        "Casual",
+        "Massively Multiplayer",
+        "RPG",
+        "Free To Play"
+      ],
+      "price": null,
+      "review": null,
+      "detail": {
+        "developers": [
+          "Ithoro LLC"
+        ],
+        "publishers": [
+          "Ithoro LLC"
+        ],
+        "genres": [
+          "Casual",
+          "Massively Multiplayer",
+          "RPG",
+          "Free To Play"
+        ],
+        "categories": [
+          "Multi-player",
+          "MMO",
+          "PvP",
+          "Online PvP",
+          "Co-op",
+          "Online Co-op",
+          "Cross-Platform Multiplayer"
+        ],
+        "dlc_count": 0,
+        "release": "10 Oct, 2026",
+        "website": null,
+        "siblings": [
+          {
+            "appid": 5233680,
+            "name": "idle.am - lofi idle mmo",
+            "ccu": 20
+          }
+        ],
+        "price": null,
+        "review": null
+      }
+    },
+    {
+      "appid": 5248650,
+      "name": "Dark Dice Dungeon",
+      "release": "9 Oct, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0147,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "hot"
+        },
+        {
+          "name": "news_count",
+          "dir": "up",
+          "bucket": "low"
+        }
+      ],
+      "active_signals": 3,
+      "demo_ccu": 1,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 1,
+      "has_news": true,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5248650/c4893d030fb8f5460f80e431c03771e2a2ae5753/header.jpg?t=1791036037",
+      "has_japanese": false,
+      "genres": [
+        "Indie",
+        "RPG",
+        "Strategy"
+      ],
+      "price": null,
+      "review": null,
+      "detail": {
+        "developers": [
+          "Lolo's Game Studio"
+        ],
+        "publishers": [
+          "Lolo's Game Studio"
+        ],
+        "genres": [
+          "Indie",
+          "RPG",
+          "Strategy"
+        ],
+        "categories": [
+          "Single-player",
+          "Multi-player",
+          "PvP",
+          "Shared/Split Screen PvP",
+          "Shared/Split Screen",
+          "Remote Play Together",
+          "Family Sharing"
+        ],
+        "dlc_count": 1,
+        "release": "9 Oct, 2026",
+        "website": "https://darkdicedungeon.com",
+        "siblings": [
+          {
+            "appid": 5249300,
+            "name": "Dark Dice Dungeon (Demo)",
+            "ccu": 1
+          }
+        ],
+        "price": null,
+        "review": null
+      }
+    },
+    {
       "appid": 4699770,
       "name": "Babel Legacy",
       "release": "7 Oct, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0146,
+      "spike_prob": 0.0145,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3859,7 +4397,7 @@
       "release": "9 Oct, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0146,
+      "spike_prob": 0.0145,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -3930,7 +4468,7 @@
           {
             "appid": 4621570,
             "name": "Botlings (Demo)",
-            "ccu": 2
+            "ccu": 1
           },
           {
             "appid": 3563480,
@@ -3952,7 +4490,7 @@
       "release": "8 Oct, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0146,
+      "spike_prob": 0.0145,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -4041,77 +4579,6 @@
           "total": 0,
           "pct": null
         }
-      }
-    },
-    {
-      "appid": 5248650,
-      "name": "Dark Dice Dungeon",
-      "release": "9 Oct, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0146,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "hot"
-        },
-        {
-          "name": "news_count",
-          "dir": "up",
-          "bucket": "low"
-        }
-      ],
-      "active_signals": 3,
-      "demo_ccu": 1,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 1,
-      "has_news": true,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5248650/c4893d030fb8f5460f80e431c03771e2a2ae5753/header.jpg?t=1791036037",
-      "has_japanese": false,
-      "genres": [
-        "Indie",
-        "RPG",
-        "Strategy"
-      ],
-      "price": null,
-      "review": null,
-      "detail": {
-        "developers": [
-          "Lolo's Game Studio"
-        ],
-        "publishers": [
-          "Lolo's Game Studio"
-        ],
-        "genres": [
-          "Indie",
-          "RPG",
-          "Strategy"
-        ],
-        "categories": [
-          "Single-player",
-          "Multi-player",
-          "PvP",
-          "Shared/Split Screen PvP",
-          "Shared/Split Screen",
-          "Remote Play Together",
-          "Family Sharing"
-        ],
-        "dlc_count": 1,
-        "release": "9 Oct, 2026",
-        "website": "https://darkdicedungeon.com",
-        "siblings": [],
-        "price": null,
-        "review": null
       }
     },
     {
@@ -4216,7 +4683,7 @@
         }
       ],
       "active_signals": 3,
-      "demo_ccu": 3,
+      "demo_ccu": 4,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 4,
@@ -4278,6 +4745,94 @@
           {
             "appid": 5258130,
             "name": "Cozy Farm - Golden Harvest Theme",
+            "ccu": null
+          }
+        ],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
+      "appid": 5129430,
+      "name": "Arcanum Idle",
+      "release": "Coming soon",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0083,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "warm"
+        },
+        {
+          "name": "dev_best_reviews",
+          "dir": "up",
+          "bucket": "low"
+        }
+      ],
+      "active_signals": 3,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": 2,
+      "dev_best_reviews": 3,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5129430/a716e61c52487630fc12e7510d99d416647882ea/header.jpg?t=1787274377",
+      "has_japanese": false,
+      "genres": [
+        "Indie",
+        "Simulation"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "Lanier Labs LLC"
+        ],
+        "publishers": [
+          "Lanier Labs LLC"
+        ],
+        "genres": [
+          "Indie",
+          "Simulation"
+        ],
+        "categories": [
+          "Single-player",
+          "Steam Achievements",
+          "Full controller support",
+          "Adjustable Text Size",
+          "Color Alternatives",
+          "#category_contrast_controls",
+          "Custom Volume Controls"
+        ],
+        "dlc_count": 0,
+        "release": "Coming soon",
+        "website": null,
+        "siblings": [
+          {
+            "appid": 5116220,
+            "name": "Rior's Arena",
+            "ccu": 2
+          },
+          {
+            "appid": 5121480,
+            "name": "Rior's Arena - Supporter Pack",
             "ccu": null
           }
         ],
@@ -5044,11 +5599,6 @@
             "ccu": 2
           },
           {
-            "appid": 3583170,
-            "name": "Rush Ultimate",
-            "ccu": 1
-          },
-          {
             "appid": 1224450,
             "name": "My Jigsaw Adventures - Roads of Life",
             "ccu": 1
@@ -5064,8 +5614,18 @@
             "ccu": 1
           },
           {
+            "appid": 4873390,
+            "name": "Coffee Craze",
+            "ccu": 1
+          },
+          {
             "appid": 1393970,
             "name": "My Jigsaw Adventures - The Source of Power",
+            "ccu": 1
+          },
+          {
+            "appid": 3583170,
+            "name": "Rush Ultimate",
             "ccu": 1
           }
         ],
@@ -5163,13 +5723,13 @@
             "ccu": 19
           },
           {
-            "appid": 598940,
-            "name": "Doodle Mafia",
-            "ccu": 2
-          },
-          {
             "appid": 4091980,
             "name": "Bouncemasters 2: Pengu Throw (Demo)",
+            "ccu": 6
+          },
+          {
+            "appid": 598940,
+            "name": "Doodle Mafia",
             "ccu": 2
           },
           {
@@ -5199,199 +5759,6 @@
           "total": 0,
           "pct": null
         }
-      }
-    },
-    {
-      "appid": 5070730,
-      "name": "Blossoms of Light",
-      "release": "Coming soon",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0073,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "cold"
-        },
-        {
-          "name": "dev_best_reviews",
-          "dir": "up",
-          "bucket": "low"
-        }
-      ],
-      "active_signals": 3,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 69,
-      "dev_best_reviews": 446,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5070730/a9554b7509f0dc2b8a4f9c295889c2805078a38c/header.jpg?t=1789537430",
-      "has_japanese": true,
-      "genres": [
-        "Casual"
-      ],
-      "price": null,
-      "review": {
-        "positive": 0,
-        "total": 0,
-        "pct": null
-      },
-      "detail": {
-        "developers": [
-          "Catnip studio"
-        ],
-        "publishers": [
-          "Catnip studio"
-        ],
-        "genres": [
-          "Casual"
-        ],
-        "categories": [
-          "Single-player",
-          "Steam Achievements",
-          "Steam Cloud",
-          "Family Sharing"
-        ],
-        "dlc_count": 0,
-        "release": "Coming soon",
-        "website": "https://store.steampowered.com/curator/44786890-Catnip-studio/",
-        "siblings": [
-          {
-            "appid": 3794810,
-            "name": "Pieceful Gallery",
-            "ccu": 52
-          },
-          {
-            "appid": 3110490,
-            "name": "Pixel Restorer",
-            "ccu": 16
-          },
-          {
-            "appid": 2723460,
-            "name": "Dogs Huddled Together 挤在一起的狗狗们",
-            "ccu": 8
-          },
-          {
-            "appid": 2675630,
-            "name": "Cats Huddled Together 挤在一起的猫猫们",
-            "ccu": 4
-          },
-          {
-            "appid": 3461680,
-            "name": "Restoring the Past",
-            "ccu": 3
-          },
-          {
-            "appid": 2782400,
-            "name": "Papercut Art Gallery-Nature",
-            "ccu": 2
-          },
-          {
-            "appid": 3160730,
-            "name": "Bunnies Huddled Together",
-            "ccu": 1
-          },
-          {
-            "appid": 2930720,
-            "name": "Birds Huddled Together",
-            "ccu": 1
-          }
-        ],
-        "price": null,
-        "review": {
-          "positive": 0,
-          "total": 0,
-          "pct": null
-        }
-      }
-    },
-    {
-      "appid": 5204200,
-      "name": "Companion OS",
-      "release": "9 Oct, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0073,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "cold"
-        },
-        {
-          "name": "dev_best_reviews",
-          "dir": "up",
-          "bucket": "low"
-        }
-      ],
-      "active_signals": 3,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 4,
-      "dev_best_reviews": 20,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5204200/70047788bbbeaa697f061b36574904701d6a01f4/header.jpg?t=1790117635",
-      "has_japanese": false,
-      "genres": [
-        "Casual",
-        "Utilities"
-      ],
-      "price": null,
-      "review": null,
-      "detail": {
-        "developers": [
-          "Pedro Verpha"
-        ],
-        "publishers": [
-          "Pedro Verpha"
-        ],
-        "genres": [
-          "Casual",
-          "Utilities"
-        ],
-        "categories": [
-          "Steam Achievements",
-          "In-App Purchases",
-          "Custom Volume Controls",
-          "#category_playable_at_your_own_pace",
-          "Playable without Timed Input",
-          "Save Anytime",
-          "Steam Cloud"
-        ],
-        "dlc_count": 0,
-        "release": "9 Oct, 2026",
-        "website": null,
-        "siblings": [
-          {
-            "appid": 4993050,
-            "name": "Mini Soccer Manager",
-            "ccu": 2
-          },
-          {
-            "appid": 4184910,
-            "name": "Game Dev Life",
-            "ccu": 1
-          }
-        ],
-        "price": null,
-        "review": null
       }
     },
     {
@@ -5458,77 +5825,6 @@
         "siblings": [],
         "price": null,
         "review": null
-      }
-    },
-    {
-      "appid": 5240720,
-      "name": "7 days in a little world",
-      "release": "6 Oct, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0072,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "warm"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5240720/af00ef64da5cc1e7cbf6b3c29d6b1d0e271726a2/header.jpg?t=1790786887",
-      "has_japanese": true,
-      "genres": [
-        "Action",
-        "Indie",
-        "Simulation"
-      ],
-      "price": null,
-      "review": {
-        "positive": 0,
-        "total": 0,
-        "pct": null
-      },
-      "detail": {
-        "developers": [
-          "kumashin"
-        ],
-        "publishers": [
-          "kumashin"
-        ],
-        "genres": [
-          "Action",
-          "Indie",
-          "Simulation"
-        ],
-        "categories": [
-          "Single-player",
-          "Steam Achievements",
-          "Partial Controller Support",
-          "Family Sharing"
-        ],
-        "dlc_count": 1,
-        "release": "6 Oct, 2026",
-        "website": null,
-        "siblings": [],
-        "price": null,
-        "review": {
-          "positive": 0,
-          "total": 0,
-          "pct": null
-        }
       }
     },
     {
@@ -5675,67 +5971,6 @@
           "total": 0,
           "pct": null
         }
-      }
-    },
-    {
-      "appid": 5284980,
-      "name": "AeroBloom",
-      "release": "6 Oct, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0072,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "warm"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5284980/b5e8c4f5d38804cb63a8b1cdb95869f38f67aa24/header.jpg?t=1790608923",
-      "has_japanese": false,
-      "genres": [
-        "Action",
-        "Casual",
-        "Indie"
-      ],
-      "price": null,
-      "review": null,
-      "detail": {
-        "developers": [
-          "Quito Digital Works"
-        ],
-        "publishers": [
-          "Quito Digital Works"
-        ],
-        "genres": [
-          "Action",
-          "Casual",
-          "Indie"
-        ],
-        "categories": [
-          "Single-player",
-          "Family Sharing"
-        ],
-        "dlc_count": 0,
-        "release": "6 Oct, 2026",
-        "website": null,
-        "siblings": [],
-        "price": null,
-        "review": null
       }
     },
     {
@@ -5929,84 +6164,6 @@
         "release": "Coming soon",
         "website": "https://manfredg.github.io/AntiCetus/",
         "siblings": [],
-        "price": null,
-        "review": {
-          "positive": 0,
-          "total": 0,
-          "pct": null
-        }
-      }
-    },
-    {
-      "appid": 5129430,
-      "name": "Arcanum Idle",
-      "release": "Coming soon",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0072,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "warm"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": 0,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5129430/a716e61c52487630fc12e7510d99d416647882ea/header.jpg?t=1787274377",
-      "has_japanese": false,
-      "genres": [
-        "Indie",
-        "Simulation"
-      ],
-      "price": null,
-      "review": {
-        "positive": 0,
-        "total": 0,
-        "pct": null
-      },
-      "detail": {
-        "developers": [
-          "Lanier Labs LLC"
-        ],
-        "publishers": [
-          "Lanier Labs LLC"
-        ],
-        "genres": [
-          "Indie",
-          "Simulation"
-        ],
-        "categories": [
-          "Single-player",
-          "Steam Achievements",
-          "Full controller support",
-          "Adjustable Text Size",
-          "Color Alternatives",
-          "#category_contrast_controls",
-          "Custom Volume Controls"
-        ],
-        "dlc_count": 0,
-        "release": "Coming soon",
-        "website": null,
-        "siblings": [
-          {
-            "appid": 5121480,
-            "name": "Rior's Arena - Supporter Pack",
-            "ccu": null
-          }
-        ],
         "price": null,
         "review": {
           "positive": 0,
@@ -6578,6 +6735,80 @@
       }
     },
     {
+      "appid": 3239360,
+      "name": "Beat, Heart, Beat",
+      "release": "9 Oct, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0072,
+      "expect": "low",
+      "conf": "mid",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "warm"
+        }
+      ],
+      "active_signals": 1,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3239360/c422485bbf0db34d4819b214a1d353202666a4fe/header.jpg?t=1790630265",
+      "has_japanese": false,
+      "genres": [
+        "Action",
+        "Indie",
+        "Early Access"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "The Wacy"
+        ],
+        "publishers": [
+          "The Wacy"
+        ],
+        "genres": [
+          "Action",
+          "Indie",
+          "Early Access"
+        ],
+        "categories": [
+          "Single-player",
+          "Full controller support",
+          "Steam Workshop",
+          "Camera Comfort",
+          "Color Alternatives",
+          "#category_contrast_controls",
+          "Custom Volume Controls"
+        ],
+        "dlc_count": 0,
+        "release": "9 Oct, 2026",
+        "website": "https://linktr.ee/beatheartbeatgame",
+        "siblings": [],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
       "appid": 3998620,
       "name": "Beetle Battle Bros",
       "release": "Coming soon",
@@ -6947,6 +7178,119 @@
       }
     },
     {
+      "appid": 5070730,
+      "name": "Blossoms of Light",
+      "release": "Coming soon",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0072,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "cold"
+        },
+        {
+          "name": "dev_best_reviews",
+          "dir": "up",
+          "bucket": "low"
+        }
+      ],
+      "active_signals": 3,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": 69,
+      "dev_best_reviews": 446,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5070730/a9554b7509f0dc2b8a4f9c295889c2805078a38c/header.jpg?t=1789537430",
+      "has_japanese": true,
+      "genres": [
+        "Casual"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "Catnip studio"
+        ],
+        "publishers": [
+          "Catnip studio"
+        ],
+        "genres": [
+          "Casual"
+        ],
+        "categories": [
+          "Single-player",
+          "Steam Achievements",
+          "Steam Cloud",
+          "Family Sharing"
+        ],
+        "dlc_count": 0,
+        "release": "Coming soon",
+        "website": "https://store.steampowered.com/curator/44786890-Catnip-studio/",
+        "siblings": [
+          {
+            "appid": 3794810,
+            "name": "Pieceful Gallery",
+            "ccu": 52
+          },
+          {
+            "appid": 3110490,
+            "name": "Pixel Restorer",
+            "ccu": 16
+          },
+          {
+            "appid": 2723460,
+            "name": "Dogs Huddled Together 挤在一起的狗狗们",
+            "ccu": 8
+          },
+          {
+            "appid": 2675630,
+            "name": "Cats Huddled Together 挤在一起的猫猫们",
+            "ccu": 4
+          },
+          {
+            "appid": 3461680,
+            "name": "Restoring the Past",
+            "ccu": 3
+          },
+          {
+            "appid": 2782400,
+            "name": "Papercut Art Gallery-Nature",
+            "ccu": 2
+          },
+          {
+            "appid": 3382500,
+            "name": "A Coloring Break",
+            "ccu": 1
+          },
+          {
+            "appid": 2930720,
+            "name": "Birds Huddled Together",
+            "ccu": 1
+          }
+        ],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
       "appid": 4460200,
       "name": "Blow The Cover",
       "release": "Coming soon",
@@ -7089,6 +7433,80 @@
             "ccu": null
           }
         ],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
+      "appid": 3627560,
+      "name": "Bounty Hunter Horrors",
+      "release": "10 Oct, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0072,
+      "expect": "low",
+      "conf": "mid",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "warm"
+        }
+      ],
+      "active_signals": 1,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3627560/6e8a2da31174d37aa5bc545596553cfd7dd62183/header.jpg?t=1790814064",
+      "has_japanese": false,
+      "genres": [
+        "Action",
+        "Adventure",
+        "Indie"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "RacerX_Games"
+        ],
+        "publishers": [
+          "RacerX_Games"
+        ],
+        "genres": [
+          "Action",
+          "Adventure",
+          "Indie"
+        ],
+        "categories": [
+          "Single-player",
+          "Multi-player",
+          "Co-op",
+          "Online Co-op",
+          "Steam Achievements",
+          "Camera Comfort",
+          "Custom Volume Controls"
+        ],
+        "dlc_count": 0,
+        "release": "10 Oct, 2026",
+        "website": null,
+        "siblings": [],
         "price": null,
         "review": {
           "positive": 0,
@@ -8532,6 +8950,158 @@
       }
     },
     {
+      "appid": 5204200,
+      "name": "Companion OS",
+      "release": "9 Oct, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0072,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "cold"
+        },
+        {
+          "name": "dev_best_reviews",
+          "dir": "up",
+          "bucket": "low"
+        }
+      ],
+      "active_signals": 3,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": 4,
+      "dev_best_reviews": 20,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5204200/70047788bbbeaa697f061b36574904701d6a01f4/header.jpg?t=1790117635",
+      "has_japanese": false,
+      "genres": [
+        "Casual",
+        "Utilities"
+      ],
+      "price": null,
+      "review": null,
+      "detail": {
+        "developers": [
+          "Pedro Verpha"
+        ],
+        "publishers": [
+          "Pedro Verpha"
+        ],
+        "genres": [
+          "Casual",
+          "Utilities"
+        ],
+        "categories": [
+          "Steam Achievements",
+          "In-App Purchases",
+          "Custom Volume Controls",
+          "#category_playable_at_your_own_pace",
+          "Playable without Timed Input",
+          "Save Anytime",
+          "Steam Cloud"
+        ],
+        "dlc_count": 0,
+        "release": "9 Oct, 2026",
+        "website": null,
+        "siblings": [
+          {
+            "appid": 4993050,
+            "name": "Mini Soccer Manager",
+            "ccu": 2
+          },
+          {
+            "appid": 4184910,
+            "name": "Game Dev Life",
+            "ccu": 1
+          }
+        ],
+        "price": null,
+        "review": null
+      }
+    },
+    {
+      "appid": 4482080,
+      "name": "Constriction",
+      "release": "9 Oct, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0072,
+      "expect": "low",
+      "conf": "mid",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "warm"
+        }
+      ],
+      "active_signals": 1,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4482080/296572a6a4df5e05babc409e7d31e09e6ab2291b/header.jpg?t=1791237784",
+      "has_japanese": false,
+      "genres": [
+        "Indie",
+        "Strategy"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "Studio Onira"
+        ],
+        "publishers": [
+          "Studio Onira"
+        ],
+        "genres": [
+          "Indie",
+          "Strategy"
+        ],
+        "categories": [
+          "Single-player",
+          "Multi-player",
+          "PvP",
+          "Online PvP",
+          "Steam Achievements",
+          "Color Alternatives",
+          "Playable without Timed Input"
+        ],
+        "dlc_count": 0,
+        "release": "9 Oct, 2026",
+        "website": null,
+        "siblings": [],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
       "appid": 4746560,
       "name": "Continuous Imperfection",
       "release": "Q3 2026",
@@ -9209,6 +9779,72 @@
       }
     },
     {
+      "appid": 5045630,
+      "name": "Crownspat",
+      "release": "11 Oct, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0072,
+      "expect": "low",
+      "conf": "mid",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "warm"
+        }
+      ],
+      "active_signals": 1,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5045630/a26fa4427892f8681131877937b3dd7223c81a6c/header.jpg?t=1790144030",
+      "has_japanese": true,
+      "genres": [
+        "Casual",
+        "Indie",
+        "Strategy"
+      ],
+      "price": null,
+      "review": null,
+      "detail": {
+        "developers": [
+          "Gambit Forge"
+        ],
+        "publishers": [
+          "Gambit Forge"
+        ],
+        "genres": [
+          "Casual",
+          "Indie",
+          "Strategy"
+        ],
+        "categories": [
+          "Single-player",
+          "Steam Achievements",
+          "Steam Workshop",
+          "Custom Volume Controls",
+          "Mouse Only Option",
+          "Playable without Timed Input",
+          "Steam Cloud"
+        ],
+        "dlc_count": 0,
+        "release": "11 Oct, 2026",
+        "website": null,
+        "siblings": [],
+        "price": null,
+        "review": null
+      }
+    },
+    {
       "appid": 4798390,
       "name": "Cruise Hantavirus Simulator",
       "release": "Coming soon",
@@ -9274,78 +9910,6 @@
         "dlc_count": 0,
         "release": "Coming soon",
         "website": null,
-        "siblings": [],
-        "price": null,
-        "review": {
-          "positive": 0,
-          "total": 0,
-          "pct": null
-        }
-      }
-    },
-    {
-      "appid": 5115370,
-      "name": "Crystal Drive Z",
-      "release": "8 Oct, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0072,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "warm"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5115370/90dfb07eaa3e4cf1674c723f4f0a0b646299c734/header.jpg?t=1789564867",
-      "has_japanese": true,
-      "genres": [
-        "Action",
-        "Indie"
-      ],
-      "price": null,
-      "review": {
-        "positive": 0,
-        "total": 0,
-        "pct": null
-      },
-      "detail": {
-        "developers": [
-          "Northline Works"
-        ],
-        "publishers": [
-          "Northline Works"
-        ],
-        "genres": [
-          "Action",
-          "Indie"
-        ],
-        "categories": [
-          "Single-player",
-          "Steam Achievements",
-          "Full controller support",
-          "Custom Volume Controls",
-          "Playable without Timed Input",
-          "DualShock Controller Support",
-          "DualShock Controller Support"
-        ],
-        "dlc_count": 0,
-        "release": "8 Oct, 2026",
-        "website": "https://www.northlineworks.net/projects/crystal-drive-z",
         "siblings": [],
         "price": null,
         "review": {
@@ -9497,81 +10061,6 @@
         "release": "Coming soon",
         "website": null,
         "siblings": [],
-        "price": null,
-        "review": {
-          "positive": 0,
-          "total": 0,
-          "pct": null
-        }
-      }
-    },
-    {
-      "appid": 5261340,
-      "name": "DEADLINE: LAST CHECKPOINT",
-      "release": "Q3 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0072,
-      "expect": "low",
-      "conf": "mid",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "warm"
-        }
-      ],
-      "active_signals": 1,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": 0,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5261340/ca78a60865cb9e358622bf8a2f08c050bcea7450/header.jpg?t=1789920337",
-      "has_japanese": false,
-      "genres": [
-        "Action"
-      ],
-      "price": null,
-      "review": {
-        "positive": 0,
-        "total": 0,
-        "pct": null
-      },
-      "detail": {
-        "developers": [
-          "Redcontroller Interactive"
-        ],
-        "publishers": [
-          "Redcontroller Interactive"
-        ],
-        "genres": [
-          "Action"
-        ],
-        "categories": [
-          "Single-player",
-          "Steam Achievements",
-          "Custom Volume Controls",
-          "Playable without Timed Input",
-          "Stereo Sound",
-          "Family Sharing"
-        ],
-        "dlc_count": 0,
-        "release": "Q3 2026",
-        "website": null,
-        "siblings": [
-          {
-            "appid": 5240380,
-            "name": "Pore Panic",
-            "ccu": null
-          }
-        ],
         "price": null,
         "review": {
           "positive": 0,
@@ -9806,7 +10295,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0068,
+      "spike_prob": 0.0069,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -9996,7 +10485,7 @@
         }
       ],
       "active_signals": 5,
-      "demo_ccu": 5,
+      "demo_ccu": 4,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 1,
@@ -10059,12 +10548,169 @@
       }
     },
     {
+      "appid": 5176690,
+      "name": "Bar Keeper",
+      "release": "9 Oct, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0065,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "warm"
+        }
+      ],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": 10,
+      "dev_best_reviews": 0,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5176690/de8d71ce8af7c38aa872c54ebad829a9dd001eaf/header.jpg?t=1788369697",
+      "has_japanese": true,
+      "genres": [
+        "Adventure",
+        "Casual",
+        "Indie",
+        "Simulation"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "KEEPLR"
+        ],
+        "publishers": [
+          "HeadArrow"
+        ],
+        "genres": [
+          "Adventure",
+          "Casual",
+          "Indie",
+          "Simulation"
+        ],
+        "categories": [
+          "Single-player",
+          "Steam Achievements",
+          "Full controller support",
+          "DualShock Controller Support",
+          "DualShock Controller Support",
+          "DualSense Controller Support",
+          "DualSense Controller Support"
+        ],
+        "dlc_count": 0,
+        "release": "9 Oct, 2026",
+        "website": "https://headarrow.com",
+        "siblings": [
+          {
+            "appid": 5115860,
+            "name": "Smoke Keeper",
+            "ccu": 4
+          }
+        ],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
+      "appid": 5261340,
+      "name": "DEADLINE: LAST CHECKPOINT",
+      "release": "Q3 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0065,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "warm"
+        }
+      ],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": 1,
+      "dev_best_reviews": 0,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5261340/ca78a60865cb9e358622bf8a2f08c050bcea7450/header.jpg?t=1789920337",
+      "has_japanese": false,
+      "genres": [
+        "Action"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "Redcontroller Interactive"
+        ],
+        "publishers": [
+          "Redcontroller Interactive"
+        ],
+        "genres": [
+          "Action"
+        ],
+        "categories": [
+          "Single-player",
+          "Steam Achievements",
+          "Custom Volume Controls",
+          "Playable without Timed Input",
+          "Stereo Sound",
+          "Family Sharing"
+        ],
+        "dlc_count": 0,
+        "release": "Q3 2026",
+        "website": null,
+        "siblings": [
+          {
+            "appid": 5240380,
+            "name": "Pore Panic",
+            "ccu": 1
+          }
+        ],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
       "appid": 5118700,
       "name": "//トロイメライ・ノクターン",
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0064,
+      "spike_prob": 0.0063,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -10135,7 +10781,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0064,
+      "spike_prob": 0.0063,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -10186,526 +10832,6 @@
         "siblings": [],
         "price": null,
         "review": null
-      }
-    },
-    {
-      "appid": 4567680,
-      "name": "A Tale Amidst Memories",
-      "release": "Coming soon",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0064,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "warm"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": true,
-      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4567680/ea51af453d9908aef337170f95125268764c2d2d/header.jpg?t=1790538025",
-      "has_japanese": false,
-      "genres": [
-        "Adventure",
-        "Indie",
-        "Free To Play"
-      ],
-      "price": null,
-      "review": {
-        "positive": 0,
-        "total": 0,
-        "pct": null
-      },
-      "detail": {
-        "developers": [
-          "Moliterno Al Tartufo"
-        ],
-        "publishers": [
-          "Moliterno Al Tartufo"
-        ],
-        "genres": [
-          "Adventure",
-          "Indie",
-          "Free To Play"
-        ],
-        "categories": [
-          "Single-player",
-          "Steam Achievements",
-          "Full controller support",
-          "Custom Volume Controls",
-          "Keyboard Only Option",
-          "Playable without Timed Input",
-          "Stereo Sound"
-        ],
-        "dlc_count": 0,
-        "release": "Coming soon",
-        "website": null,
-        "siblings": [],
-        "price": null,
-        "review": {
-          "positive": 0,
-          "total": 0,
-          "pct": null
-        }
-      }
-    },
-    {
-      "appid": 4565840,
-      "name": "Bet On It",
-      "release": "Coming soon",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0064,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "warm"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": true,
-      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4565840/4e54130ba3909ceeef9dfcf1053017d50f937232/header.jpg?t=1777954006",
-      "has_japanese": true,
-      "genres": [
-        "Action",
-        "Adventure",
-        "Strategy",
-        "Free To Play"
-      ],
-      "price": null,
-      "review": {
-        "positive": 0,
-        "total": 0,
-        "pct": null
-      },
-      "detail": {
-        "developers": [
-          "Lacozy"
-        ],
-        "publishers": [
-          "Lacozy"
-        ],
-        "genres": [
-          "Action",
-          "Adventure",
-          "Strategy",
-          "Free To Play"
-        ],
-        "categories": [
-          "Multi-player",
-          "PvP",
-          "Online PvP",
-          "Steam Achievements",
-          "Custom Volume Controls",
-          "#category_playable_at_your_own_pace",
-          "Playable without Timed Input"
-        ],
-        "dlc_count": 0,
-        "release": "Coming soon",
-        "website": null,
-        "siblings": [],
-        "price": null,
-        "review": {
-          "positive": 0,
-          "total": 0,
-          "pct": null
-        }
-      }
-    },
-    {
-      "appid": 4546060,
-      "name": "Bullet Hero",
-      "release": "October 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0064,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "warm"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": true,
-      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4546060/010e841b5c49f3788e0a2dd763bf8cafb8e3bf39/header.jpg?t=1790467386",
-      "has_japanese": false,
-      "genres": [
-        "Action",
-        "Indie",
-        "Free To Play",
-        "Early Access"
-      ],
-      "price": null,
-      "review": {
-        "positive": 0,
-        "total": 0,
-        "pct": null
-      },
-      "detail": {
-        "developers": [
-          "vertoker"
-        ],
-        "publishers": [
-          "vertoker"
-        ],
-        "genres": [
-          "Action",
-          "Indie",
-          "Free To Play",
-          "Early Access"
-        ],
-        "categories": [
-          "Single-player",
-          "Steam Workshop",
-          "Custom Volume Controls",
-          "Adjustable Difficulty",
-          "Playable without Timed Input",
-          "DualShock Controller Support",
-          "DualShock Controller Support"
-        ],
-        "dlc_count": 0,
-        "release": "October 2026",
-        "website": "https://bullethero.space/",
-        "siblings": [],
-        "price": null,
-        "review": {
-          "positive": 0,
-          "total": 0,
-          "pct": null
-        }
-      }
-    },
-    {
-      "appid": 5068010,
-      "name": "CHUD LIFE",
-      "release": "Coming soon",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0064,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "warm"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": true,
-      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5068010/cbad123abfa2d0a0e1f8b5bc41887bf67ca184eb/header.jpg?t=1790221993",
-      "has_japanese": false,
-      "genres": [
-        "Adventure",
-        "Casual",
-        "Indie",
-        "Free To Play"
-      ],
-      "price": null,
-      "review": null,
-      "detail": {
-        "developers": [
-          "Obaid Rumani"
-        ],
-        "publishers": [
-          "execelia"
-        ],
-        "genres": [
-          "Adventure",
-          "Casual",
-          "Indie",
-          "Free To Play"
-        ],
-        "categories": [
-          "Single-player",
-          "#category_playable_at_your_own_pace",
-          "Playable without Timed Input",
-          "Family Sharing"
-        ],
-        "dlc_count": 0,
-        "release": "Coming soon",
-        "website": null,
-        "siblings": [],
-        "price": null,
-        "review": null
-      }
-    },
-    {
-      "appid": 5005680,
-      "name": "CatPoker",
-      "release": "Coming soon",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0064,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "warm"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": true,
-      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5005680/0a4c277994d69bb3aee202d34ba70ccbc6d6ba6c/header.jpg?t=1790592650",
-      "has_japanese": false,
-      "genres": [
-        "Casual",
-        "Indie",
-        "Strategy",
-        "Free To Play"
-      ],
-      "price": null,
-      "review": {
-        "positive": 0,
-        "total": 0,
-        "pct": null
-      },
-      "detail": {
-        "developers": [
-          "HotpotGames"
-        ],
-        "publishers": [
-          "HotpotGames"
-        ],
-        "genres": [
-          "Casual",
-          "Indie",
-          "Strategy",
-          "Free To Play"
-        ],
-        "categories": [
-          "Multi-player",
-          "PvP",
-          "Online PvP",
-          "LAN PvP",
-          "Custom Volume Controls",
-          "Adjustable Difficulty",
-          "Mouse Only Option"
-        ],
-        "dlc_count": 2,
-        "release": "Coming soon",
-        "website": null,
-        "siblings": [
-          {
-            "appid": 5303420,
-            "name": "CatPoker猫扑克-FoundationPack创始人礼包",
-            "ccu": null
-          }
-        ],
-        "price": null,
-        "review": {
-          "positive": 0,
-          "total": 0,
-          "pct": null
-        }
-      }
-    },
-    {
-      "appid": 4896360,
-      "name": "Ceto-7",
-      "release": "2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0064,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "warm"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": true,
-      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4896360/77b57222b79ba0214c8b17acfecca3e36a395e32/header.jpg?t=1790622123",
-      "has_japanese": false,
-      "genres": [
-        "Action",
-        "Adventure",
-        "Indie",
-        "Free To Play"
-      ],
-      "price": null,
-      "review": {
-        "positive": 0,
-        "total": 0,
-        "pct": null
-      },
-      "detail": {
-        "developers": [
-          "M.A.D Lad Games"
-        ],
-        "publishers": [
-          "M.A.D Lad Games"
-        ],
-        "genres": [
-          "Action",
-          "Adventure",
-          "Indie",
-          "Free To Play"
-        ],
-        "categories": [
-          "Single-player",
-          "Custom Volume Controls",
-          "#category_playable_at_your_own_pace",
-          "Playable without Timed Input",
-          "Save Anytime",
-          "Stereo Sound",
-          "Family Sharing"
-        ],
-        "dlc_count": 0,
-        "release": "2026",
-        "website": "https://www.davemurraygames.com/portfolio-collections/my-portfolio/ceto-7",
-        "siblings": [],
-        "price": null,
-        "review": {
-          "positive": 0,
-          "total": 0,
-          "pct": null
-        }
-      }
-    },
-    {
-      "appid": 5045330,
-      "name": "DOTARIX",
-      "release": "Coming soon",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0064,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "warm"
-        }
-      ],
-      "active_signals": 2,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": true,
-      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5045330/bdc3593a8c30e25b43eb815d835e3ad8875275ff/header.jpg?t=1790023684",
-      "has_japanese": false,
-      "genres": [
-        "Action",
-        "Adventure",
-        "Free To Play"
-      ],
-      "price": null,
-      "review": {
-        "positive": 0,
-        "total": 0,
-        "pct": null
-      },
-      "detail": {
-        "developers": [
-          "Gracjan Niebieszczański"
-        ],
-        "publishers": [
-          "Gracjan Niebieszczański"
-        ],
-        "genres": [
-          "Action",
-          "Adventure",
-          "Free To Play"
-        ],
-        "categories": [
-          "Single-player",
-          "Steam Achievements",
-          "Adjustable Difficulty",
-          "Family Sharing"
-        ],
-        "dlc_count": 0,
-        "release": "Coming soon",
-        "website": "https://www.wgranie.pl",
-        "siblings": [],
-        "price": null,
-        "review": {
-          "positive": 0,
-          "total": 0,
-          "pct": null
-        }
       }
     },
     {
@@ -10825,6 +10951,80 @@
         "categories": [
           "Single-player",
           "Family Sharing"
+        ],
+        "dlc_count": 0,
+        "release": "Coming soon",
+        "website": null,
+        "siblings": [],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
+      "appid": 4567680,
+      "name": "A Tale Amidst Memories",
+      "release": "Coming soon",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0063,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "warm"
+        }
+      ],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": true,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4567680/ea51af453d9908aef337170f95125268764c2d2d/header.jpg?t=1790538025",
+      "has_japanese": false,
+      "genres": [
+        "Adventure",
+        "Indie",
+        "Free To Play"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "Moliterno Al Tartufo"
+        ],
+        "publishers": [
+          "Moliterno Al Tartufo"
+        ],
+        "genres": [
+          "Adventure",
+          "Indie",
+          "Free To Play"
+        ],
+        "categories": [
+          "Single-player",
+          "Steam Achievements",
+          "Full controller support",
+          "Custom Volume Controls",
+          "Keyboard Only Option",
+          "Playable without Timed Input",
+          "Stereo Sound"
         ],
         "dlc_count": 0,
         "release": "Coming soon",
@@ -11044,6 +11244,82 @@
       }
     },
     {
+      "appid": 4565840,
+      "name": "Bet On It",
+      "release": "Coming soon",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0063,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "warm"
+        }
+      ],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": true,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4565840/4e54130ba3909ceeef9dfcf1053017d50f937232/header.jpg?t=1777954006",
+      "has_japanese": true,
+      "genres": [
+        "Action",
+        "Adventure",
+        "Strategy",
+        "Free To Play"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "Lacozy"
+        ],
+        "publishers": [
+          "Lacozy"
+        ],
+        "genres": [
+          "Action",
+          "Adventure",
+          "Strategy",
+          "Free To Play"
+        ],
+        "categories": [
+          "Multi-player",
+          "PvP",
+          "Online PvP",
+          "Steam Achievements",
+          "Custom Volume Controls",
+          "#category_playable_at_your_own_pace",
+          "Playable without Timed Input"
+        ],
+        "dlc_count": 0,
+        "release": "Coming soon",
+        "website": null,
+        "siblings": [],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
       "appid": 4994540,
       "name": "Brilliante Photo Viewer",
       "release": "Coming soon",
@@ -11174,6 +11450,147 @@
           "total": 0,
           "pct": null
         }
+      }
+    },
+    {
+      "appid": 4546060,
+      "name": "Bullet Hero",
+      "release": "October 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0063,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "warm"
+        }
+      ],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": true,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4546060/010e841b5c49f3788e0a2dd763bf8cafb8e3bf39/header.jpg?t=1790467386",
+      "has_japanese": false,
+      "genres": [
+        "Action",
+        "Indie",
+        "Free To Play",
+        "Early Access"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "vertoker"
+        ],
+        "publishers": [
+          "vertoker"
+        ],
+        "genres": [
+          "Action",
+          "Indie",
+          "Free To Play",
+          "Early Access"
+        ],
+        "categories": [
+          "Single-player",
+          "Steam Workshop",
+          "Custom Volume Controls",
+          "Adjustable Difficulty",
+          "Playable without Timed Input",
+          "DualShock Controller Support",
+          "DualShock Controller Support"
+        ],
+        "dlc_count": 0,
+        "release": "October 2026",
+        "website": "https://bullethero.space/",
+        "siblings": [],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
+      "appid": 5068010,
+      "name": "CHUD LIFE",
+      "release": "Coming soon",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0063,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "warm"
+        }
+      ],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": true,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5068010/cbad123abfa2d0a0e1f8b5bc41887bf67ca184eb/header.jpg?t=1790221993",
+      "has_japanese": false,
+      "genres": [
+        "Adventure",
+        "Casual",
+        "Indie",
+        "Free To Play"
+      ],
+      "price": null,
+      "review": null,
+      "detail": {
+        "developers": [
+          "Obaid Rumani"
+        ],
+        "publishers": [
+          "execelia"
+        ],
+        "genres": [
+          "Adventure",
+          "Casual",
+          "Indie",
+          "Free To Play"
+        ],
+        "categories": [
+          "Single-player",
+          "#category_playable_at_your_own_pace",
+          "Playable without Timed Input",
+          "Family Sharing"
+        ],
+        "dlc_count": 0,
+        "release": "Coming soon",
+        "website": null,
+        "siblings": [],
+        "price": null,
+        "review": null
       }
     },
     {
@@ -11378,6 +11795,164 @@
             "ccu": null
           }
         ],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
+      "appid": 5005680,
+      "name": "CatPoker",
+      "release": "Coming soon",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0063,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "warm"
+        }
+      ],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": true,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5005680/0a4c277994d69bb3aee202d34ba70ccbc6d6ba6c/header.jpg?t=1790592650",
+      "has_japanese": false,
+      "genres": [
+        "Casual",
+        "Indie",
+        "Strategy",
+        "Free To Play"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "HotpotGames"
+        ],
+        "publishers": [
+          "HotpotGames"
+        ],
+        "genres": [
+          "Casual",
+          "Indie",
+          "Strategy",
+          "Free To Play"
+        ],
+        "categories": [
+          "Multi-player",
+          "PvP",
+          "Online PvP",
+          "LAN PvP",
+          "Custom Volume Controls",
+          "Adjustable Difficulty",
+          "Mouse Only Option"
+        ],
+        "dlc_count": 2,
+        "release": "Coming soon",
+        "website": null,
+        "siblings": [
+          {
+            "appid": 5303420,
+            "name": "CatPoker猫扑克-FoundationPack创始人礼包",
+            "ccu": null
+          }
+        ],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
+      "appid": 4896360,
+      "name": "Ceto-7",
+      "release": "2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0063,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "warm"
+        }
+      ],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": true,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4896360/77b57222b79ba0214c8b17acfecca3e36a395e32/header.jpg?t=1790622123",
+      "has_japanese": false,
+      "genres": [
+        "Action",
+        "Adventure",
+        "Indie",
+        "Free To Play"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "M.A.D Lad Games"
+        ],
+        "publishers": [
+          "M.A.D Lad Games"
+        ],
+        "genres": [
+          "Action",
+          "Adventure",
+          "Indie",
+          "Free To Play"
+        ],
+        "categories": [
+          "Single-player",
+          "Custom Volume Controls",
+          "#category_playable_at_your_own_pace",
+          "Playable without Timed Input",
+          "Save Anytime",
+          "Stereo Sound",
+          "Family Sharing"
+        ],
+        "dlc_count": 0,
+        "release": "2026",
+        "website": "https://www.davemurraygames.com/portfolio-collections/my-portfolio/ceto-7",
+        "siblings": [],
         "price": null,
         "review": {
           "positive": 0,
@@ -11965,6 +12540,149 @@
       }
     },
     {
+      "appid": 5226810,
+      "name": "Cybernetic Strategy",
+      "release": "9 Oct, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0063,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "warm"
+        }
+      ],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": true,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5226810/75d318b4a1f9f1a85da881faaef3193d6a44a050/header.jpg?t=1791056670",
+      "has_japanese": false,
+      "genres": [
+        "Action",
+        "Casual",
+        "Indie",
+        "Strategy",
+        "Free To Play",
+        "Early Access"
+      ],
+      "price": null,
+      "review": null,
+      "detail": {
+        "developers": [
+          "Dean Satine"
+        ],
+        "publishers": [
+          "Dean Satine"
+        ],
+        "genres": [
+          "Action",
+          "Casual",
+          "Indie",
+          "Strategy",
+          "Free To Play",
+          "Early Access"
+        ],
+        "categories": [
+          "Single-player",
+          "Multi-player",
+          "PvP",
+          "Online PvP",
+          "Cross-Platform Multiplayer",
+          "Steam Achievements",
+          "In-App Purchases"
+        ],
+        "dlc_count": 1,
+        "release": "9 Oct, 2026",
+        "website": "https://deansatine.github.io/CyberneticStrategyUniverse/",
+        "siblings": [],
+        "price": null,
+        "review": null
+      }
+    },
+    {
+      "appid": 5045330,
+      "name": "DOTARIX",
+      "release": "Coming soon",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0063,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "warm"
+        }
+      ],
+      "active_signals": 2,
+      "demo_ccu": null,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": true,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5045330/bdc3593a8c30e25b43eb815d835e3ad8875275ff/header.jpg?t=1790023684",
+      "has_japanese": false,
+      "genres": [
+        "Action",
+        "Adventure",
+        "Free To Play"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "Gracjan Niebieszczański"
+        ],
+        "publishers": [
+          "Gracjan Niebieszczański"
+        ],
+        "genres": [
+          "Action",
+          "Adventure",
+          "Free To Play"
+        ],
+        "categories": [
+          "Single-player",
+          "Steam Achievements",
+          "Adjustable Difficulty",
+          "Family Sharing"
+        ],
+        "dlc_count": 0,
+        "release": "Coming soon",
+        "website": "https://www.wgranie.pl",
+        "siblings": [],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
       "appid": 5326110,
       "name": "DRUNKARD",
       "release": "8 Oct, 2026",
@@ -12029,7 +12747,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0058,
+      "spike_prob": 0.0057,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -12217,7 +12935,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0056,
+      "spike_prob": 0.0055,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -12282,7 +13000,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0056,
+      "spike_prob": 0.0055,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -12478,7 +13196,7 @@
       "release": "Q3 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.005,
+      "spike_prob": 0.0051,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -12563,7 +13281,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.005,
+      "spike_prob": 0.0051,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -12629,7 +13347,7 @@
           {
             "appid": 3245620,
             "name": "Color Fear (Demo)",
-            "ccu": 2
+            "ccu": 1
           }
         ],
         "price": null,
@@ -12712,7 +13430,7 @@
           {
             "appid": 4358370,
             "name": "CELESTAY Craft&Slowlife (Demo)",
-            "ccu": 7
+            "ccu": 6
           }
         ],
         "price": null,
@@ -12729,7 +13447,7 @@
       "release": "Q3 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.004,
+      "spike_prob": 0.0039,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -13205,7 +13923,7 @@
           {
             "appid": 5277040,
             "name": "Calcio Totale (Demo)",
-            "ccu": 2
+            "ccu": 1
           }
         ],
         "price": null,
@@ -13299,390 +14017,6 @@
       }
     },
     {
-      "appid": 5243430,
-      "name": "AI-VJ - Cyber Punk Visuals",
-      "release": null,
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0024,
-      "expect": "low",
-      "conf": "low",
-      "factors": [],
-      "active_signals": 0,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "header_image": null,
-      "has_japanese": null,
-      "genres": [],
-      "price": null,
-      "review": null,
-      "detail": {
-        "developers": [],
-        "publishers": [],
-        "genres": [],
-        "categories": [],
-        "dlc_count": null,
-        "release": null,
-        "website": null,
-        "siblings": [],
-        "price": null,
-        "review": null
-      }
-    },
-    {
-      "appid": 4411010,
-      "name": "Beat the Meat",
-      "release": null,
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0024,
-      "expect": "low",
-      "conf": "low",
-      "factors": [],
-      "active_signals": 0,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "header_image": null,
-      "has_japanese": null,
-      "genres": [],
-      "price": null,
-      "review": null,
-      "detail": {
-        "developers": [],
-        "publishers": [],
-        "genres": [],
-        "categories": [],
-        "dlc_count": null,
-        "release": null,
-        "website": null,
-        "siblings": [],
-        "price": null,
-        "review": null
-      }
-    },
-    {
-      "appid": 5333810,
-      "name": "Blooming Parasite Demo",
-      "release": null,
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0024,
-      "expect": "low",
-      "conf": "low",
-      "factors": [],
-      "active_signals": 0,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "header_image": null,
-      "has_japanese": null,
-      "genres": [],
-      "price": null,
-      "review": null,
-      "detail": {
-        "developers": [],
-        "publishers": [],
-        "genres": [],
-        "categories": [],
-        "dlc_count": null,
-        "release": null,
-        "website": null,
-        "siblings": [],
-        "price": null,
-        "review": null
-      }
-    },
-    {
-      "appid": 5170320,
-      "name": "BumpBall",
-      "release": null,
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0024,
-      "expect": "low",
-      "conf": "low",
-      "factors": [],
-      "active_signals": 0,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "header_image": null,
-      "has_japanese": null,
-      "genres": [],
-      "price": null,
-      "review": {
-        "positive": 0,
-        "total": 0,
-        "pct": null
-      },
-      "detail": {
-        "developers": [],
-        "publishers": [],
-        "genres": [],
-        "categories": [],
-        "dlc_count": null,
-        "release": null,
-        "website": null,
-        "siblings": [],
-        "price": null,
-        "review": {
-          "positive": 0,
-          "total": 0,
-          "pct": null
-        }
-      }
-    },
-    {
-      "appid": 5260460,
-      "name": "Climb or Meow Demo",
-      "release": null,
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0024,
-      "expect": "low",
-      "conf": "low",
-      "factors": [],
-      "active_signals": 0,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "header_image": null,
-      "has_japanese": null,
-      "genres": [],
-      "price": null,
-      "review": null,
-      "detail": {
-        "developers": [],
-        "publishers": [],
-        "genres": [],
-        "categories": [],
-        "dlc_count": null,
-        "release": null,
-        "website": null,
-        "siblings": [],
-        "price": null,
-        "review": null
-      }
-    },
-    {
-      "appid": 5296050,
-      "name": "Coloring Pixels - Halloween 8 Pack",
-      "release": null,
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0024,
-      "expect": "low",
-      "conf": "low",
-      "factors": [],
-      "active_signals": 0,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "header_image": null,
-      "has_japanese": null,
-      "genres": [],
-      "price": null,
-      "review": null,
-      "detail": {
-        "developers": [],
-        "publishers": [],
-        "genres": [],
-        "categories": [],
-        "dlc_count": null,
-        "release": null,
-        "website": null,
-        "siblings": [],
-        "price": null,
-        "review": null
-      }
-    },
-    {
-      "appid": 4482080,
-      "name": "Constriction",
-      "release": null,
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0024,
-      "expect": "low",
-      "conf": "low",
-      "factors": [],
-      "active_signals": 0,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "header_image": null,
-      "has_japanese": null,
-      "genres": [],
-      "price": null,
-      "review": {
-        "positive": 0,
-        "total": 0,
-        "pct": null
-      },
-      "detail": {
-        "developers": [],
-        "publishers": [],
-        "genres": [],
-        "categories": [],
-        "dlc_count": null,
-        "release": null,
-        "website": null,
-        "siblings": [],
-        "price": null,
-        "review": {
-          "positive": 0,
-          "total": 0,
-          "pct": null
-        }
-      }
-    },
-    {
-      "appid": 4841390,
-      "name": "Curse of Baghdad",
-      "release": null,
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0024,
-      "expect": "low",
-      "conf": "low",
-      "factors": [],
-      "active_signals": 0,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "header_image": null,
-      "has_japanese": null,
-      "genres": [],
-      "price": null,
-      "review": {
-        "positive": 0,
-        "total": 0,
-        "pct": null
-      },
-      "detail": {
-        "developers": [],
-        "publishers": [],
-        "genres": [],
-        "categories": [],
-        "dlc_count": null,
-        "release": null,
-        "website": null,
-        "siblings": [],
-        "price": null,
-        "review": {
-          "positive": 0,
-          "total": 0,
-          "pct": null
-        }
-      }
-    },
-    {
-      "appid": 5226810,
-      "name": "Cybernetic Strategy",
-      "release": null,
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0024,
-      "expect": "low",
-      "conf": "low",
-      "factors": [],
-      "active_signals": 0,
-      "demo_ccu": null,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": null,
-      "dev_best_reviews": null,
-      "web_news": null,
-      "web_views": null,
-      "web_reach": null,
-      "is_free": false,
-      "header_image": null,
-      "has_japanese": null,
-      "genres": [],
-      "price": null,
-      "review": null,
-      "detail": {
-        "developers": [],
-        "publishers": [],
-        "genres": [],
-        "categories": [],
-        "dlc_count": null,
-        "release": null,
-        "website": null,
-        "siblings": [],
-        "price": null,
-        "review": null
-      }
-    },
-    {
       "appid": 4378370,
       "name": "Anomalous Cleaning Detail",
       "release": "8 Oct, 2026",
@@ -13754,13 +14088,13 @@
         "website": "https://pixeldripgames.com.au/",
         "siblings": [
           {
-            "appid": 4378380,
-            "name": "Anomalous Cleaning Detail (Demo)",
-            "ccu": 2
-          },
-          {
             "appid": 2823050,
             "name": "SCP: Descent (Demo)",
+            "ccu": 1
+          },
+          {
+            "appid": 4378380,
+            "name": "Anomalous Cleaning Detail (Demo)",
             "ccu": 1
           },
           {
@@ -13980,96 +14314,6 @@
           {
             "appid": 3966440,
             "name": "Monstrix TCG Card Shop (Demo)",
-            "ccu": 1
-          }
-        ],
-        "price": null,
-        "review": {
-          "positive": 0,
-          "total": 0,
-          "pct": null
-        }
-      }
-    },
-    {
-      "appid": 2980450,
-      "name": "Cliax Codec",
-      "release": "6 Oct, 2026",
-      "release_known": false,
-      "coming_soon": true,
-      "spike_prob": 0.0017,
-      "expect": "low",
-      "conf": "high",
-      "factors": [
-        {
-          "name": "genre",
-          "dir": "up",
-          "bucket": "warm"
-        },
-        {
-          "name": "dev_best_reviews",
-          "dir": "up",
-          "bucket": "low"
-        }
-      ],
-      "active_signals": 4,
-      "demo_ccu": 1,
-      "twitch_peak": null,
-      "streamers": 0,
-      "news_count": 0,
-      "has_news": false,
-      "dev_best_peak": 2,
-      "dev_best_reviews": 233,
-      "web_news": 0,
-      "web_views": null,
-      "web_reach": 0,
-      "is_free": false,
-      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2980450/header.jpg?t=1790008606",
-      "has_japanese": false,
-      "genres": [
-        "Action",
-        "Adventure",
-        "Indie"
-      ],
-      "price": null,
-      "review": {
-        "positive": 0,
-        "total": 0,
-        "pct": null
-      },
-      "detail": {
-        "developers": [
-          "Cliax Games"
-        ],
-        "publishers": [
-          "Cliax Games"
-        ],
-        "genres": [
-          "Action",
-          "Adventure",
-          "Indie"
-        ],
-        "categories": [
-          "Single-player",
-          "Steam Achievements",
-          "Full controller support",
-          "DualShock Controller Support",
-          "DualShock Controller Support",
-          "DualSense Controller Support",
-          "DualSense Controller Support"
-        ],
-        "dlc_count": 0,
-        "release": "6 Oct, 2026",
-        "website": "https://cliax-games.com/games/cliax-codec/",
-        "siblings": [
-          {
-            "appid": 3445950,
-            "name": "Cliax Codec (Demo)",
-            "ccu": 1
-          },
-          {
-            "appid": 1198510,
-            "name": "Paperball",
             "ccu": 1
           }
         ],
@@ -14664,6 +14908,78 @@
         "dlc_count": 0,
         "release": "Coming soon",
         "website": null,
+        "siblings": [],
+        "price": null,
+        "review": {
+          "positive": 0,
+          "total": 0,
+          "pct": null
+        }
+      }
+    },
+    {
+      "appid": 5115370,
+      "name": "Crystal Drive Z",
+      "release": "8 Oct, 2026",
+      "release_known": false,
+      "coming_soon": true,
+      "spike_prob": 0.0015,
+      "expect": "low",
+      "conf": "high",
+      "factors": [
+        {
+          "name": "genre",
+          "dir": "up",
+          "bucket": "warm"
+        }
+      ],
+      "active_signals": 2,
+      "demo_ccu": 1,
+      "twitch_peak": null,
+      "streamers": 0,
+      "news_count": 0,
+      "has_news": false,
+      "dev_best_peak": null,
+      "dev_best_reviews": null,
+      "web_news": null,
+      "web_views": null,
+      "web_reach": null,
+      "is_free": false,
+      "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5115370/90dfb07eaa3e4cf1674c723f4f0a0b646299c734/header.jpg?t=1789564867",
+      "has_japanese": true,
+      "genres": [
+        "Action",
+        "Indie"
+      ],
+      "price": null,
+      "review": {
+        "positive": 0,
+        "total": 0,
+        "pct": null
+      },
+      "detail": {
+        "developers": [
+          "Northline Works"
+        ],
+        "publishers": [
+          "Northline Works"
+        ],
+        "genres": [
+          "Action",
+          "Indie"
+        ],
+        "categories": [
+          "Single-player",
+          "Steam Achievements",
+          "Full controller support",
+          "Custom Volume Controls",
+          "Playable without Timed Input",
+          "DualShock Controller Support",
+          "DualShock Controller Support"
+        ],
+        "dlc_count": 0,
+        "release": "8 Oct, 2026",
+        "website": "https://www.northlineworks.net/projects/crystal-drive-z",
         "siblings": [],
         "price": null,
         "review": {
