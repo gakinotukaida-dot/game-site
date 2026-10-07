@@ -37,7 +37,7 @@ jobs:
           WRITE_RETRIES: 10
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           MENTIONS_CAP: ${{ github.event.inputs.cap || '30' }}
-          MENTIONS_SOURCES: "wikipedia_pageviews"
+          MENTIONS_SOURCES: "wikipedia_pageviews,wikipedia_pageviews_appid"
           PAGEVIEW_DAYS: ${{ github.event.inputs.pageview_days || '14' }}
           DRY_RUN: "false"
         run: python scripts/web_mentions_sweep.py
