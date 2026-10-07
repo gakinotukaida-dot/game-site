@@ -190,25 +190,49 @@ def src_wikidata_sitelinks(name):
     return len(_wd_sitelinks_map(name))
 
 
+PV_RETRIES = int(os.environ.get("PV_RETRIES") or "3")
+PV_BACKOFF_CAP = float(os.environ.get("PV_BACKOFF_CAP") or "30")
+
+
+class IncompleteResult(ValueError):
+    """Raised when a multi-request total could not be fully collected. Callers skip the row instead of recording a partial sum."""
+
+
+def _retry_wait(e, i):
+    ra = (e.headers or {}).get("Retry-After") if getattr(e, "headers", None) else None
+    try:
+        wait = float(ra) if ra else 2.0 * (2 ** i)
+    except ValueError:
+        wait = 2.0 * (2 ** i)
+    return min(PV_BACKOFF_CAP, wait)
+
+
 def _pageviews_range(project, title, start_date, end_date):
     """指定 project（例 en.wikipedia）の記事 title の [start_date, end_date] 合計ページビュー（人間アクセスのみ）。
-    その言語版に閲覧データが無い(404)は0。公式 Wikimedia Pageviews API・キー不要（過去の任意期間も引ける）。"""
+    その言語版に閲覧データが無い(404)は0。公式 Wikimedia Pageviews API・キー不要（過去の任意期間も引ける）。
+    429 and 5xx are retried with backoff (Retry-After honored); other 4xx mean no data and count as 0."""
     art = urllib.parse.quote(title.replace(" ", "_"), safe="")
     url = (f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/"
            f"{project}/all-access/user/{art}/daily/{start_date:%Y%m%d}/{end_date:%Y%m%d}")
-    try:
-        data = _get_json(url)
-    except urllib.error.HTTPError as e:
-        if e.code == 404:
+    for i in range(PV_RETRIES + 1):
+        try:
+            data = _get_json(url)
+            break
+        except urllib.error.HTTPError as e:
+            if e.code == 429 or e.code >= 500:
+                if i == PV_RETRIES:
+                    raise
+                time.sleep(_retry_wait(e, i))
+                continue
             return 0
-        raise
     items = (data or {}).get("items") or []
     return sum(int(it.get("views") or 0) for it in items)
 
 
 def pageviews_between(name, start_date, end_date, max_langs=None):
     """全言語版Wikipediaの [start_date, end_date] のページビュー合計。任意期間版（日次収集＝現在窓／backfill＝発売前窓 の両方が使う）。
-    Wikidata sitelinks で各言語の記事タイトルを得て、言語ごとに合算。公式API・キー不要。1言語だけの失敗はスキップ（合計は返す）。"""
+    Wikidata sitelinks で各言語の記事タイトルを得て、言語ごとに合算。公式API・キー不要。
+    If any language fails after retries, raises IncompleteResult so no partial sum is ever recorded."""
     smap = _wd_sitelinks_map(name)
     if not smap:
         return 0
@@ -224,8 +248,8 @@ def pageviews_between(name, start_date, end_date, max_langs=None):
         project = f"{lang.replace('_', '-')}.wikipedia"   # "zh_yue" -> "zh-yue.wikipedia"
         try:
             total += _pageviews_range(project, title, start_date, end_date)
-        except (urllib.error.URLError, ValueError, OSError):
-            pass                              # その言語版だけ諦めて続行（合計は返す）
+        except (urllib.error.URLError, ValueError, OSError) as e:
+            raise IncompleteResult(f"pageviews {project}: {type(e).__name__}") from e
         used += 1
         time.sleep(0.05)                      # 各言語版に優しく
     return total
