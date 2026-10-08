@@ -229,11 +229,12 @@ def _pageviews_range(project, title, start_date, end_date):
     return sum(int(it.get("views") or 0) for it in items)
 
 
-def pageviews_between(name, start_date, end_date, max_langs=None):
+def pageviews_between(name, start_date, end_date, max_langs=None, smap=None):
     """全言語版Wikipediaの [start_date, end_date] のページビュー合計。任意期間版（日次収集＝現在窓／backfill＝発売前窓 の両方が使う）。
     Wikidata sitelinks で各言語の記事タイトルを得て、言語ごとに合算。公式API・キー不要。
     If any language fails after retries, raises IncompleteResult so no partial sum is ever recorded."""
-    smap = _wd_sitelinks_map(name)
+    if smap is None:
+        smap = _wd_sitelinks_map(name)
     if not smap:
         return 0
     cap = max_langs or MAX_PV_LANGS
@@ -262,6 +263,44 @@ def src_wikipedia_pageviews(name):
     return pageviews_between(name, end - timedelta(days=PAGEVIEW_DAYS), end)
 
 
+def _wd_qid_by_appid(appid):
+    """Wikidata item whose Steam application ID (P1733) equals appid. None when no item or more than one item matches."""
+    q = urllib.parse.urlencode({"action": "query", "list": "search", "srsearch": f"haswbstatement:P1733={int(appid)}",
+                                "srnamespace": "0", "srlimit": "2", "srinfo": "totalhits", "format": "json"})
+    d = _get_json("https://www.wikidata.org/w/api.php?" + q)
+    hits = ((d or {}).get("query") or {}).get("search") or []
+    return hits[0].get("title") if len(hits) == 1 else None
+
+
+def _wd_sitelinks_by_appid(appid):
+    """Language-Wikipedia sitelinks {langwiki: title} of the item matched by Steam AppID. {} when unmatched (never falls back to name search)."""
+    key = ("appid", int(appid))
+    if key in _WD_CACHE:
+        return _WD_CACHE[key]
+    out = {}
+    qid = _wd_qid_by_appid(appid)
+    if qid:
+        q2 = urllib.parse.urlencode({"action": "wbgetentities", "ids": qid, "props": "sitelinks", "format": "json"})
+        d2 = _get_json("https://www.wikidata.org/w/api.php?" + q2)
+        links = (((d2 or {}).get("entities") or {}).get(qid) or {}).get("sitelinks") or {}
+        for k, v in links.items():
+            if k.endswith("wiki") and k not in _WD_NONLANG:
+                title = (v or {}).get("title")
+                if title:
+                    out[k] = title
+    _WD_CACHE[key] = out
+    return out
+
+
+def src_wikidata_sitelinks_appid(appid):
+    return len(_wd_sitelinks_by_appid(appid))
+
+
+def src_wikipedia_pageviews_appid(appid):
+    end = datetime.now(timezone.utc).date()
+    return pageviews_between(None, end - timedelta(days=PAGEVIEW_DAYS), end, smap=_wd_sitelinks_by_appid(appid))
+
+
 def src_gdelt(name):
     """GDELT の直近1週間の**世界の多言語ニュース**記事数（65言語超・地域横断）。公式API・キー不要。壊れたら例外→スキップ。
     GDELT はクエリに敏感：フレーズ（空白入り）は引用符・単語はそのまま。sort等の余計な指定は外す。"""
@@ -284,7 +323,10 @@ SOURCE_FUNCS = {
     "hackernews": src_hackernews,             # 英語圏・技術者寄り（偏りあり）
     "youtube": src_youtube,                   # 世界だが要APIキー
     "note": src_note,                         # 既定外（403）
+    "wikidata_sitelinks_appid": src_wikidata_sitelinks_appid,
+    "wikipedia_pageviews_appid": src_wikipedia_pageviews_appid,
 }
+APPID_SOURCES = {"wikidata_sitelinks_appid", "wikipedia_pageviews_appid"}
 
 
 def _write(sql_fn):
@@ -347,7 +389,7 @@ def main():
         qname = _clean_name(name)   # 検索は正規化名で（一致率↑）。保存キーは appid のまま。
         for s in active:
             try:
-                n = SOURCE_FUNCS[s](qname)
+                n = SOURCE_FUNCS[s](appid if s in APPID_SOURCES else qname)
             except urllib.error.HTTPError as e:
                 print(f"  [skip] {s:12} appid={appid} '{(name or '')[:24]}': HTTP {e.code}")
                 n = None
