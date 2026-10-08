@@ -113,7 +113,7 @@
 | `streamers` | 整数 | 配信者の数。★**こちらは `0` が入ります＝「調べて0人」。** 上の `twitch_peak: null`（未取得）と**意味が違います** |
 | `news_count` / `has_news` | 整数 / 真偽 | 告知・ニュースの本数と有無 |
 | `dev_best_peak` / `dev_best_reviews` | 整数 / null | 開発元の過去作の最高同接／レビュー数 |
-| `web_news` | 整数 / null | 世界の多言語ニュース記事数（GDELT） |
+| `web_news` | 整数 / null | 世界の多言語ニュース記事数（GDELT）。★2026-10 から収集を停止（API の制限で大半が取得失敗のため）。以後は null |
 | `web_views` | 整数 / null | 全言語版 Wikipedia の直近ページビュー合計 |
 | `web_reach` | 整数 / null | 言語版 Wikipedia の数（Wikidata） |
 

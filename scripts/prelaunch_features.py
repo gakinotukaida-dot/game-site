@@ -84,6 +84,11 @@ def dev_best_cte(self_from, asof_expr, name="dev_best"):
 )"""
 
 
+# GDELT の値は「取得時点から直近1週間」の記事数。古いスナップショットは別の週の話なので as-of に使わない
+# （2026-10 に定時収集を止めたため、これが無いと最後の値が推論で使われ続ける）。
+GDELT_FRESH_DAYS = 8
+
+
 def web_feature_sql(asof, web_ok):
     """web_mentions（分離テーブル）から web_news/web_reach を **asof より前の最新スナップショット**で as-of 参照する列。
     web_ok=False（テーブル未作成/収集前）のときは NULL 列を返す＝どのバケットも none 扱いで無影響（読み取り専用の他クエリを壊さない）。
@@ -94,6 +99,7 @@ def web_feature_sql(asof, web_ok):
                 "      NULL::bigint AS web_reach")
     return f"""      (SELECT wm.mentions FROM web_mentions wm
         WHERE wm.appid = g.appid AND wm.source = 'gdelt' AND wm.recorded_at < {asof}
+          AND wm.recorded_at >= {asof} - interval '{GDELT_FRESH_DAYS} days'
         ORDER BY wm.recorded_at DESC LIMIT 1) AS web_news,
       (SELECT wm.mentions FROM web_mentions wm
         WHERE wm.appid = g.appid AND wm.source = 'wikipedia_pageviews' AND wm.recorded_at < {asof}
