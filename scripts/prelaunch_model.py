@@ -49,6 +49,10 @@ MODEL_KIND = (os.environ.get("MODEL_KIND") or "nb").strip().lower()   # nb（既
 if MODEL_KIND not in ("nb", "lr"):
     MODEL_KIND = "nb"   # 想定外の値は保守側（従来）へ倒す
 SHADOW_COMPARE = (os.environ.get("SHADOW_COMPARE") or "").strip().lower() in ("1", "true", "yes")
+# Shadow comparison for excluding features (env SHADOW_EXCLUDE, comma separated; default empty = off).
+# Same 70/30 split, same MODEL_KIND: "current" (EXCLUDE_FEATURES as set) vs "excluded" (plus SHADOW_EXCLUDE).
+SHADOW_EXCLUDE = sorted({x.strip() for x in (os.environ.get("SHADOW_EXCLUDE") or "").split(",")
+                         if x.strip() in F.EXCLUDABLE})
 # lr の正則化の候補（交差検証で1つ選ぶ）。大きいほど重みを0へ縮める＝材料の薄い区切りを控えめにする。
 LR_L2_GRID = [float(x) for x in (os.environ.get("LR_L2_GRID") or "0.03,0.1,0.3,1,3,10,30,100").split(",") if x.strip()]
 # lr の係数をそろえる基準区切り（＝「材料なし」）。各特徴量でこの区切りの係数を0にし、差分は切片へ移す。
@@ -415,6 +419,54 @@ def shadow_compare(train, test, base):
     return out
 
 
+def _with_excluded(names, fn):
+    """Run fn() with F.EXCLUDED_FEATURES temporarily set to names (restored afterwards)."""
+    saved = set(F.EXCLUDED_FEATURES)
+    F.EXCLUDED_FEATURES.clear()
+    F.EXCLUDED_FEATURES.update(names)
+    try:
+        return fn()
+    finally:
+        F.EXCLUDED_FEATURES.clear()
+        F.EXCLUDED_FEATURES.update(saved)
+
+
+def shadow_exclude_compare(train, test, base, extra):
+    """Train the same MODEL_KIND twice on the same split: current features vs current minus `extra`.
+    Reports test metrics/calibration (same yardstick as shadow_compare) and how many test rows change.
+    No verdict is computed here: acceptance criteria are pre-registered outside the code (owner decides)."""
+    cur = set(F.EXCLUDED_FEATURES)
+    variants = {"current": sorted(cur), "excluded": sorted(cur | set(extra))}
+    out = {"split": {"train_n": len(train), "test_n": len(test)}, "kind": MODEL_KIND,
+           "extra_excluded": sorted(extra), "variants": {}}
+    probs = {}
+    for name, excl in variants.items():
+        def run():
+            m = learn_model(train, base=base)
+            return m, [F.score(m, {k: r.get(k) for k in F.SQL_FEATURES}, r["genres"])["prob"] for r in test]
+        m, ps = _with_excluded(excl, run)
+        probs[name] = ps
+        scored = list(zip(ps, [r["hit"] for r in test]))
+        entry = {"excluded": excl, "metrics": _cmp_metrics(scored), "calibration": _calibration(scored)}
+        if m.get("kind") == "lr":
+            entry["l2"] = m.get("l2")
+        out["variants"][name] = entry
+    # Rows whose raw value of an extra-excluded feature is in a non-"none" bucket (they carry the signal).
+    carrying = [i for i, r in enumerate(test)
+                if any(_with_excluded(variants["current"], lambda: F.bucketize(f, r.get(f))) != "none"
+                       for f in extra)]
+    diffs = [abs(a - b) for a, b in zip(probs["current"], probs["excluded"])]
+    out["changes"] = {
+        "rows_changed_over_0.001": sum(1 for d in diffs if d > 0.001),
+        "max_abs_change": round(max(diffs), 6) if diffs else None,
+        "test_rows_with_signal": len(carrying),
+        "test_rows_with_signal_hits": sum(1 for i in carrying if test[i]["hit"]),
+        "signal_rows": [{"current": round(probs["current"][i], 4), "excluded": round(probs["excluded"][i], 4),
+                         "hit": bool(test[i]["hit"])} for i in carrying][:50],
+    }
+    return out
+
+
 def main():
     conn = psycopg2.connect(DATABASE_URL)
     try:
@@ -512,6 +564,17 @@ def main():
             print(f"  [影比較] {kind}: 上位帯 予測{mt['top_band']['pred_mean']}・実測{mt['top_band']['actual_rate']}"
                   f"・n={mt['top_band']['n']}／lift×{mt['top_decile_lift']}／Brier {mt['brier']}")
         print(f"  [影比較] 判定＝{cmp_['criteria']['verdict']} {cmp_['criteria']}")
+
+    if SHADOW_EXCLUDE and len(train) >= 50 and len(test) >= 20:
+        cmp_x = shadow_exclude_compare(train, test, base, SHADOW_EXCLUDE)
+        payload["shadow_exclude_compare"] = cmp_x
+        for vname, e in cmp_x["variants"].items():
+            mt = e["metrics"]
+            print(f"  [exclude-shadow] {vname} excluded={e['excluded']}: top band pred {mt['top_band']['pred_mean']}"
+                  f" actual {mt['top_band']['actual_rate']} n={mt['top_band']['n']} / lift x{mt['top_decile_lift']}"
+                  f" / Brier {mt['brier']} / top-decile {mt['top_decile_ref']}")
+            print(f"  [exclude-shadow] {vname} calibration {json.dumps(e['calibration'])}")
+        print(f"  [exclude-shadow] changes {json.dumps(cmp_x['changes'])}")
 
     out_dir = os.path.dirname(OUT_PATH)
     if out_dir:

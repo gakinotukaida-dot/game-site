@@ -1,0 +1,40 @@
+# Shadow comparison: the prelaunch model with vs without some features (default: the two Twitch features).
+# Location: .github/workflows/prelaunch_exclude_shadow.yml
+# Role: same 70/30 split, same MODEL_KIND as production (lr). Trains "current" and "excluded" and prints
+#       test metrics / calibration bands / how many test rows change. Manual run only (workflow_dispatch).
+# Safety: DB read-only (SELECT only). Writes only a temp JSON inside the runner. Nothing is committed,
+#         the site and data/*.json are not touched.
+# Undo: delete this file.
+name: prelaunch exclude shadow (with vs without features)
+
+on:
+  workflow_dispatch:
+    inputs:
+      exclude:
+        description: "Features to exclude in the comparison (comma separated)"
+        default: "twitch_peak,streamers"
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  shadow:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install "psycopg2-binary>=2.9"
+      - name: Compare with vs without features (DB read-only / temp output only)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          MODEL_KIND: lr
+          SHADOW_EXCLUDE: ${{ github.event.inputs.exclude || 'twitch_peak,streamers' }}
+          OUT_PATH: ${{ runner.temp }}/prelaunch_exclude_shadow.json
+        run: python scripts/prelaunch_model.py
+      - name: Print comparison JSON
+        env:
+          OUT_PATH: ${{ runner.temp }}/prelaunch_exclude_shadow.json
+        run: python -c "import json,os; print(json.dumps(json.load(open(os.environ['OUT_PATH']))['shadow_exclude_compare'], ensure_ascii=False, indent=1))"

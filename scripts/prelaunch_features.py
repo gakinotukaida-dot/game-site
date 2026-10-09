@@ -25,6 +25,7 @@
 """
 
 import math
+import os
 
 # 特徴量の順序（SQLの並びと一致させる）。genre はSQLではなくPython側で算出（学習した命中率が要るため）。
 # web_news / web_reach は web_mentions（分離テーブル）由来。テーブルが無ければ NULL＝none で無影響（自動フォールバック）。
@@ -36,6 +37,15 @@ FEATURE_NAMES = SQL_FEATURES + ["genre"]
 DEMO_WIN = 14
 TW_WIN = 30
 NEWS_WIN = 90
+
+# Features excluded from learning (env EXCLUDE_FEATURES, comma separated; default empty = unchanged behaviour).
+# An excluded feature always falls into its "none" bucket, so it gets weight 0 and never appears as a factor.
+# Raw values (e.g. twitch_peak in upcoming.json) are still exported as before. Only SQL features whose
+# baseline bucket is "none" may be excluded (is_free / genre are not supported).
+EXCLUDABLE = {"demo_ccu", "twitch_peak", "streamers", "news_count", "web_news", "web_views", "web_reach",
+              "dev_best_peak", "dev_best_reviews"}
+EXCLUDED_FEATURES = {x.strip() for x in (os.environ.get("EXCLUDE_FEATURES") or "").split(",")
+                     if x.strip() in EXCLUDABLE}
 
 
 def web_mentions_exists(cur):
@@ -126,6 +136,8 @@ def feature_sql(asof, demo_win=DEMO_WIN, tw_win=TW_WIN, news_win=NEWS_WIN, web_o
 
 def bucketize(name, v, genre_rates=None, base=None):
     """特徴量の値を数個の区切り（bucket）に落とす。学習・推論で同じ関数を使う＝定義を固定。"""
+    if name in EXCLUDED_FEATURES:
+        return "none"
     if name == "demo_ccu":
         if v is None or v <= 0: return "none"
         if v < 50: return "low"
