@@ -30,6 +30,9 @@ jobs:
           # 1002-2042（本人承認）：ロジスティック回帰へ切り替え。影比較の初回は事前登録の条件で合格（土台 1002-2042-G4）。
           # 戻し方＝この1行を消す（nb＝従来のスコアカードに戻る）。prediction_scorecard.yml の同じ行も一緒に消すこと。
           MODEL_KIND: lr
+          # 1009 (owner approved, comparison run 37936712703): drop the two Twitch features from learning.
+          # Undo = delete this line (and the same line in prediction_scorecard.yml; keep both in sync).
+          EXCLUDE_FEATURES: twitch_peak,streamers
           # LOOKBACK_DAYS: "180"
           # OUTCOME_DAYS: "14"
           # HIT_THRESHOLD: "1000"
