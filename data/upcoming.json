@@ -3,22 +3,22 @@
   "schema": "upcoming_v5",
   "source": "games(coming_soon/release_date) + 実測シグナル(体験版/Twitch/告知/開発元実績/ジャンル) + prelaunch_model",
   "note": "発売前の羽根予想。spike_prob=跳ね確率＝自社実績で較正したモデルの出力（参考・外れうる）。モデルが無い場合は expect のみ（実測シグナルの有無）。発売日が今日以前の作品は除外（coming_soon フラグが古い“居座り”も落とす）。",
-  "generated_at": "2026-10-13T12:08:56.350261+00:00",
+  "generated_at": "2026-10-13T21:31:58.689467+00:00",
   "model": {
     "schema": "prelaunch_model_v2",
     "readiness": "validated",
-    "base_rate": 0.041751,
-    "n_pairs": 7880,
+    "base_rate": 0.041746,
+    "n_pairs": 7881,
     "hit_threshold": 1000,
     "validation_oos": {
-      "eval_n": 2279,
-      "eval_base": 0.0373,
-      "top_decile_rate": 0.2511,
-      "top_decile_lift": 6.73,
+      "eval_n": 2280,
+      "eval_base": 0.03728,
+      "top_decile_rate": 0.25,
+      "top_decile_lift": 6.71,
       "mean_prob_hit": 0.31683,
       "mean_prob_miss": 0.03217
     },
-    "generated_at": "2026-10-13T11:49:20.468499+00:00"
+    "generated_at": "2026-10-13T21:15:33.671958+00:00"
   },
   "params": {
     "limit": 200,
@@ -35,10 +35,15 @@
       "release": "14 Oct, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.9227,
+      "spike_prob": 0.996,
       "expect": "high",
       "conf": "high",
       "factors": [
+        {
+          "name": "demo_ccu",
+          "dir": "up",
+          "bucket": "high"
+        },
         {
           "name": "news_count",
           "dir": "up",
@@ -48,15 +53,10 @@
           "name": "genre",
           "dir": "up",
           "bucket": "hot"
-        },
-        {
-          "name": "dev_best_reviews",
-          "dir": "up",
-          "bucket": "high"
         }
       ],
       "active_signals": 5,
-      "demo_ccu": 407,
+      "demo_ccu": 536,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 10,
@@ -110,14 +110,14 @@
         "website": null,
         "siblings": [
           {
-            "appid": 1449850,
-            "name": "Yu-Gi-Oh! Master Duel",
-            "ccu": 18095
-          },
-          {
             "appid": 1665460,
             "name": "eFootball™",
-            "ccu": 12513
+            "ccu": 14686
+          },
+          {
+            "appid": 1449850,
+            "name": "Yu-Gi-Oh! Master Duel",
+            "ccu": 8495
           },
           {
             "appid": 601510,
@@ -135,6 +135,11 @@
             "ccu": 1156
           },
           {
+            "appid": 5000760,
+            "name": "Castlevania: Belmont's Curse (Demo)",
+            "ccu": 485
+          },
+          {
             "appid": 2492670,
             "name": "METAL GEAR SOLID 4: Guns of the Patriots - Master Collection Version",
             "ccu": 378
@@ -143,11 +148,6 @@
             "appid": 1932640,
             "name": "Suikoden I&II HD Remaster Gate Rune and Dunan Unification Wars",
             "ccu": 282
-          },
-          {
-            "appid": 5000760,
-            "name": "Castlevania: Belmont's Curse (Demo)",
-            "ccu": 246
           }
         ],
         "price": {
@@ -169,7 +169,7 @@
       "release": "15 Oct, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.6959,
+      "spike_prob": 0.6966,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -239,7 +239,7 @@
           {
             "appid": 1401590,
             "name": "Disney Dreamlight Valley",
-            "ccu": 3107
+            "ccu": 5053
           },
           {
             "appid": 1815780,
@@ -291,7 +291,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.4797,
+      "spike_prob": 0.4798,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -388,7 +388,7 @@
       "release": "14 Oct, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.4092,
+      "spike_prob": 0.4094,
       "expect": "high",
       "conf": "high",
       "factors": [
@@ -548,7 +548,7 @@
           {
             "appid": 3978510,
             "name": "Chained Beasts (Demo)",
-            "ccu": 124
+            "ccu": 146
           },
           {
             "appid": 2936030,
@@ -776,7 +776,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0724,
+      "spike_prob": 0.0725,
       "expect": "mid",
       "conf": "high",
       "factors": [
@@ -1113,7 +1113,7 @@
       "release": "15 Oct, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0348,
+      "spike_prob": 0.0349,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1192,7 +1192,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0348,
+      "spike_prob": 0.0349,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1269,7 +1269,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0348,
+      "spike_prob": 0.0349,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1346,7 +1346,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0309,
+      "spike_prob": 0.031,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -1503,14 +1503,14 @@
         "website": "https://amongthetrolls.com/",
         "siblings": [
           {
-            "appid": 4167740,
-            "name": "Among the Trolls (Demo)",
-            "ccu": 14
-          },
-          {
             "appid": 2153350,
             "name": "Brothers: A Tale of Two Sons Remake",
             "ccu": 7
+          },
+          {
+            "appid": 4167740,
+            "name": "Among the Trolls (Demo)",
+            "ccu": 5
           },
           {
             "appid": 5283060,
@@ -2240,7 +2240,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0248,
+      "spike_prob": 0.0249,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2394,7 +2394,7 @@
       "release": "26 Oct, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0232,
+      "spike_prob": 0.0233,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -2473,7 +2473,7 @@
           {
             "appid": 4348350,
             "name": "Drive With Friends (Demo)",
-            "ccu": 5
+            "ccu": 2
           },
           {
             "appid": 3119780,
@@ -4957,14 +4957,14 @@
         "website": null,
         "siblings": [
           {
+            "appid": 4393810,
+            "name": "Cozy Builder (Demo)",
+            "ccu": 24
+          },
+          {
             "appid": 2168260,
             "name": "Forgotten Seas",
             "ccu": 10
-          },
-          {
-            "appid": 4393810,
-            "name": "Cozy Builder (Demo)",
-            "ccu": 5
           }
         ],
         "price": null,
@@ -5141,9 +5141,9 @@
             "ccu": 5
           },
           {
-            "appid": 598940,
-            "name": "Doodle Mafia",
-            "ccu": 2
+            "appid": 4091980,
+            "name": "Bouncemasters 2: Pengu Throw (Demo)",
+            "ccu": 3
           },
           {
             "appid": 431640,
@@ -5151,8 +5151,8 @@
             "ccu": 2
           },
           {
-            "appid": 4091980,
-            "name": "Bouncemasters 2: Pengu Throw (Demo)",
+            "appid": 598940,
+            "name": "Doodle Mafia",
             "ccu": 2
           },
           {
@@ -5185,7 +5185,7 @@
       "release": "14 Oct, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0076,
+      "spike_prob": 0.0075,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -5265,7 +5265,7 @@
       "release": "15 Oct, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0076,
+      "spike_prob": 0.0075,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -5347,7 +5347,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0076,
+      "spike_prob": 0.0075,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -5435,7 +5435,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0076,
+      "spike_prob": 0.0075,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -5531,7 +5531,7 @@
       "release": "16 Oct, 2026",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0076,
+      "spike_prob": 0.0075,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -5611,7 +5611,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0076,
+      "spike_prob": 0.0075,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -5692,7 +5692,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0076,
+      "spike_prob": 0.0075,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -5771,7 +5771,7 @@
       "release": "Coming soon",
       "release_known": false,
       "coming_soon": true,
-      "spike_prob": 0.0076,
+      "spike_prob": 0.0075,
       "expect": "low",
       "conf": "high",
       "factors": [
@@ -9363,7 +9363,7 @@
           {
             "appid": 4348350,
             "name": "Drive With Friends (Demo)",
-            "ccu": 5
+            "ccu": 2
           },
           {
             "appid": 3119780,
@@ -10651,7 +10651,7 @@
         }
       ],
       "active_signals": 5,
-      "demo_ccu": 14,
+      "demo_ccu": 18,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 1,
@@ -11699,7 +11699,7 @@
         }
       ],
       "active_signals": 4,
-      "demo_ccu": 20,
+      "demo_ccu": 15,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 1,
@@ -12119,12 +12119,12 @@
         }
       ],
       "active_signals": 3,
-      "demo_ccu": 1,
+      "demo_ccu": 2,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 0,
       "has_news": false,
-      "dev_best_peak": 1,
+      "dev_best_peak": 2,
       "dev_best_reviews": null,
       "web_news": null,
       "web_views": null,
@@ -12287,7 +12287,7 @@
         }
       ],
       "active_signals": 3,
-      "demo_ccu": 2,
+      "demo_ccu": 1,
       "twitch_peak": null,
       "streamers": 0,
       "news_count": 0,
@@ -14656,7 +14656,7 @@
           {
             "appid": 5294650,
             "name": "Bone to Pick: Forensic Case Files Demo",
-            "ccu": 12
+            "ccu": 2
           }
         ],
         "price": null,
