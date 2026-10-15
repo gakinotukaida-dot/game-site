@@ -32,12 +32,19 @@ from psycopg2.extras import execute_batch
 
 from _filters import not_adult
 from web_mentions_sweep import DDL, pageviews_between  # テーブル定義と“任意期間ページビュー合計”を共有
+from web_mentions_sweep import _wd_sitelinks_by_appid
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 LOOKBACK_DAYS = int(os.environ.get("LOOKBACK_DAYS") or "180")   # 学習窓と一致（この範囲の発売済みを覆う）
 PAGEVIEW_DAYS = int(os.environ.get("PAGEVIEW_DAYS") or "14")    # 発売前の実閲覧を測る窓（日次収集と一致）
 BACKFILL_CAP = int(os.environ.get("BACKFILL_CAP") or "150")    # 1回の処理件数（Neon autosuspend 無効化で cold-start が消えたため増量。150×8/日で約2日一巡）
 FLUSH_EVERY = int(os.environ.get("FLUSH_EVERY") or "20")       # この件数ごとに書き込む（常時起動になったので温存目的の細かい flush は不要）
+# Which Wikidata lookup to backfill. "name" (default) = unchanged behaviour (name search -> 'wikipedia_pageviews').
+# "appid" = look up the item by Steam AppID (P1733) and write 'wikipedia_pageviews_appid' (same as the daily appid source).
+BACKFILL_SOURCE = (os.environ.get("BACKFILL_SOURCE") or "name").strip().lower()
+if BACKFILL_SOURCE not in ("name", "appid"):
+    raise SystemExit(f"BACKFILL_SOURCE must be 'name' or 'appid' (got {BACKFILL_SOURCE!r})")
+SOURCE_KEY = "wikipedia_pageviews_appid" if BACKFILL_SOURCE == "appid" else "wikipedia_pageviews"
 
 # 発売済み（直近LOOKBACK日）で、まだ“発売前 web_views”を持たない作品。発売日が新しい順に少しずつ。
 TARGET_QUERY = f"""
@@ -51,7 +58,7 @@ WHERE g.release_date IS NOT NULL
   AND {not_adult('g')}
   AND NOT EXISTS (
     SELECT 1 FROM web_mentions wm
-    WHERE wm.appid = g.appid AND wm.source = 'wikipedia_pageviews'
+    WHERE wm.appid = g.appid AND wm.source = %(source)s
       AND wm.recorded_at < g.release_date
   )
 ORDER BY g.release_date DESC
@@ -60,7 +67,10 @@ LIMIT %(cap)s
 
 # recorded_at＝発売日前日（as-of で“発売前”に入るように）。source は日次収集と同一キー。
 INSERT_SQL = ("INSERT INTO web_mentions (appid, source, mentions, recorded_at) "
-              "VALUES (%s, 'wikipedia_pageviews', %s, %s)")
+              "VALUES (%s, %s, %s, %s)")
+
+# Remaining-target count for the log (same filter as TARGET_QUERY, without ORDER/LIMIT). Read-only.
+COUNT_QUERY = "SELECT count(*) FROM (" + TARGET_QUERY.split("ORDER BY")[0] + ") t"
 
 
 def _connect_retry(fn, attempts=None):
@@ -103,7 +113,7 @@ def get_targets():
     try:
         conn.set_session(readonly=True, autocommit=True)
         with conn.cursor() as cur:
-            cur.execute(TARGET_QUERY, {"lookback": LOOKBACK_DAYS, "cap": BACKFILL_CAP})
+            cur.execute(TARGET_QUERY, {"lookback": LOOKBACK_DAYS, "cap": BACKFILL_CAP, "source": SOURCE_KEY})
             return cur.fetchall()
     finally:
         conn.close()
@@ -119,8 +129,22 @@ def get_targets_or_none():
             cur.execute("SELECT to_regclass('public.web_mentions')")
             if cur.fetchone()[0] is None:
                 return None
-            cur.execute(TARGET_QUERY, {"lookback": LOOKBACK_DAYS, "cap": BACKFILL_CAP})
+            cur.execute(TARGET_QUERY, {"lookback": LOOKBACK_DAYS, "cap": BACKFILL_CAP, "source": SOURCE_KEY})
             return cur.fetchall()
+    finally:
+        conn.close()
+
+
+def count_remaining():
+    """Read-only count of targets not yet backfilled for SOURCE_KEY (for measuring progress). None on error."""
+    conn = psycopg2.connect(DATABASE_URL)
+    try:
+        conn.set_session(readonly=True, autocommit=True)
+        with conn.cursor() as cur:
+            cur.execute(COUNT_QUERY, {"lookback": LOOKBACK_DAYS, "source": SOURCE_KEY})
+            return cur.fetchone()[0]
+    except psycopg2.Error:
+        return None
     finally:
         conn.close()
 
@@ -128,7 +152,8 @@ def get_targets_or_none():
 def _flush(rows):
     """rows を一括 INSERT（recorded_at＝発売日前日）。書き込み＝Neon cold-start に再試行つき。"""
     if rows:
-        _connect_retry(lambda conn: execute_batch(conn.cursor(), INSERT_SQL, rows, page_size=200))
+        _connect_retry(lambda conn: execute_batch(
+            conn.cursor(), INSERT_SQL, [(a, SOURCE_KEY, m, r) for (a, m, r) in rows], page_size=200))
 
 
 def main():
@@ -151,6 +176,8 @@ def main():
     else:
         # テーブルは有る＝長い計算に入る前に write-primary を起こしておく（cold-start をここで吸収）。
         _warmup()
+    if BACKFILL_SOURCE == "appid":
+        print(f"[web-backfill] source={SOURCE_KEY} remaining={count_remaining()} this_run={len(targets)}")
 
     # 3) 各作品の発売前 [release_date-PAGEVIEW_DAYS, release_date] の全言語ページビュー合計を計算し、
     #    FLUSH_EVERY 件ごとに書き込む。★計算(HTTP)は数分かかるため、こまめに書いて write-primary を温存
@@ -160,13 +187,17 @@ def main():
     for appid, name, rd in targets:
         start = rd - timedelta(days=PAGEVIEW_DAYS)
         try:
-            total = int(pageviews_between(name, start, rd))
+            if BACKFILL_SOURCE == "appid":
+                # No item for this AppID (or more than one) -> empty sitelinks -> 0, same as the daily appid source.
+                total = int(pageviews_between(None, start, rd, smap=_wd_sitelinks_by_appid(appid)))
+            else:
+                total = int(pageviews_between(name, start, rd))
         except Exception as e:   # 1作品の失敗で全体を止めない（次回に再挑戦）
             print(f"  [skip] appid={appid} '{(name or '')[:28]}': {type(e).__name__}")
             continue
         rec_at = rd - timedelta(days=1)   # 発売日前日＝as-of で“発売前”に入る
         buffer.append((appid, total, rec_at))
-        print(f"  web_views(発売前) appid={appid:>9} {total:>9}  発売 {rd}  {(name or '')[:34]}")
+        print(f"  web_views(発売前){' [appid]' if BACKFILL_SOURCE == 'appid' else ''} appid={appid:>9} {total:>9}  発売 {rd}  {(name or '')[:34]}")
         if len(buffer) >= FLUSH_EVERY:
             _flush(buffer)
             written += len(buffer)
@@ -176,6 +207,10 @@ def main():
 
     if not written:
         print("[web-backfill] 記録行 0（全件失敗/該当なし）。")
+        return 0
+    if BACKFILL_SOURCE == "appid":
+        print(f"[web-backfill] wrote {written} rows to {SOURCE_KEY} (recorded_at = day before release). "
+              f"Not read by the model yet (features still read 'wikipedia_pageviews').")
         return 0
     print(f"[web-backfill] 記録 {written} 件（発売前 web_views・recorded_at=発売日前日・{FLUSH_EVERY}件ごとに書込）。"
           f"次回のモデル再学習(04:20)が特徴量として拾い、web_views の重みが自動で付き始めます。")

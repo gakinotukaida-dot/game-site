@@ -1,0 +1,46 @@
+# Backfill pre-release pageviews looked up by Steam AppID (P1733) instead of by name.
+# Location: .github/workflows/web_backfill_appid.yml
+# Role: stage 1 of switching web_views to the AppID source. Writes only the 'wikipedia_pageviews_appid'
+#       source (recorded_at = day before release). The model does not read this source yet, so predictions,
+#       the site and data/*.json do not change.
+# Safety: isolated table web_mentions, INSERT only, idempotent (a game already backfilled for this source is skipped).
+#         The name-based backfill (web_backfill.yml) is not touched.
+# Undo: delete this file. Rows already written stay (signals are never deleted) and are not read by anything.
+name: web backfill appid (pre-release pageviews by Steam AppID)
+
+on:
+  workflow_dispatch:
+    inputs:
+      cap:
+        description: "Games per run"
+        default: "50"
+        required: false
+  schedule:
+    # Every 3 hours at :25, offset from the name-based backfill (:55) so the two do not hit Wikimedia at once.
+    - cron: "25 */3 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-backfill-appid
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install "psycopg2-binary>=2.9"
+      - name: Backfill pre-release pageviews by AppID (isolated table / INSERT only / idempotent)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          BACKFILL_SOURCE: appid
+          BACKFILL_CAP: ${{ github.event.inputs.cap || '50' }}
+          WARMUP_RETRIES: 11
+          WRITE_RETRIES: 10
+          FLUSH_EVERY: 5
+        run: python scripts/web_backfill.py
