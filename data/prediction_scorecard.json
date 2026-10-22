@@ -2,7 +2,7 @@
   "view": "prediction_scorecard",
   "schema": "prediction_scorecard_v1",
   "note": "羽根予想の答え合わせ（as-of・リーク無し）。holdout=過去を70/30分割しtrainだけで学習しtestを採点（honestなバックテスト）。live=発売前に記録した予測→発売後の結果（最も硬い真のout-of-sample・日々増える）。calibration は「◯%と予測した群が実際に何%跳ねたか」＝予測と実測が近いほど信頼できる。",
-  "generated_at": "2026-10-21T10:53:26.794989+00:00",
+  "generated_at": "2026-10-22T10:54:04.633232+00:00",
   "params": {
     "lookback_days": 180,
     "outcome_days": 14,
@@ -18,20 +18,20 @@
     ]
   },
   "holdout": {
-    "n_pairs": 8614,
-    "train_n": 6098,
-    "test_n": 2516,
+    "n_pairs": 8721,
+    "train_n": 6165,
+    "test_n": 2556,
     "ready": true,
     "metrics": {
-      "n": 2516,
+      "n": 2556,
       "hits": 91,
-      "base_rate": 0.03617,
-      "top_decile_n": 251,
-      "top_decile_rate": 0.23506,
+      "base_rate": 0.0356,
+      "top_decile_n": 255,
+      "top_decile_rate": 0.23137,
       "top_decile_lift": 6.5,
-      "brier": 0.02688,
-      "high_conf_n": 161,
-      "high_conf_rate": 0.30435
+      "brier": 0.02641,
+      "high_conf_n": 235,
+      "high_conf_rate": 0.25106
     },
     "calibration": [
       {
@@ -39,54 +39,54 @@
           0.0,
           0.02
         ],
-        "n": 1835,
-        "pred_mean": 0.0093,
-        "actual_rate": 0.0071
+        "n": 1797,
+        "pred_mean": 0.0089,
+        "actual_rate": 0.0061
       },
       {
         "range": [
           0.02,
           0.05
         ],
-        "n": 326,
-        "pred_mean": 0.039,
-        "actual_rate": 0.0368
+        "n": 401,
+        "pred_mean": 0.0359,
+        "actual_rate": 0.0349
       },
       {
         "range": [
           0.05,
           0.1
         ],
-        "n": 120,
-        "pred_mean": 0.0719,
-        "actual_rate": 0.0583
+        "n": 122,
+        "pred_mean": 0.0716,
+        "actual_rate": 0.0574
       },
       {
         "range": [
           0.1,
           0.2
         ],
-        "n": 135,
-        "pred_mean": 0.1269,
-        "actual_rate": 0.1259
+        "n": 133,
+        "pred_mean": 0.1251,
+        "actual_rate": 0.1203
       },
       {
         "range": [
           0.2,
           0.4
         ],
-        "n": 59,
-        "pred_mean": 0.3183,
-        "actual_rate": 0.3051
+        "n": 63,
+        "pred_mean": 0.3094,
+        "actual_rate": 0.3016
       },
       {
         "range": [
           0.4,
           1.0
         ],
-        "n": 41,
-        "pred_mean": 0.7137,
-        "actual_rate": 0.5854
+        "n": 40,
+        "pred_mean": 0.7177,
+        "actual_rate": 0.6
       }
     ],
     "examples": [
@@ -118,7 +118,7 @@
         "appid": 2764460,
         "name": "Sandustry",
         "release": "2026-08-13",
-        "pred": 0.9967,
+        "pred": 0.9966,
         "hit": true,
         "launch_peak": 12531
       },
@@ -126,7 +126,7 @@
         "appid": 3883570,
         "name": "Invokyr",
         "release": "2026-10-08",
-        "pred": 0.9955,
+        "pred": 0.9952,
         "hit": true,
         "launch_peak": 10009
       },
@@ -134,7 +134,7 @@
         "appid": 3808690,
         "name": "Pathogenic",
         "release": "2026-07-16",
-        "pred": 0.9864,
+        "pred": 0.986,
         "hit": true,
         "launch_peak": 5893
       },
@@ -142,7 +142,7 @@
         "appid": 5085740,
         "name": "Needle in a Haystack",
         "release": "2026-09-29",
-        "pred": 0.9803,
+        "pred": 0.9798,
         "hit": false,
         "launch_peak": 547
       },
@@ -150,7 +150,7 @@
         "appid": 3669870,
         "name": "CONTROL Resonant",
         "release": "2026-09-24",
-        "pred": 0.9593,
+        "pred": 0.9587,
         "hit": true,
         "launch_peak": 42770
       },
@@ -158,39 +158,39 @@
         "appid": 3010850,
         "name": "Gears of War: E-Day",
         "release": "2026-10-06",
-        "pred": 0.9522,
+        "pred": 0.9534,
         "hit": true,
         "launch_peak": 28695
-      },
-      {
-        "appid": 2936290,
-        "name": "The Life and Suffering of Prince Jerian",
-        "release": "2026-07-20",
-        "pred": 0.8889,
-        "hit": true,
-        "launch_peak": 1775
-      },
-      {
-        "appid": 3276050,
-        "name": "SpaceCraft",
-        "release": "2026-06-11",
-        "pred": 0.8864,
-        "hit": true,
-        "launch_peak": 7685
       },
       {
         "appid": 3751950,
         "name": "Assassin's Creed Black Flag Resynced",
         "release": "2026-07-09",
-        "pred": 0.8846,
+        "pred": 0.8873,
         "hit": true,
         "launch_peak": 104679
+      },
+      {
+        "appid": 3276050,
+        "name": "SpaceCraft",
+        "release": "2026-06-11",
+        "pred": 0.8861,
+        "hit": true,
+        "launch_peak": 7685
+      },
+      {
+        "appid": 2936290,
+        "name": "The Life and Suffering of Prince Jerian",
+        "release": "2026-07-20",
+        "pred": 0.8853,
+        "hit": true,
+        "launch_peak": 1775
       },
       {
         "appid": 3949550,
         "name": "1666: Amsterdam",
         "release": "2026-08-25",
-        "pred": 0.8771,
+        "pred": 0.8786,
         "hit": true,
         "launch_peak": 1456
       },
@@ -198,7 +198,7 @@
         "appid": 2333000,
         "name": "Silver Pines",
         "release": "2026-10-08",
-        "pred": 0.8496,
+        "pred": 0.8469,
         "hit": true,
         "launch_peak": 4550
       },
@@ -206,7 +206,7 @@
         "appid": 2001760,
         "name": "Beast of Reincarnation",
         "release": "2026-08-03",
-        "pred": 0.8354,
+        "pred": 0.8353,
         "hit": true,
         "launch_peak": 14995
       }
@@ -215,35 +215,35 @@
   "live": {
     "counts": {
       "settling": {
-        "n": 848,
+        "n": 789,
         "hits": 0
       },
       "pending": {
-        "n": 1753,
+        "n": 1711,
         "hits": 0
       },
       "resolved": {
-        "n": 4347,
-        "hits": 188
+        "n": 4457,
+        "hits": 195
       },
       "unobserved": {
-        "n": 1915,
+        "n": 1961,
         "hits": 0
       }
     },
-    "pending": 1753,
-    "settling": 848,
-    "resolved": 4347,
+    "pending": 1711,
+    "settling": 789,
+    "resolved": 4457,
     "metrics": {
-      "n": 4347,
-      "hits": 188,
-      "base_rate": 0.04325,
-      "top_decile_n": 434,
-      "top_decile_rate": 0.27419,
-      "top_decile_lift": 6.34,
-      "brier": 0.03198,
-      "high_conf_n": 314,
-      "high_conf_rate": 0.34713
+      "n": 4457,
+      "hits": 195,
+      "base_rate": 0.04375,
+      "top_decile_n": 445,
+      "top_decile_rate": 0.27865,
+      "top_decile_lift": 6.37,
+      "brier": 0.03187,
+      "high_conf_n": 316,
+      "high_conf_rate": 0.35759
     },
     "calibration": [
       {
@@ -251,8 +251,8 @@
           0.0,
           0.02
         ],
-        "n": 3243,
-        "pred_mean": 0.0048,
+        "n": 3335,
+        "pred_mean": 0.0047,
         "actual_rate": 0.0114
       },
       {
@@ -260,18 +260,18 @@
           0.02,
           0.05
         ],
-        "n": 527,
+        "n": 538,
         "pred_mean": 0.0308,
-        "actual_rate": 0.0417
+        "actual_rate": 0.0446
       },
       {
         "range": [
           0.05,
           0.1
         ],
-        "n": 230,
+        "n": 233,
         "pred_mean": 0.0732,
-        "actual_rate": 0.0783
+        "actual_rate": 0.0773
       },
       {
         "range": [
@@ -296,12 +296,21 @@
           0.4,
           1.0
         ],
-        "n": 177,
-        "pred_mean": 0.6717,
-        "actual_rate": 0.4915
+        "n": 181,
+        "pred_mean": 0.6763,
+        "actual_rate": 0.5028
       }
     ],
     "examples": [
+      {
+        "appid": 1551980,
+        "name": "Clive Barker's Hellraiser: Revival",
+        "release": "2026-10-08",
+        "pred": 0.9999,
+        "hit": true,
+        "launch_peak": 9475,
+        "predicted_at": "2026-10-01T09:26:16.176132+00:00"
+      },
       {
         "appid": 2584270,
         "name": "Mortal Shell II",
@@ -427,15 +436,6 @@
         "hit": true,
         "launch_peak": 1456,
         "predicted_at": "2026-08-20T03:31:21.339696+00:00"
-      },
-      {
-        "appid": 3597200,
-        "name": "Grail",
-        "release": "2026-09-01",
-        "pred": 0.9885,
-        "hit": false,
-        "launch_peak": 822,
-        "predicted_at": "2026-08-28T14:36:13.225125+00:00"
       }
     ]
   }
