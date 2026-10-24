@@ -2,7 +2,7 @@
   "view": "prediction_scorecard",
   "schema": "prediction_scorecard_v1",
   "note": "羽根予想の答え合わせ（as-of・リーク無し）。holdout=過去を70/30分割しtrainだけで学習しtestを採点（honestなバックテスト）。live=発売前に記録した予測→発売後の結果（最も硬い真のout-of-sample・日々増える）。calibration は「◯%と予測した群が実際に何%跳ねたか」＝予測と実測が近いほど信頼できる。",
-  "generated_at": "2026-10-23T10:45:09.732653+00:00",
+  "generated_at": "2026-10-24T10:02:03.022349+00:00",
   "params": {
     "lookback_days": 180,
     "outcome_days": 14,
@@ -18,20 +18,20 @@
     ]
   },
   "holdout": {
-    "n_pairs": 8847,
-    "train_n": 6245,
-    "test_n": 2602,
+    "n_pairs": 8980,
+    "train_n": 6346,
+    "test_n": 2634,
     "ready": true,
     "metrics": {
-      "n": 2602,
+      "n": 2634,
       "hits": 91,
-      "base_rate": 0.03497,
-      "top_decile_n": 260,
-      "top_decile_rate": 0.22692,
-      "top_decile_lift": 6.49,
-      "brier": 0.02599,
-      "high_conf_n": 238,
-      "high_conf_rate": 0.2479
+      "base_rate": 0.03455,
+      "top_decile_n": 263,
+      "top_decile_rate": 0.23194,
+      "top_decile_lift": 6.71,
+      "brier": 0.02554,
+      "high_conf_n": 175,
+      "high_conf_rate": 0.28571
     },
     "calibration": [
       {
@@ -39,54 +39,54 @@
           0.0,
           0.02
         ],
-        "n": 1840,
-        "pred_mean": 0.0087,
-        "actual_rate": 0.006
+        "n": 1910,
+        "pred_mean": 0.0091,
+        "actual_rate": 0.0063
       },
       {
         "range": [
           0.02,
           0.05
         ],
-        "n": 403,
-        "pred_mean": 0.0356,
-        "actual_rate": 0.0347
+        "n": 331,
+        "pred_mean": 0.0368,
+        "actual_rate": 0.0332
       },
       {
         "range": [
           0.05,
           0.1
         ],
-        "n": 121,
-        "pred_mean": 0.0712,
-        "actual_rate": 0.0579
+        "n": 218,
+        "pred_mean": 0.081,
+        "actual_rate": 0.0826
       },
       {
         "range": [
           0.1,
           0.2
         ],
-        "n": 137,
-        "pred_mean": 0.1268,
-        "actual_rate": 0.1241
+        "n": 78,
+        "pred_mean": 0.1444,
+        "actual_rate": 0.1154
       },
       {
         "range": [
           0.2,
           0.4
         ],
-        "n": 61,
-        "pred_mean": 0.3147,
-        "actual_rate": 0.2951
+        "n": 58,
+        "pred_mean": 0.3328,
+        "actual_rate": 0.2759
       },
       {
         "range": [
           0.4,
           1.0
         ],
-        "n": 40,
-        "pred_mean": 0.7189,
-        "actual_rate": 0.6
+        "n": 39,
+        "pred_mean": 0.7269,
+        "actual_rate": 0.641
       }
     ],
     "examples": [
@@ -102,7 +102,7 @@
         "appid": 2638890,
         "name": "Onimusha: Way of the Sword",
         "release": "2026-09-03",
-        "pred": 0.9998,
+        "pred": 0.9996,
         "hit": true,
         "launch_peak": 84889
       },
@@ -118,7 +118,7 @@
         "appid": 2764460,
         "name": "Sandustry",
         "release": "2026-08-13",
-        "pred": 0.9966,
+        "pred": 0.9965,
         "hit": true,
         "launch_peak": 12531
       },
@@ -126,7 +126,7 @@
         "appid": 3883570,
         "name": "Invokyr",
         "release": "2026-10-08",
-        "pred": 0.9953,
+        "pred": 0.9952,
         "hit": true,
         "launch_peak": 10009
       },
@@ -134,7 +134,7 @@
         "appid": 3808690,
         "name": "Pathogenic",
         "release": "2026-07-16",
-        "pred": 0.9863,
+        "pred": 0.9841,
         "hit": true,
         "launch_peak": 5893
       },
@@ -142,39 +142,31 @@
         "appid": 5085740,
         "name": "Needle in a Haystack",
         "release": "2026-09-29",
-        "pred": 0.9801,
+        "pred": 0.9784,
         "hit": false,
         "launch_peak": 547
-      },
-      {
-        "appid": 3669870,
-        "name": "CONTROL Resonant",
-        "release": "2026-09-24",
-        "pred": 0.9575,
-        "hit": true,
-        "launch_peak": 42770
       },
       {
         "appid": 3010850,
         "name": "Gears of War: E-Day",
         "release": "2026-10-06",
-        "pred": 0.9511,
+        "pred": 0.9715,
         "hit": true,
         "launch_peak": 28695
       },
       {
-        "appid": 3276050,
-        "name": "SpaceCraft",
-        "release": "2026-06-11",
-        "pred": 0.8909,
+        "appid": 3669870,
+        "name": "CONTROL Resonant",
+        "release": "2026-09-24",
+        "pred": 0.943,
         "hit": true,
-        "launch_peak": 7685
+        "launch_peak": 42770
       },
       {
         "appid": 3751950,
         "name": "Assassin's Creed Black Flag Resynced",
         "release": "2026-07-09",
-        "pred": 0.8891,
+        "pred": 0.9249,
         "hit": true,
         "launch_peak": 104679
       },
@@ -182,15 +174,23 @@
         "appid": 2936290,
         "name": "The Life and Suffering of Prince Jerian",
         "release": "2026-07-20",
-        "pred": 0.8857,
+        "pred": 0.8761,
         "hit": true,
         "launch_peak": 1775
+      },
+      {
+        "appid": 3276050,
+        "name": "SpaceCraft",
+        "release": "2026-06-11",
+        "pred": 0.8753,
+        "hit": true,
+        "launch_peak": 7685
       },
       {
         "appid": 3949550,
         "name": "1666: Amsterdam",
         "release": "2026-08-25",
-        "pred": 0.8803,
+        "pred": 0.8691,
         "hit": true,
         "launch_peak": 1456
       },
@@ -198,52 +198,52 @@
         "appid": 2333000,
         "name": "Silver Pines",
         "release": "2026-10-08",
-        "pred": 0.8487,
+        "pred": 0.8506,
         "hit": true,
         "launch_peak": 4550
       },
       {
-        "appid": 2001760,
-        "name": "Beast of Reincarnation",
-        "release": "2026-08-03",
-        "pred": 0.8361,
+        "appid": 3448650,
+        "name": "Aliens: Fireteam Elite 2",
+        "release": "2026-08-25",
+        "pred": 0.8252,
         "hit": true,
-        "launch_peak": 14995
+        "launch_peak": 7413
       }
     ]
   },
   "live": {
     "counts": {
       "settling": {
-        "n": 795,
+        "n": 912,
         "hits": 0
       },
       "pending": {
-        "n": 1678,
+        "n": 1601,
         "hits": 0
       },
       "resolved": {
-        "n": 4538,
+        "n": 4556,
         "hits": 198
       },
       "unobserved": {
-        "n": 1994,
+        "n": 2000,
         "hits": 0
       }
     },
-    "pending": 1678,
-    "settling": 795,
-    "resolved": 4538,
+    "pending": 1601,
+    "settling": 912,
+    "resolved": 4556,
     "metrics": {
-      "n": 4538,
+      "n": 4556,
       "hits": 198,
-      "base_rate": 0.04363,
-      "top_decile_n": 453,
-      "top_decile_rate": 0.27815,
+      "base_rate": 0.04346,
+      "top_decile_n": 455,
+      "top_decile_rate": 0.27692,
       "top_decile_lift": 6.37,
-      "brier": 0.03185,
-      "high_conf_n": 320,
-      "high_conf_rate": 0.35625
+      "brier": 0.03173,
+      "high_conf_n": 321,
+      "high_conf_rate": 0.35514
     },
     "calibration": [
       {
@@ -251,18 +251,18 @@
           0.0,
           0.02
         ],
-        "n": 3401,
+        "n": 3417,
         "pred_mean": 0.0048,
-        "actual_rate": 0.0112
+        "actual_rate": 0.0111
       },
       {
         "range": [
           0.02,
           0.05
         ],
-        "n": 546,
+        "n": 548,
         "pred_mean": 0.0307,
-        "actual_rate": 0.044
+        "actual_rate": 0.0438
       },
       {
         "range": [
