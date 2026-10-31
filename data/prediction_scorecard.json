@@ -2,7 +2,7 @@
   "view": "prediction_scorecard",
   "schema": "prediction_scorecard_v1",
   "note": "羽根予想の答え合わせ（as-of・リーク無し）。holdout=過去を70/30分割しtrainだけで学習しtestを採点（honestなバックテスト）。live=発売前に記録した予測→発売後の結果（最も硬い真のout-of-sample・日々増える）。calibration は「◯%と予測した群が実際に何%跳ねたか」＝予測と実測が近いほど信頼できる。",
-  "generated_at": "2026-10-30T11:54:19.867790+00:00",
+  "generated_at": "2026-10-31T11:28:09.801480+00:00",
   "params": {
     "lookback_days": 180,
     "outcome_days": 14,
@@ -18,20 +18,20 @@
     ]
   },
   "holdout": {
-    "n_pairs": 9514,
-    "train_n": 6732,
-    "test_n": 2782,
+    "n_pairs": 9647,
+    "train_n": 6833,
+    "test_n": 2814,
     "ready": true,
     "metrics": {
-      "n": 2782,
-      "hits": 94,
-      "base_rate": 0.03379,
-      "top_decile_n": 278,
-      "top_decile_rate": 0.21583,
-      "top_decile_lift": 6.39,
-      "brier": 0.02477,
-      "high_conf_n": 235,
-      "high_conf_rate": 0.24255
+      "n": 2814,
+      "hits": 95,
+      "base_rate": 0.03376,
+      "top_decile_n": 281,
+      "top_decile_rate": 0.21708,
+      "top_decile_lift": 6.43,
+      "brier": 0.02511,
+      "high_conf_n": 206,
+      "high_conf_rate": 0.27184
     },
     "calibration": [
       {
@@ -39,54 +39,54 @@
           0.0,
           0.02
         ],
-        "n": 1956,
-        "pred_mean": 0.0091,
-        "actual_rate": 0.0061
+        "n": 1924,
+        "pred_mean": 0.0083,
+        "actual_rate": 0.0052
       },
       {
         "range": [
           0.02,
           0.05
         ],
-        "n": 393,
-        "pred_mean": 0.0328,
-        "actual_rate": 0.0305
+        "n": 400,
+        "pred_mean": 0.028,
+        "actual_rate": 0.03
       },
       {
         "range": [
           0.05,
           0.1
         ],
-        "n": 194,
-        "pred_mean": 0.0673,
-        "actual_rate": 0.067
+        "n": 282,
+        "pred_mean": 0.0659,
+        "actual_rate": 0.0603
       },
       {
         "range": [
           0.1,
           0.2
         ],
-        "n": 132,
-        "pred_mean": 0.1241,
-        "actual_rate": 0.1061
+        "n": 98,
+        "pred_mean": 0.138,
+        "actual_rate": 0.1327
       },
       {
         "range": [
           0.2,
           0.4
         ],
-        "n": 59,
-        "pred_mean": 0.2919,
-        "actual_rate": 0.2712
+        "n": 61,
+        "pred_mean": 0.2631,
+        "actual_rate": 0.2459
       },
       {
         "range": [
           0.4,
           1.0
         ],
-        "n": 48,
-        "pred_mean": 0.69,
-        "actual_rate": 0.5625
+        "n": 49,
+        "pred_mean": 0.7057,
+        "actual_rate": 0.5714
       }
     ],
     "examples": [
@@ -102,9 +102,17 @@
         "appid": 1551980,
         "name": "Clive Barker's Hellraiser: Revival",
         "release": "2026-10-08",
-        "pred": 1.0,
+        "pred": 0.9999,
         "hit": true,
         "launch_peak": 9475
+      },
+      {
+        "appid": 2638890,
+        "name": "Onimusha: Way of the Sword",
+        "release": "2026-09-03",
+        "pred": 0.9998,
+        "hit": true,
+        "launch_peak": 84889
       },
       {
         "appid": 4225980,
@@ -115,26 +123,18 @@
         "launch_peak": 15335
       },
       {
-        "appid": 2638890,
-        "name": "Onimusha: Way of the Sword",
-        "release": "2026-09-03",
-        "pred": 0.9996,
-        "hit": true,
-        "launch_peak": 84889
-      },
-      {
-        "appid": 3883570,
-        "name": "Invokyr",
-        "release": "2026-10-08",
-        "pred": 0.9953,
-        "hit": true,
-        "launch_peak": 10009
+        "appid": 4487060,
+        "name": "Northgard Battlegrounds",
+        "release": "2026-10-27",
+        "pred": 0.9976,
+        "hit": false,
+        "launch_peak": 588
       },
       {
         "appid": 2764460,
         "name": "Sandustry",
         "release": "2026-08-13",
-        "pred": 0.9938,
+        "pred": 0.9942,
         "hit": true,
         "launch_peak": 12531
       },
@@ -142,63 +142,55 @@
         "appid": 3808690,
         "name": "Pathogenic",
         "release": "2026-07-16",
-        "pred": 0.9873,
+        "pred": 0.9908,
         "hit": true,
         "launch_peak": 5893
       },
       {
-        "appid": 3010850,
-        "name": "Gears of War: E-Day",
-        "release": "2026-10-06",
-        "pred": 0.9762,
+        "appid": 3883570,
+        "name": "Invokyr",
+        "release": "2026-10-08",
+        "pred": 0.9908,
         "hit": true,
-        "launch_peak": 28695
+        "launch_peak": 10009
       },
       {
         "appid": 3024130,
         "name": "Pao Pao",
         "release": "2026-10-26",
-        "pred": 0.9723,
+        "pred": 0.9716,
         "hit": true,
         "launch_peak": 3791
-      },
-      {
-        "appid": 5085740,
-        "name": "Needle in a Haystack",
-        "release": "2026-09-29",
-        "pred": 0.9581,
-        "hit": false,
-        "launch_peak": 547
       },
       {
         "appid": 3669870,
         "name": "CONTROL Resonant",
         "release": "2026-09-24",
-        "pred": 0.9493,
+        "pred": 0.97,
         "hit": true,
         "launch_peak": 42770
       },
       {
-        "appid": 3751950,
-        "name": "Assassin's Creed Black Flag Resynced",
-        "release": "2026-07-09",
-        "pred": 0.9211,
+        "appid": 3010850,
+        "name": "Gears of War: E-Day",
+        "release": "2026-10-06",
+        "pred": 0.9653,
         "hit": true,
-        "launch_peak": 104679
+        "launch_peak": 28695
       },
       {
-        "appid": 3949550,
-        "name": "1666: Amsterdam",
-        "release": "2026-08-25",
-        "pred": 0.9132,
-        "hit": true,
-        "launch_peak": 1456
+        "appid": 5085740,
+        "name": "Needle in a Haystack",
+        "release": "2026-09-29",
+        "pred": 0.9609,
+        "hit": false,
+        "launch_peak": 547
       },
       {
         "appid": 2936290,
         "name": "The Life and Suffering of Prince Jerian",
         "release": "2026-07-20",
-        "pred": 0.9029,
+        "pred": 0.9257,
         "hit": true,
         "launch_peak": 1775
       },
@@ -206,42 +198,50 @@
         "appid": 3276050,
         "name": "SpaceCraft",
         "release": "2026-06-11",
-        "pred": 0.885,
+        "pred": 0.9153,
         "hit": true,
         "launch_peak": 7685
+      },
+      {
+        "appid": 3751950,
+        "name": "Assassin's Creed Black Flag Resynced",
+        "release": "2026-07-09",
+        "pred": 0.8986,
+        "hit": true,
+        "launch_peak": 104679
       }
     ]
   },
   "live": {
     "counts": {
       "settling": {
-        "n": 784,
+        "n": 916,
         "hits": 0
       },
       "pending": {
-        "n": 1958,
+        "n": 2103,
         "hits": 0
       },
       "resolved": {
-        "n": 4993,
+        "n": 5007,
         "hits": 210
       },
       "unobserved": {
-        "n": 2158,
+        "n": 2175,
         "hits": 0
       }
     },
-    "pending": 1958,
-    "settling": 784,
-    "resolved": 4993,
+    "pending": 2103,
+    "settling": 916,
+    "resolved": 5007,
     "metrics": {
-      "n": 4993,
+      "n": 5007,
       "hits": 210,
-      "base_rate": 0.04206,
-      "top_decile_n": 499,
-      "top_decile_rate": 0.27054,
-      "top_decile_lift": 6.43,
-      "brier": 0.03056,
+      "base_rate": 0.04194,
+      "top_decile_n": 500,
+      "top_decile_rate": 0.27,
+      "top_decile_lift": 6.44,
+      "brier": 0.03048,
       "high_conf_n": 346,
       "high_conf_rate": 0.35549
     },
@@ -251,7 +251,7 @@
           0.0,
           0.02
         ],
-        "n": 3770,
+        "n": 3784,
         "pred_mean": 0.0049,
         "actual_rate": 0.0103
       },
