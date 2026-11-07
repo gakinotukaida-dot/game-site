@@ -251,12 +251,26 @@ def main():
         print(f"    OOS: base={hm.get('base_rate')} 上位十分位 {hm.get('top_decile_rate')}"
               f"（lift {hm.get('top_decile_lift')}）Brier {hm.get('brier')}"
               f" 高確度群 {hm.get('high_conf_rate')}（n={hm.get('high_conf_n')}）")
+        bands = [b for b in (holdout.get("calibration") or []) if b.get("n", 0) > 0]
+        if bands:
+            b = max(bands, key=lambda x: x["range"][0])
+            print(f"    holdout 較正: 上位帯 [{b['range'][0]},{b['range'][1]}) 予測平均 {b['pred_mean']}"
+                  f" 実測 {b['actual_rate']} n={b['n']}")
+        else:
+            print("    holdout 較正の帯なし")
     if live is None:
         print("  live: prediction_log 未作成（prediction_log_sweep 未実行）＝実運用の対はこれから貯まる。")
     else:
         lm = live.get("metrics") or {}
         print(f"  live: 予測中 {live.get('pending')} / 答え合わせ待ち {live.get('settling')} / 確定 {live.get('resolved')} 件"
               f"（的中率 base={lm.get('base_rate')} 上位十分位lift {lm.get('top_decile_lift')}）")
+        bands = [b for b in (live.get("calibration") or []) if b.get("n", 0) > 0]
+        if bands:
+            b = max(bands, key=lambda x: x["range"][0])
+            print(f"    live 較正: 上位帯 [{b['range'][0]},{b['range'][1]}) 予測平均 {b['pred_mean']}"
+                  f" 実測 {b['actual_rate']} n={b['n']}")
+        else:
+            print("    live 較正の帯なし")
 
 
 if __name__ == "__main__":
