@@ -1086,7 +1086,7 @@ def main():
             "confidence": r["conf_code"],
             "score": {"eff": round(r["eff"], 2), "base": round(r["base"], 2),
                       "boost": round(r["boost"], 2), "boost_capped": bool(r["boost_capped"])},
-            # 折れ線グラフ用の観測履歴（[[ts,ccu],...]・6hバケット・now_ccuと同形式）。無い作品は付けない。
+            # 折れ線グラフ用の観測履歴（[[ts,ccu],...]・6hバケット・now_ccuと同形式）。無い作品は空配列 []。
             "history": hist_by.get(int(r["appid"]), []),
         }
         if HOUR_MATCHED:  # ⑤ 時刻整合の平常値を使えたか（1=A′採用 / 0=日数不足で現行の平常値＋確度は降格済み）
