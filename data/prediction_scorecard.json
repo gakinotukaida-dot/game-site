@@ -2,7 +2,7 @@
   "view": "prediction_scorecard",
   "schema": "prediction_scorecard_v1",
   "note": "羽根予想の答え合わせ（as-of・リーク無し）。holdout=過去を70/30分割しtrainだけで学習しtestを採点（honestなバックテスト）。live=発売前に記録した予測→発売後の結果（最も硬い真のout-of-sample・日々増える）。calibration は「◯%と予測した群が実際に何%跳ねたか」＝予測と実測が近いほど信頼できる。",
-  "generated_at": "2026-11-18T14:51:37.495023+00:00",
+  "generated_at": "2026-11-19T14:57:31.310759+00:00",
   "params": {
     "lookback_days": 180,
     "outcome_days": 14,
@@ -18,20 +18,20 @@
     ]
   },
   "holdout": {
-    "n_pairs": 11564,
-    "train_n": 8188,
-    "test_n": 3376,
+    "n_pairs": 11789,
+    "train_n": 8340,
+    "test_n": 3449,
     "ready": true,
     "metrics": {
-      "n": 3376,
-      "hits": 107,
-      "base_rate": 0.03169,
-      "top_decile_n": 337,
-      "top_decile_rate": 0.20178,
-      "top_decile_lift": 6.37,
-      "brier": 0.02375,
-      "high_conf_n": 244,
-      "high_conf_rate": 0.2582
+      "n": 3449,
+      "hits": 108,
+      "base_rate": 0.03131,
+      "top_decile_n": 344,
+      "top_decile_rate": 0.2064,
+      "top_decile_lift": 6.59,
+      "brier": 0.02343,
+      "high_conf_n": 251,
+      "high_conf_rate": 0.25498
     },
     "calibration": [
       {
@@ -39,54 +39,54 @@
           0.0,
           0.02
         ],
-        "n": 2281,
+        "n": 2325,
         "pred_mean": 0.0078,
-        "actual_rate": 0.0053
+        "actual_rate": 0.0052
       },
       {
         "range": [
           0.02,
           0.05
         ],
-        "n": 477,
-        "pred_mean": 0.0258,
-        "actual_rate": 0.0231
+        "n": 494,
+        "pred_mean": 0.0255,
+        "actual_rate": 0.0223
       },
       {
         "range": [
           0.05,
           0.1
         ],
-        "n": 377,
-        "pred_mean": 0.063,
-        "actual_rate": 0.0557
+        "n": 385,
+        "pred_mean": 0.0614,
+        "actual_rate": 0.0545
       },
       {
         "range": [
           0.1,
           0.2
         ],
-        "n": 112,
-        "pred_mean": 0.1418,
-        "actual_rate": 0.1339
+        "n": 116,
+        "pred_mean": 0.1389,
+        "actual_rate": 0.1293
       },
       {
         "range": [
           0.2,
           0.4
         ],
-        "n": 74,
-        "pred_mean": 0.2483,
-        "actual_rate": 0.2432
+        "n": 73,
+        "pred_mean": 0.2437,
+        "actual_rate": 0.2603
       },
       {
         "range": [
           0.4,
           1.0
         ],
-        "n": 55,
-        "pred_mean": 0.6579,
-        "actual_rate": 0.5455
+        "n": 56,
+        "pred_mean": 0.6497,
+        "actual_rate": 0.5357
       }
     ],
     "examples": [
@@ -102,7 +102,7 @@
         "appid": 1551980,
         "name": "Clive Barker's Hellraiser: Revival",
         "release": "2026-10-08",
-        "pred": 0.9998,
+        "pred": 0.9997,
         "hit": true,
         "launch_peak": 9475
       },
@@ -110,7 +110,7 @@
         "appid": 2638890,
         "name": "Onimusha: Way of the Sword",
         "release": "2026-09-03",
-        "pred": 0.9995,
+        "pred": 0.9992,
         "hit": true,
         "launch_peak": 84889
       },
@@ -118,7 +118,7 @@
         "appid": 4225980,
         "name": "Trails in the Sky 2nd Chapter",
         "release": "2026-09-16",
-        "pred": 0.9993,
+        "pred": 0.9989,
         "hit": true,
         "launch_peak": 15335
       },
@@ -126,31 +126,31 @@
         "appid": 4487060,
         "name": "Northgard Battlegrounds",
         "release": "2026-10-27",
-        "pred": 0.9939,
+        "pred": 0.9905,
         "hit": false,
         "launch_peak": 588
-      },
-      {
-        "appid": 2764460,
-        "name": "Sandustry",
-        "release": "2026-08-13",
-        "pred": 0.9843,
-        "hit": true,
-        "launch_peak": 12531
       },
       {
         "appid": 3808690,
         "name": "Pathogenic",
         "release": "2026-07-16",
-        "pred": 0.9836,
+        "pred": 0.9775,
         "hit": true,
         "launch_peak": 5893
+      },
+      {
+        "appid": 2764460,
+        "name": "Sandustry",
+        "release": "2026-08-13",
+        "pred": 0.9763,
+        "hit": true,
+        "launch_peak": 12531
       },
       {
         "appid": 3883570,
         "name": "Invokyr",
         "release": "2026-10-08",
-        "pred": 0.9782,
+        "pred": 0.9673,
         "hit": true,
         "launch_peak": 10009
       },
@@ -158,7 +158,7 @@
         "appid": 3669870,
         "name": "CONTROL Resonant",
         "release": "2026-09-24",
-        "pred": 0.9604,
+        "pred": 0.9594,
         "hit": true,
         "launch_peak": 42770
       },
@@ -166,7 +166,7 @@
         "appid": 3024130,
         "name": "Pao Pao",
         "release": "2026-10-26",
-        "pred": 0.9555,
+        "pred": 0.9553,
         "hit": true,
         "launch_peak": 5729
       },
@@ -174,76 +174,76 @@
         "appid": 3010850,
         "name": "Gears of War: E-Day",
         "release": "2026-10-06",
-        "pred": 0.9359,
+        "pred": 0.9328,
         "hit": true,
         "launch_peak": 28695
-      },
-      {
-        "appid": 5085740,
-        "name": "Needle in a Haystack",
-        "release": "2026-09-29",
-        "pred": 0.9282,
-        "hit": false,
-        "launch_peak": 547
       },
       {
         "appid": 2936290,
         "name": "The Life and Suffering of Prince Jerian",
         "release": "2026-07-20",
-        "pred": 0.9042,
+        "pred": 0.9024,
         "hit": true,
         "launch_peak": 1775
+      },
+      {
+        "appid": 5085740,
+        "name": "Needle in a Haystack",
+        "release": "2026-09-29",
+        "pred": 0.8968,
+        "hit": false,
+        "launch_peak": 547
       },
       {
         "appid": 3276050,
         "name": "SpaceCraft",
         "release": "2026-06-11",
-        "pred": 0.8898,
+        "pred": 0.8855,
         "hit": true,
         "launch_peak": 7685
       },
       {
-        "appid": 4576490,
-        "name": "Casualties: Unknown",
-        "release": "2026-11-09",
-        "pred": 0.8821,
+        "appid": 3751950,
+        "name": "Assassin's Creed Black Flag Resynced",
+        "release": "2026-07-09",
+        "pred": 0.8804,
         "hit": true,
-        "launch_peak": 7073
+        "launch_peak": 104679
       }
     ]
   },
   "live": {
     "counts": {
       "settling": {
-        "n": 683,
+        "n": 677,
         "hits": 0
       },
       "pending": {
-        "n": 2018,
+        "n": 1950,
         "hits": 0
       },
       "resolved": {
-        "n": 6177,
+        "n": 6264,
         "hits": 237
       },
       "unobserved": {
-        "n": 3009,
+        "n": 3067,
         "hits": 0
       }
     },
-    "pending": 2018,
-    "settling": 683,
-    "resolved": 6177,
+    "pending": 1950,
+    "settling": 677,
+    "resolved": 6264,
     "metrics": {
-      "n": 6177,
+      "n": 6264,
       "hits": 237,
-      "base_rate": 0.03837,
-      "top_decile_n": 617,
-      "top_decile_rate": 0.24959,
-      "top_decile_lift": 6.51,
-      "brier": 0.02867,
-      "high_conf_n": 403,
-      "high_conf_rate": 0.33747
+      "base_rate": 0.03784,
+      "top_decile_n": 626,
+      "top_decile_rate": 0.2476,
+      "top_decile_lift": 6.54,
+      "brier": 0.02838,
+      "high_conf_n": 412,
+      "high_conf_rate": 0.3301
     },
     "calibration": [
       {
@@ -251,54 +251,54 @@
           0.0,
           0.02
         ],
-        "n": 4782,
+        "n": 4851,
         "pred_mean": 0.0049,
-        "actual_rate": 0.0109
+        "actual_rate": 0.0107
       },
       {
         "range": [
           0.02,
           0.05
         ],
-        "n": 670,
+        "n": 678,
         "pred_mean": 0.0302,
-        "actual_rate": 0.0388
+        "actual_rate": 0.0383
       },
       {
         "range": [
           0.05,
           0.1
         ],
-        "n": 295,
-        "pred_mean": 0.0712,
-        "actual_rate": 0.0644
+        "n": 301,
+        "pred_mean": 0.071,
+        "actual_rate": 0.0631
       },
       {
         "range": [
           0.1,
           0.2
         ],
-        "n": 127,
-        "pred_mean": 0.1485,
-        "actual_rate": 0.1496
+        "n": 128,
+        "pred_mean": 0.1487,
+        "actual_rate": 0.1484
       },
       {
         "range": [
           0.2,
           0.4
         ],
-        "n": 99,
-        "pred_mean": 0.2777,
-        "actual_rate": 0.2121
+        "n": 100,
+        "pred_mean": 0.277,
+        "actual_rate": 0.21
       },
       {
         "range": [
           0.4,
           1.0
         ],
-        "n": 204,
-        "pred_mean": 0.6751,
-        "actual_rate": 0.4902
+        "n": 206,
+        "pred_mean": 0.6736,
+        "actual_rate": 0.4854
       }
     ],
     "examples": [
